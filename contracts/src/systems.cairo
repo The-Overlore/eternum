@@ -11,5 +11,4 @@ mod bank;
 mod hyperstructure;
 mod buildings;
 mod npc;
-
 mod test;

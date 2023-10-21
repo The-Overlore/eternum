@@ -9,19 +9,19 @@ mod config_systems {
         LaborCostResources, LaborCostAmount, LaborConfig, CapacityConfig, RoadConfig, SpeedConfig,
         TravelConfig, WeightConfig, WorldConfig, SoldierConfig, HealthConfig, AttackConfig,
         DefenceConfig, CombatConfig, LevelingConfig, RealmFreeMintConfig, LaborBuildingsConfig,
-        LaborBuildingCost
+        LaborBuildingCost, NpcConfig
     };
 
     use eternum::systems::config::interface::{
         IWorldConfig, IWeightConfig, ICapacityConfig, ILaborConfig, ITransportConfig,
         IHyperstructureConfig, ICombatConfig, ILevelingConfig, IBankConfig, IRealmFreeMintConfig,
-        IBuildingsConfig
+        IBuildingsConfig, INpcConfig
     };
 
     use eternum::constants::{
         WORLD_CONFIG_ID, LABOR_CONFIG_ID, TRANSPORT_CONFIG_ID, ROAD_CONFIG_ID, SOLDIER_ENTITY_TYPE,
         COMBAT_CONFIG_ID, REALM_LEVELING_CONFIG_ID, HYPERSTRUCTURE_LEVELING_CONFIG_ID,
-        REALM_FREE_MINT_CONFIG_ID, BUILDING_CONFIG_ID
+        REALM_FREE_MINT_CONFIG_ID, BUILDING_CONFIG_ID, NPC_CONFIG_ID
     };
 
     use eternum::models::hyperstructure::HyperStructure;
@@ -103,6 +103,12 @@ mod config_systems {
         }
     }
 
+    #[external(v0)]
+    impl NpcConfigImpl of INpcConfig<ContractState> {
+        fn set_spawn_config(self: @ContractState, world: IWorldDispatcher, spawn_delay: u128) {
+            set!(world, (NpcConfig { config_id: NPC_CONFIG_ID, spawn_delay }));
+        }
+    }
 
     #[external(v0)]
     impl CapacityConfigImpl of ICapacityConfig<ContractState> {
@@ -577,7 +583,6 @@ mod config_systems {
             hyperstructure_id
         }
     }
-
 
     #[external(v0)]
     impl BankConfigImpl of IBankConfig<ContractState> {

@@ -73,6 +73,14 @@ trait ICombatConfig<TContractState> {
 
 
 #[starknet::interface]
+trait INpcConfig<TContractState> {
+    fn set_spawn_config(
+        self: @TContractState, world: IWorldDispatcher, spawn_delay: u128
+    );
+}
+
+
+#[starknet::interface]
 trait ILaborConfig<TContractState> {
     fn set_labor_cost_resources(
         self: @TContractState,

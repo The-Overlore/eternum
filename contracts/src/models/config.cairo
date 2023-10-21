@@ -159,7 +159,6 @@ struct WeightConfig {
     weight_gram: u128,
 }
 
-
 trait WeightConfigTrait {
     fn get_weight(world: IWorldDispatcher, resource_type: u8, amount: u128) -> u128;
 }
@@ -304,6 +303,13 @@ struct LaborBuildingCost {
     labor_category: u8,
     resource_cost_id: u128,
     resource_cost_count: u32,
+}
+
+#[derive(Model, Copy, Drop, Serde)]
+struct NpcConfig {
+    #[key]
+    config_id: u128,
+    spawn_delay: u128,
 }
 
 
