@@ -283,6 +283,11 @@ export function createOptimisticSystemCalls({
       }
     };
   }
+  
+  //   TODO: implement optimistic spawn npc
+  function optimisticSpawnNpc() {
+    return async function () {};
+  }
 
   function optimisticHarvestLabor(
     ts: number,
@@ -396,5 +401,6 @@ export function createOptimisticSystemCalls({
     optimisticBuildLabor,
     optimisticHarvestLabor,
     optimisticBuildRoad,
+    optimisticSpawnNpc,
   };
 }

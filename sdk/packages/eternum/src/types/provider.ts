@@ -224,5 +224,9 @@ export interface CreateLaborBuildingProps extends SystemSigner {
 }
 
 export interface DestroyLaborBuildingProps extends SystemSigner {
+	realm_entity_id: num.BigNumberish;
+}
+
+export interface SpawnNpcProps extends SystemSigner {
   realm_entity_id: num.BigNumberish;
 }

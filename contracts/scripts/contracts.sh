@@ -34,6 +34,9 @@ export HYPERSTRUCTURE_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contrac
 
 export BUILDINGS_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::buildings::contracts::buildings_systems" ).address')
 
+export NPC_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::npc::contracts::npc_systems" ).address')
+
+
 echo "-------------------------ADDRESS----------------------------------------"
 echo world : $SOZO_WORLD
 echo config : $CONFIG_SYSTEMS
@@ -52,3 +55,4 @@ echo name : $NAME_SYSTEMS
 echo bank : $BANK_SYSTEMS
 echo hyperstructure : $HYPERSTRUCTURE_SYSTEMS
 echo buildings : $BUILDINGS_SYSTEMS
+echo npc : $NPC_SYSTEMS

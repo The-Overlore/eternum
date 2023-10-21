@@ -35,6 +35,7 @@ import {
   DisassembleCaravanAndReturnFreeUnitsProps,
   CreateLaborBuildingProps,
   DestroyLaborBuildingProps,
+  SpawnNpcProps
 } from "../types/provider";
 import { Call } from "starknet";
 
@@ -82,6 +83,18 @@ export class EternumProvider extends DojoProvider {
       calldata: [this.getWorldAddress(), entity_id, resource_type, labor_units, multiplier],
     });
 
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async spawn_npc(props: SpawnNpcProps) {
+    const { realm_entity_id, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "spawn_npc",
+      calldata: [this.getWorldAddress(), realm_entity_id],
+    });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,
     });
