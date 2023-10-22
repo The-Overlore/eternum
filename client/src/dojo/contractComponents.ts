@@ -497,6 +497,7 @@ export function defineContractComponents(world: World) {
           mood: RecsType.Number,
           role: RecsType.Number,
           sex: RecsType.Number,
+          realm_id: RecsType.Number,
         },
         {
           metadata: {
