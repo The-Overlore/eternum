@@ -3104,7 +3104,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": null,
-      "class_hash": "0x5ffef7238cfabb8fe7922776d9110827058b5bb337971a3a2f2ac98f4f9e772",
+      "class_hash": "0x566947b96506f356587708f7defb4d468ebf4a885c356e708faac0a58769c5c",
       "abi": [
         {
           "type": "impl",
@@ -3156,7 +3156,7 @@
                   "type": "dojo::world::IWorldDispatcher"
                 },
                 {
-                  "name": "realm_entity_id",
+                  "name": "realm_id",
                   "type": "core::felt252"
                 }
               ],
@@ -3165,6 +3165,30 @@
                   "type": "core::felt252"
                 }
               ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "change_mood",
+              "inputs": [
+                {
+                  "name": "world",
+                  "type": "dojo::world::IWorldDispatcher"
+                },
+                {
+                  "name": "realm_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "npc_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "mood",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [],
               "state_mutability": "view"
             }
           ]
@@ -11189,7 +11213,7 @@
       "name": "eternum::models::last_spawned::last_spawned",
       "members": [
         {
-          "name": "realm_entity_id",
+          "name": "realm_id",
           "type": "felt252",
           "key": true
         },
@@ -11199,7 +11223,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x7b451366fdb8661b14312c54290f8812f30e18a401d5dd15d3b77eec9b9977c",
+      "class_hash": "0x627a3d24d75c413fce54cc39dcce06387e7a312b30010a600540c3eebd8c73b",
       "abi": [
         {
           "type": "function",
@@ -12453,27 +12477,32 @@
       "name": "eternum::models::npc::npc",
       "members": [
         {
-          "name": "realm_entity_id",
-          "type": "felt252",
-          "key": true
-        },
-        {
           "name": "entity_id",
           "type": "felt252",
           "key": true
         },
         {
+          "name": "realm_id",
+          "type": "felt252",
+          "key": false
+        },
+        {
           "name": "mood",
-          "type": "Mood",
+          "type": "felt252",
+          "key": false
+        },
+        {
+          "name": "role",
+          "type": "u8",
           "key": false
         },
         {
           "name": "sex",
-          "type": "Sex",
+          "type": "u8",
           "key": false
         }
       ],
-      "class_hash": "0x3ed4dbc8b66e783fb66579b9086b1c1e6b0817b544915841c7cd474e4804b12",
+      "class_hash": "0x39a1f3ba8755547bfda6703d53696a9223512db0a5b458e94cfc89103a1e901",
       "abi": [
         {
           "type": "function",
