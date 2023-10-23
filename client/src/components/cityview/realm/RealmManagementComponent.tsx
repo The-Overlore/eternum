@@ -14,6 +14,7 @@ import useRealmStore from "../../../hooks/store/useRealmStore";
 import RealmCombatComponent from "./RealmCombatComponent";
 import RealmInfoComponent from "./RealmInfoComponent";
 import { RealmBuildingsComponent } from "./RealmBuildingsComponent";
+import { NpcProvider } from "../../../NpcContext";
 
 const RealmManagementComponent = () => {
   const realmEntityId = useRealmStore((state) => state.realmEntityId);
