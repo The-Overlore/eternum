@@ -47,8 +47,6 @@ export const LaborComponent = ({
     account: { account },
   } = useDojo();
 
-  const { setGenMsg, setType } = useNpcs();
-
   const nextBlockTimestamp = useBlockchainStore((state) => state.nextBlockTimestamp);
 
   const realmEntityId = useRealmStore((state) => state.realmEntityId);
