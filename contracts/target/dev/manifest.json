@@ -1262,7 +1262,7 @@
     },
     {
       "name": "eternum::systems::combat::contracts::combat_systems",
-      "address": 0x1b0a83a27a357e0574393ab06c0c774db7312a0993538cc0186d054f75ee84e,
+      "address": null,
       "class_hash": "0x173ca5c49724c074eb62ba686acf36ebd2c849769f6787476e59efd3545166f",
       "abi": [
         {
@@ -2825,8 +2825,8 @@
     },
     {
       "name": "eternum::systems::leveling::contracts::leveling_systems",
-      "address": 0x29ae99df03a05e0be62f21c42ed50e18c3c5eff9372030791e6f6ed8377b5b3,
-      "class_hash": "0x3bebafb096c5ff90466ccca710f83de2e87e1b35894133b7c37efc1533f2234",
+      "address": null,
+      "class_hash": "0x1f93fff7e3cbd6724a123d42df808838cbc98de8a9def49a11200fe72acffae",
       "abi": [
         {
           "type": "impl",
@@ -3104,7 +3104,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": null,
-      "class_hash": "0x5adfac0647e3198c934d6bcab94681adc64631ea18c73b5b2d8d706996286cb",
+      "class_hash": "0xb2dfe183e0130e90e90d4a39ac39a4cd541cd023cef1e3020308215ac23310",
       "abi": [
         {
           "type": "impl",
@@ -3165,30 +3165,6 @@
                   "type": "core::felt252"
                 }
               ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "change_mood",
-              "inputs": [
-                {
-                  "name": "world",
-                  "type": "dojo::world::IWorldDispatcher"
-                },
-                {
-                  "name": "realm_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "npc_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "mood",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [],
               "state_mutability": "view"
             }
           ]
@@ -3270,7 +3246,7 @@
     },
     {
       "name": "eternum::systems::realm::contracts::realm_systems",
-      "address": 0x25df90992b8eebca69f08035ceda822dee73028e828ceb8421895814eacd3d,
+      "address": null,
       "class_hash": "0x6827e21f990df7b7e8dd68986d2b2db1e72ed9870296c51cf1f3337947b7bf6",
       "abi": [
         {
@@ -3467,7 +3443,7 @@
     },
     {
       "name": "eternum::systems::resources::contracts::resource_systems",
-      "address": 0x406b259886beb36b2474c7a85ad8298b948eeca68b3a185ee7ba870dbc025c8,
+      "address": null,
       "class_hash": "0x1a5a5866aa113304c5fcf476d352fb442e356bc443d37e6a32e9d3206f6e3d5",
       "abi": [
         {
@@ -3743,7 +3719,7 @@
     },
     {
       "name": "eternum::systems::test::contracts::resource::test_resource_systems",
-      "address": 0x501733faf4b36b7359ecf918fa8437e1b6c4f23287ff3011d8a2eda6c6c2224,
+      "address": null,
       "class_hash": "0x16bd172136fefc5cb7833fd593e656edee1dd8eb38016022fd73bf16d33098d",
       "abi": [
         {
@@ -3896,7 +3872,7 @@
     },
     {
       "name": "eternum::systems::trade::contracts::trade_systems::trade_systems",
-      "address": 0x63cbe849cf6325e727a8d6f82f25fad7dc7eb9433767f5c1b8c59189e36c9b6,
+      "address": null,
       "class_hash": "0x3752564568fbe474b70a20d094b263889fa7edf1dd8d0f0c5bbfca1dfd30d2a",
       "abi": [
         {
@@ -4146,8 +4122,8 @@
     },
     {
       "name": "eternum::systems::transport::contracts::caravan_systems::caravan_systems",
-      "address": 0x3f8d39786c3f984482b25a770fc85fd2a4f45725e74fdd385c5c38e9f5681c6,
-      "class_hash": "0x26d8441fd2b13fe067a85fcb932c8ec28331b980dd6b4e22080590deaac377f",
+      "address": null,
+      "class_hash": "0x36b1420dee488031d45b4d66d581dd9a5af0baab1c91a5f505c370b82c827dc",
       "abi": [
         {
           "type": "impl",
@@ -12487,22 +12463,12 @@
           "key": false
         },
         {
-          "name": "mood",
+          "name": "characteristics",
           "type": "felt252",
-          "key": false
-        },
-        {
-          "name": "role",
-          "type": "u8",
-          "key": false
-        },
-        {
-          "name": "sex",
-          "type": "u8",
           "key": false
         }
       ],
-      "class_hash": "0x39a1f3ba8755547bfda6703d53696a9223512db0a5b458e94cfc89103a1e901",
+      "class_hash": "0x121b85bc995c5651333ee0217add464b9b8f9454bf70fd36b33c2017dd41d2c",
       "abi": [
         {
           "type": "function",
