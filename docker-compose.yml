@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  katana:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    volumes:
+      - ./volume:/volume
+    ports:
+      - "5050:5050"
+    entrypoint: /bin/bash -c "/app/scripts/katana.sh > /volume/katana.log"
+
+  torii:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    volumes:
+      - ./volume:/volume
+    ports:
+      - "8080:8080"
+    depends_on:
+      - katana
+    entrypoint: /bin/bash -c "/app/scripts/torii.sh > /volume/torii.log"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/app/client
+      - ./volume:/volume
+      - ./sdk:/app/sdk
+      - ./contracts/target:/app/contracts/target
+    ports:
+      - "5173:5173"
+    depends_on:
+      - torii
+    entrypoint: /bin/bash -c "/client.sh > /volume/client.log"
