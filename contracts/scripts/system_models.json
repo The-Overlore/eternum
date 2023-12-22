@@ -132,5 +132,8 @@
         "OwnedResourcesTracker",
         "LaborBuilding"
     ],
-    "NPC_SYSTEMS": ["Npc", "LastSpawned"]
+    "NPC_SYSTEMS": [
+        "Npc", 
+        "LastSpawned"
+    ]
 }
