@@ -209,3 +209,13 @@ export interface TransferItemsFromMultipleProps extends SystemSigner {
     receiver_id: num.BigNumberish;
   }[];
 }
+
+export interface SpawnNpcProps extends SystemSigner {
+  realm_id: num.BigNumberish;
+}
+
+export interface ChangeMoodProps extends SystemSigner {
+  realm_id: num.BigNumberish;
+  npc_id: num.BigNumberish;
+  mood: num.BigNumberish;
+}

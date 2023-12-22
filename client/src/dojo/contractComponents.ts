@@ -515,6 +515,38 @@ export function defineContractComponents(world: World) {
         },
       );
     })(),
+    Npc: (() => {
+      const name = "Npc";
+      return defineComponent(
+        world,
+        {
+          realm_id: RecsType.Number,
+          mood: RecsType.Number,
+          role: RecsType.Number,
+          sex: RecsType.Number,
+        },
+        {
+          metadata: {
+            name: name,
+          },
+        },
+      );
+    })(),
+    LastSpawned: (() => {
+      const name = "LastSpawned";
+      return defineComponent(
+        world,
+        {
+          last_spawned_ts: RecsType.Number,
+        },
+        {
+          metadata: {
+            name: name,
+          },
+        },
+      );
+    })(),
+
     LaborAuction: (() => {
       return defineComponent(
         world,

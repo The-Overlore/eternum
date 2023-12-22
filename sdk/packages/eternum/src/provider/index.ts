@@ -30,7 +30,10 @@ import {
   HealSoldiersProps,
   HarvestAllLaborProps,
   SwapBankAndTravelBackProps,
+  SpawnNpcProps,
+  ChangeMoodProps,
 } from "../types/provider";
+
 import { Call } from "starknet";
 
 const UUID_OFFSET_CREATE_CARAVAN = 2;
@@ -77,6 +80,30 @@ export class EternumProvider extends RPCProvider {
       calldata: [this.getWorldAddress(), entity_id, resource_type, labor_units, multiplier],
     });
 
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async spawn_npc(props: SpawnNpcProps) {
+    const { realm_id, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "spawn_npc",
+      calldata: [this.getWorldAddress(), realm_id],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async change_mood(props: ChangeMoodProps) {
+    const { realm_id, npc_id, mood, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "change_mood",
+      calldata: [this.getWorldAddress(), realm_id, npc_id, mood],
+    });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,
     });
