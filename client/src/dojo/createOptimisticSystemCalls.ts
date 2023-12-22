@@ -286,7 +286,6 @@ export function createOptimisticSystemCalls({
     };
   }
 
-  //   TODO: implement optimistic spawn npc
   function optimisticSpawnNpc(systemCall: (args: SpawnNpcProps) => Promise<void>) {
     return async function (this: any, args: SpawnNpcProps) {
       const { realm_id } = args;
