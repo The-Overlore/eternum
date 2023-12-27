@@ -43,7 +43,6 @@ build_client() {
 	bun install
 	bun run build-packages
 	bun install
-	cd client
 }
 
 COMMAND=$1

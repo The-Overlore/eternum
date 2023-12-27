@@ -84,19 +84,18 @@ cd clients && sozo build && sozo migrate
 
 ## Docker Building Instructions
 
-- Make sure you are running dojo v0.4.1: `dojoup --version 0.4.1`
-- Unless this is your first time running it, clean up your bun cache and `node_modules`. From the root: `rm -rf ~/.bun/install/cache && rm -rf node_modules && rm -rf ./client/node_modules`
-- `bun install`
-- `bun run build-packages`
-- `bun install` (yes, this is necessary)
-- `./services.sh start`, wait for a few minutes
-- `cd client && bun run dev`
+1. Make sure you are running dojo v0.4.1: `dojoup --version 0.4.1`
+2. `./system_up.sh start`, wait for a few minutes
+3. `./system_up.sh build_client`
+4. `cd client && bun run dev`
 
-You can stop all services: `./services.sh stop`  
+Start all services: `./services.sh start` or one more by adding the names of the services. Careful that some services depend on others to run  
+Stop all services: `./services.sh stop` or one more by adding the names of the services. Careful that some services depend on others to run  
 Restart one particular service: `./services.sh restart_service <torii/katana/lore-machine>`  
 Restart all services: `./services.sh restart`  
-Prune your system of all docker images, containers, volumes, networks: `./services.sh prune`
-
+Prune your system of all docker images, containers, volumes, networks: `./services.sh prune`  
+Build the client: `./system_up.sh build_client`  
+Clean the cache for the client (this is done automatically when running `build_client`): `./system_up.sh clean_cache`  
 
 ---
 
