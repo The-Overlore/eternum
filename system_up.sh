@@ -61,7 +61,7 @@ elif [ $COMMAND = "prune_docker" ]; then
 elif [ $COMMAND = "clean_cache" ]; then
 	clean_cache
 elif [ $COMMAND = "build_client" ]; then
-	clean_cache
+	build_client
 elif [ $COMMAND = "restart_service" ]; then
 	restart_service $1
 else
