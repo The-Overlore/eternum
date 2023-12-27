@@ -22,8 +22,10 @@ restart_service() {
 	if [ ! -n $1 ]; then
 		help "restart_service"
 	fi
-
-	docker compose up -d ${service} --no-deps --build
+	service=$1
+	RESTART_SERVICE="RESTART_$(echo ${service} | tr [a-z] [A-Z])"
+	docker compose build --build-arg ${RESTART_SERVICE}=true ${service}
+	docker compose up -d --no-deps ${service}
 }
 
 prune_services() {
@@ -43,7 +45,7 @@ elif [ $COMMAND = "restart" ]; then
 elif [ $COMMAND = "prune" ]; then
 	prune_services
 elif [ $COMMAND = "restart_service" ]; then
-	restart_service $2
+	restart_service $1
 else
 	help ${COMMAND}
 fi

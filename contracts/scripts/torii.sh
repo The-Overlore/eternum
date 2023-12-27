@@ -15,8 +15,7 @@ torii --world 0x5cb4ce060de62a7b6bfd4cb70fd4ae3196bfe399c372cb0863e632ba8cc73ef 
 # echo "Waiting for torii to boot..."
 sleep 5
 
-# If we aren't restarting then set_config
-if [ ! -n ${RESTART_TORII} ]; then
+if [ -z "$RESTART_TORII" ]; then
 	set_config
 fi
 
