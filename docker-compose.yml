@@ -9,7 +9,7 @@ services:
       - ./volume:/volume
     ports:
       - "5050:5050"
-    entrypoint: /bin/bash -c "/app/scripts/katana.sh > /volume/katana.log"
+    entrypoint: /bin/bash -c "/app/scripts/katana.sh > /volume/katana.logs"
 
   torii:
     build:
@@ -21,19 +21,16 @@ services:
       - "8080:8080"
     depends_on:
       - katana
-    entrypoint: /bin/bash -c "/app/scripts/torii.sh > /volume/torii.log"
+    entrypoint: /bin/bash -c "/app/scripts/torii.sh > /volume/torii.logs"
 
-  client:
+  lore-machine:
     build:
-      context: ./client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Dockers/Dockerfile-lore-machine
     volumes:
-      - ./client:/app/client
       - ./volume:/volume
-      - ./sdk:/app/sdk
-      - ./contracts/target:/app/contracts/target
     ports:
-      - "5173:5173"
+      - "8765:8765"
     depends_on:
       - torii
-    entrypoint: /bin/bash -c "/client.sh > /volume/client.log"
+    entrypoint: /bin/bash -c "/lore-machine/lore-machine.sh > /volume/lore-machine.logs"
