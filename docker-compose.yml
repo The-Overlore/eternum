@@ -33,4 +33,5 @@ services:
       - "8765:8765"
     depends_on:
       - torii
+    tty: true
     entrypoint: /bin/bash -c "/lore-machine/lore-machine.sh > /volume/lore-machine.logs"

@@ -42,7 +42,7 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
     "react-popper": "^2.3.0",
-    "react-use-websocket": "latest",
+    "react-use-websocket": "^4.5.0",
     "starknet": "^5.19.5",
     "three": "^0.148.0",
     "three-stdlib": "^2.21.8",
