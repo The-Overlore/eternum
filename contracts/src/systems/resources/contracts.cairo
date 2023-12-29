@@ -420,7 +420,28 @@ mod resource_systems {
             resource_chest
 
         }
+        
+        fn get_contents(world: IWorldDispatcher, chest_id: u128) -> Span<(u8, u128)>{
+            let mut resources: Array<(u8, u128)> = array![];
+            let resource_chest = get!(world, chest_id, ResourceChest);
+            let mut resource_chest_weight = get!(world, chest_id, Weight);
+            
+            if (resource_chest_weight.value == 0) {
+                return resources.span();
+            }
 
+            let mut index = 0;
+            loop {
+                if index == resource_chest.resources_count {
+                    break ();
+                }
+                let detached_resource = get!(world, (chest_id, index), DetachedResource);
+                resources.append((detached_resource.resource_type, detached_resource.resource_amount));
+                index += 1;
+            };
+
+            return resources.span();
+        }
 
         fn lock_until(world: IWorldDispatcher, entity_id: u128, ts: u64) {
 

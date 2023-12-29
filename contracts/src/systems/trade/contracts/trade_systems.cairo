@@ -33,7 +33,22 @@ mod trade_systems {
     use eternum::constants::{REALM_ENTITY_TYPE, WORLD_CONFIG_ID, FREE_TRANSPORT_ENTITY_TYPE};
 
     use core::poseidon::poseidon_hash_span;
+    
+    #[derive(Drop, starknet::Event)]
+    struct TradeCompleted {
+        #[key]
+        trade_id: u128,
+        maker_id: u128,
+        taker_id: u128,
+        maker_resources: Span<(u8, u128)>,
+        taker_resources: Span<(u8, u128)>
+    }
 
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        TradeCompleted: TradeCompleted,
+    }
 
     #[external(v0)]
     impl TradeSystemsImpl of ITradeSystems<ContractState> {
@@ -278,8 +293,16 @@ mod trade_systems {
                 ));
             };
 
-    
-            
+
+            emit!(world, TradeCompleted {
+                trade_id, 
+                maker_id: trade.maker_id,
+                taker_id, 
+                maker_resources: resource_chest::get_contents(world, trade.maker_resource_chest_id),
+                taker_resources: resource_chest::get_contents(world, trade.taker_resource_chest_id),
+
+            });
+
 
             /////////  Update Trade   ///////////////
             //////////////////////////////////////////
