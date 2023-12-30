@@ -23,7 +23,6 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
 
   useEffect(() => {
     let _tab: string = "";
-    // if (["farmers"].includes(params?.tab as string)) {
     if (["villagers"].includes(params?.tab as string)) {
       _tab = "villagers";
       moveCameraToFoodView();
