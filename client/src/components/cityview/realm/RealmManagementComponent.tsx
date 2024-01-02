@@ -168,7 +168,7 @@ const RealmManagementComponent = () => {
       _tab = "open-offers";
     } else if (["labor", "food", "mines", "farm", "fish"].includes(params?.tab as string)) {
       _tab = "labor";
-    } else if (["military", "army", "defense", "siege"].includes(params?.tab as string)) {
+    } else if (["military", "raids", "defence", "siege"].includes(params?.tab as string)) {
       _tab = "military";
     } else if (["villagers"].includes(params?.tab as string)) {
       _tab = "villagers";
