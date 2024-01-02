@@ -3500,7 +3500,7 @@
     {
       "name": "eternum::systems::trade::contracts::trade_systems::trade_systems",
       "address": "0x63cbe849cf6325e727a8d6f82f25fad7dc7eb9433767f5c1b8c59189e36c9b6",
-      "class_hash": "0x5408a56f824e45f1d27d1b99ad35163e92fbc3ae8388b23643fb12b0e50229c",
+      "class_hash": "0x18299ae9174d4103688386a1a73c86062a69520651a57a4cadf3657a978c5da",
       "abi": [
         {
           "type": "impl",
@@ -3695,7 +3695,7 @@
         },
         {
           "type": "event",
-          "name": "eternum::systems::trade::contracts::trade_systems::trade_systems::TradeCompleted",
+          "name": "eternum::systems::trade::contracts::trade_systems::trade_systems::OrderAccepted",
           "kind": "struct",
           "members": [
             {
@@ -3722,6 +3722,11 @@
               "name": "taker_resources",
               "type": "core::array::Span::<(core::integer::u8, core::integer::u128)>",
               "kind": "data"
+            },
+            {
+              "name": "timestamp",
+              "type": "core::integer::u64",
+              "kind": "data"
             }
           ]
         },
@@ -3736,8 +3741,8 @@
               "kind": "nested"
             },
             {
-              "name": "TradeCompleted",
-              "type": "eternum::systems::trade::contracts::trade_systems::trade_systems::TradeCompleted",
+              "name": "OrderAccepted",
+              "type": "eternum::systems::trade::contracts::trade_systems::trade_systems::OrderAccepted",
               "kind": "nested"
             }
           ]
