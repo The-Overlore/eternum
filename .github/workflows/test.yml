@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - overlore-0.3.0
   pull_request:
     branches:
       - main
+      - overlore-0.3.0
 
 jobs:
   test:
@@ -23,7 +25,7 @@ jobs:
 
       - name: Download Dojo release artifact
         run: |
-          curl -L -o dojo-linux-x86_64.tar.gz https://github.com/dojoengine/dojo/releases/download/v0.4.0/dojo_v0.4.0_linux_amd64.tar.gz
+          curl -L -o dojo-linux-x86_64.tar.gz https://github.com/dojoengine/dojo/releases/download/v0.4.1/dojo_v0.4.1_linux_amd64.tar.gz
           tar -xzf dojo-linux-x86_64.tar.gz
           sudo mv sozo /usr/local/bin/
 
