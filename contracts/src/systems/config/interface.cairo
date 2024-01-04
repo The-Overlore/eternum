@@ -125,10 +125,8 @@ trait ILaborConfig<TContractState> {
 #[starknet::interface]
 trait ITransportConfig<TContractState> {
     fn set_road_config(
-        self: @TContractState,
-        world: IWorldDispatcher,
-        fee_resource_type: u8,
-        fee_amount: u128,
+        self: @TContractState, world: IWorldDispatcher, 
+        resource_costs: Span<(u8, u128)>,
         speed_up_by: u64
     );
 
