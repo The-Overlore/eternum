@@ -340,4 +340,16 @@ mod inventory_transfer_system_tests {
 
     }
 
+    #[test]
+    #[available_gas(30000000000000)]
+    fn test_get_contents() {
+        let (world, chest_id, donor_id, donor_transport_id, inventory_systems_dispatcher) 
+            = setup();
+        
+        let resources = InternalResourceChestSystemsImpl::get_contents(world, chest_id);
+        assert(
+            resources == array![(ResourceTypes::STONE, 1000), (ResourceTypes::GOLD, 1000),].span(), 'invalid resources'
+        );
+    }
+
 }

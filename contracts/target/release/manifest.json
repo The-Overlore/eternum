@@ -3873,7 +3873,7 @@
     {
       "name": "eternum::systems::trade::contracts::trade_systems::trade_systems",
       "address": null,
-      "class_hash": "0x3752564568fbe474b70a20d094b263889fa7edf1dd8d0f0c5bbfca1dfd30d2a",
+      "class_hash": "0x1376dc7486b1f4cf95b6836f84317400a22fc0a06cad61a64b64d2179d362c1",
       "abi": [
         {
           "type": "impl",
@@ -4100,6 +4100,43 @@
         },
         {
           "type": "event",
+          "name": "eternum::systems::trade::contracts::trade_systems::trade_systems::OrderAccepted",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "trade_id",
+              "type": "core::integer::u128",
+              "kind": "key"
+            },
+            {
+              "name": "maker_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "taker_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "maker_resources",
+              "type": "core::array::Span::<(core::integer::u8, core::integer::u128)>",
+              "kind": "data"
+            },
+            {
+              "name": "taker_resources",
+              "type": "core::array::Span::<(core::integer::u8, core::integer::u128)>",
+              "kind": "data"
+            },
+            {
+              "name": "timestamp",
+              "type": "core::integer::u64",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "eternum::systems::trade::contracts::trade_systems::trade_systems::Event",
           "kind": "enum",
           "variants": [
@@ -4111,6 +4148,11 @@
             {
               "name": "CreateOrder",
               "type": "eternum::systems::trade::contracts::trade_systems::trade_systems::CreateOrder",
+              "kind": "nested"
+            },
+            {
+              "name": "OrderAccepted",
+              "type": "eternum::systems::trade::contracts::trade_systems::trade_systems::OrderAccepted",
               "kind": "nested"
             }
           ]
