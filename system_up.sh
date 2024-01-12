@@ -20,6 +20,8 @@ start_services() {
 		done
 	fi
 	echo "👷 Building service(s)"
+
+  cp ../Dockers/config/litefs.static-lease.yml ./config/
 	docker compose build ${build_args} $@
 	echo "▶️ Starting service(s)"
 	docker compose up -d --no-deps $@
@@ -41,7 +43,7 @@ clean_cache() {
 }
 
 build_contracts() {
-	echo "📑 Building contrats"
+	echo "📑 Building contracts"
 	cd contracts && sozo build
 }
 
@@ -66,7 +68,7 @@ elif [ $COMMAND = "stop" ]; then
 elif [ $COMMAND = "restart" ]; then
 	stop_services $SERVICES
 	start_services true $SERVICES
-elif [ $COMMAND = "prune_docker" ]; then
+elif [ $COMMAND = "prune_services" ]; then
 	prune_services
 elif [ $COMMAND = "clean_cache" ]; then
 	clean_cache

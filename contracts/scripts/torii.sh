@@ -7,7 +7,7 @@ export STARKNET_RPC_URL=http://katana:5050
 
 sozo migrate --rpc-url $STARKNET_RPC_URL
 
-torii --world $SOZO_WORLD --rpc $STARKNET_RPC_URL &
+torii --world $SOZO_WORLD --rpc $STARKNET_RPC_URL --database $WORLD_DB &
 
 # echo "Waiting for torii to boot..."
 sleep 5

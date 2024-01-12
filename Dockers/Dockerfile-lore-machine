@@ -14,9 +14,15 @@ SHELL ["/bin/bash", "-c"]
 
 ENV PATH="${PATH}:/root/.local/bin"
 
+ADD Dockers/config/litefs.static-lease.yml /etc/litefs.yml
+
 # Update and install some common packages
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libsqlite3-mod-spatialite \
     curl \
+    fuse3 \
+    sqlite \
     git \
     vim \
     wget \
@@ -25,8 +31,10 @@ RUN apt-get update && apt-get install -y \
 	python3.9 \
 	make \
     && rm -rf /var/lib/apt/lists/* && \
-	git clone --depth 1 https://github.com/The-Overlore/lore-machine.git && \
+	git clone --depth 1 https://github.com/The-Overlore/lore-machine.git -b litefs-world-db && \
 	curl -sSL https://install.python-poetry.org | python3 -
+
+COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
 
 COPY ./Dockers/lore-machine.sh /lore-machine
 
