@@ -33,6 +33,7 @@ import {
   SpawnNpcProps,
   ChangeMoodProps,
   MintResourcesProps,
+  DisassembleCaravanAndReturnFreeUnitsProps,
 } from "../types/provider";
 
 import { Call } from "starknet";
@@ -326,6 +327,25 @@ export class EternumProvider extends DojoProvider {
       entrypoint: "create",
       calldata: [this.getWorldAddress(), entity_ids.length, ...entity_ids],
     });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async disassemble_caravan_and_return_free_units(props: DisassembleCaravanAndReturnFreeUnitsProps) {
+    const { caravan_id, unit_ids, signer } = props;
+    const tx = await this.executeMulti(signer, [
+      {
+        contractAddress: getContractByName(this.manifest, "caravan_systems"),
+        entrypoint: "disassemble",
+        calldata: [this.getWorldAddress(), caravan_id],
+      },
+      {
+        contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
+        entrypoint: "return_free_units",
+        calldata: [this.getWorldAddress(), unit_ids.length, ...unit_ids],
+      },
+    ]);
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,
     });
