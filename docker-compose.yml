@@ -44,7 +44,7 @@ services:
     environment:
       IS_PRIMARY: "FALSE"
       WORLD_DB: "/litefs/world.db"
-      DEV_TORII_WS: "ws://localhost:8080/graphql/ws"
+      DEV_TORII_WS: "ws://torii:8080/graphql/ws"
       ENTRY_CMD: "/bin/bash -c /lore-machine/lore-machine.sh"
     tty: true
     entrypoint: litefs mount
