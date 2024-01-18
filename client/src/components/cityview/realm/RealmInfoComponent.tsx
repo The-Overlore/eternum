@@ -17,6 +17,7 @@ import { RealmLevel } from "../../../elements/RealmLevel";
 import Button from "../../../elements/Button";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { getComponentValue } from "@dojoengine/recs";
+import { ConqueredHyperstructures } from "../../worldmap/hyperstructures/ConqueredHyperstructures";
 
 type RealmInfoComponentProps = {};
 
@@ -50,7 +51,6 @@ export const RealmInfoComponent = ({}: RealmInfoComponentProps) => {
   const [levelUpProgress, setLevelUpProgress] = useState(0);
 
   const [showRealmLevelUp, setShowRealmLevelUp] = useState(false);
-  const [_, setShowHyperstructureLevelUp] = useState(false);
   const setTooltip = useUIStore((state) => state.setTooltip);
   const moveCameraToRealm = useUIStore((state) => state.moveCameraToRealm);
   const moveCameraToWorldMapView = useUIStore((state) => state.moveCameraToWorldMapView);
@@ -182,7 +182,8 @@ export const RealmInfoComponent = ({}: RealmInfoComponentProps) => {
           {/* {showHyperstructureLevelUp && (
               <LevelingPopup onClose={() => setShowHyperstructureLevelUp(false)}></LevelingPopup>
             )} */}
-        </div>
+            <ConqueredHyperstructures className={"text-xxs"} entityId={hyperstructureId} />
+          </div>
       )}
       <div className="flex space-x-2 mt-1 items-center px-4">
         <div

@@ -163,6 +163,7 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
   };
 
   const merge_soldiers = async (props: MergeSoldiersProps) => {
+    console.log({ props });
     setComponentsFromEvents(contractComponents, getEvents(await provider.merge_soldiers(props)));
   };
 
