@@ -23,28 +23,32 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
 
   useEffect(() => {
     let _tab: string = "";
-    if (["villagers"].includes(params?.tab as string)) {
+    if (["townhall"].includes(params?.tab as string)) {
+      _tab = "townhall";
+    } else if (["villagers"].includes(params?.tab as string)) {
       _tab = "villagers";
       moveCameraToFoodView();
     } else {
       _tab = params?.tab as any;
       moveCameraToLaborView();
     }
+
     const tabIndex = tabs.findIndex((tab) => tab.key === _tab);
     if (tabIndex >= 0) {
       setSelectedTab(tabIndex);
     }
   }, [params]);
 
+  // !! Using "villagers" as key sets it to be first opened when accessing tab.
   const tabs = useMemo(
     () => [
       {
-        key: "Townhall",
+        key: "townhall",
         label: <div>Townhall</div>,
         component: <NpcPanel />,
       },
       {
-        key: "villagers",
+        key: "villagers_list",
         label: (
           <div 
             onMouseEnter={() => setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Tooltip</p> })}
@@ -64,7 +68,7 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
   return (
     <>
       <Tabs
-        selectedIndex={selectedTab}
+        selectedIndex={selectedTab} 
         onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
         variant="default"
         className="h-full"

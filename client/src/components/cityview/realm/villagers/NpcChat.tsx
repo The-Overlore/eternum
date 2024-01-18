@@ -2,15 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import NpcChatMessage from "./NpcChatMessage";
 import { NpcChatMessageProps } from "./NpcChatMessage";
+import { getRealm } from "../../../../utils/realms";
+
+import { RealmInterface } from "@bibliothecadao/eternum";
+import useRealmStore from "../../../../hooks/store/useRealmStore";
+import { unpackResources } from "../../../../utils/packedData";
+import { getOrderName } from "@bibliothecadao/eternum";
 
 interface NpcChatProps {
   spawned: number;
-  realmId: bigint;
+  realmId_var: bigint;
 }
 
 // Store chat history in this ;
-const NpcChat = ({ spawned, realmId }: NpcChatProps) => {
-  const chatIdentifier: string = `npc_chat_${realmId}`;
+const NpcChat = ({ spawned, realmId_var }: NpcChatProps) => {
+  const { realmId } = useRealmStore();
+  const chatIdentifier: string = `npc_chat_${realmId_var}`;
   const bottomRef = useRef<HTMLDivElement>(null);
   const [messageList, setMessageList] = useState<NpcChatMessageProps[]>(
     JSON.parse(window.localStorage.getItem(chatIdentifier) ?? "[]"),
@@ -41,16 +48,30 @@ const NpcChat = ({ spawned, realmId }: NpcChatProps) => {
       }
     }, 1);
   }, [lastJsonMessage]);
-
+  
   useEffect(() => {
     if (spawned === -1) {
       return;
     }
+    
+    function serializeRealmData(realm: RealmInterface) {
+      const res = {
+        realmId: realm.realmId.toString(),
+        resources: unpackResources(BigInt(realm.resourceTypesPacked), realm.resourceTypesCount),
+        name: realm.name,
+        cities: realm.cities,
+        harbors: realm.harbors,
+        rivers: realm.rivers,
+        regions: realm.regions,
+        wonder: realm.wonder,
+        order: getOrderName(realm.order)
+      };
+      return res;
+    }
 
     sendJsonMessage({
-      // Replace with this after demo version
-      // user: realm.realm_id,
-      user: 0,
+      type: "townhall",
+      realm: serializeRealmData(getRealm(realmId as bigint)),
       day: spawned,
     });
   }, [spawned]);
