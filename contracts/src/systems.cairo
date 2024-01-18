@@ -9,4 +9,6 @@ mod leveling;
 mod name;
 mod bank;
 mod npc;
+mod hyperstructure;
+
 mod test;
