@@ -16,7 +16,7 @@ import RealmInfoComponent from "./RealmInfoComponent";
 import { NpcProvider } from "../../../NpcContext";
 
 const RealmManagementComponent = () => {
-  const { realmEntityId } = useRealmStore();
+  const realmEntityId = useRealmStore((state) => state.realmEntityId);
 
   const [selectedTab, setSelectedTab] = useState(1);
 
