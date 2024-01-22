@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 	python3.9 \
 	make \
     && rm -rf /var/lib/apt/lists/* && \
-	git clone --depth 1 https://github.com/The-Overlore/lore-machine.git -b litefs-world-db && \
+	git clone --depth 1 https://github.com/The-Overlore/lore-machine.git && \
 	curl -sSL https://install.python-poetry.org | python3 -
 
 COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
