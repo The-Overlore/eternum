@@ -21,6 +21,7 @@ start_services() {
 	fi
 	echo "👷 Building service(s)"
 
+  cp ../Dockers/config/litefs.static-lease.yml ./config/
 	docker compose build ${build_args} $@
 	echo "▶️ Starting service(s)"
 	docker compose up -d --no-deps $@
