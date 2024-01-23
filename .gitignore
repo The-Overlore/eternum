@@ -1,2 +1,3 @@
 node_modules
 volume/
+contracts/config/litefs.static-lease.yml
