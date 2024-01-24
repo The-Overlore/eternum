@@ -394,7 +394,6 @@ export class EternumProvider extends DojoProvider {
       regions,
       wonder,
       order,
-      order_hyperstructure_id,
       position,
       signer,
     } = props;
@@ -414,7 +413,6 @@ export class EternumProvider extends DojoProvider {
           regions,
           wonder,
           order,
-          order_hyperstructure_id,
           2,
           position.x,
           position.y,
@@ -440,7 +438,6 @@ export class EternumProvider extends DojoProvider {
         regions,
         wonder,
         order,
-        order_hyperstructure_id,
         position,
       } = realm;
 
@@ -459,7 +456,6 @@ export class EternumProvider extends DojoProvider {
             regions,
             wonder,
             order,
-            order_hyperstructure_id, // TODO: issue here we can't pass th BigINt
             2, // entity ID in position struct
             position.x,
             position.y,
