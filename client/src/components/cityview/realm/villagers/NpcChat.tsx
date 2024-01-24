@@ -89,7 +89,7 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
     }
 
   sendJsonMessage({
-      str_realmId,
+      realm_id: str_realmId,
     });
   }, [spawned]);
 
