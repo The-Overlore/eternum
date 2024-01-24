@@ -13,7 +13,7 @@ type NpcPanelProps = {
 
 export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const [spawned, setSpawned] = useState(-1);
-  const { realmEntityId } = useRealmStore();
+  const { realmId } = useRealmStore();
   
   const [selectedTownhall, setSelectedTownhall] = useState<string | null>(null);
 
@@ -46,8 +46,8 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   }
 
   const realm = useMemo(() => {
-    return realmEntityId ? getRealm(realmEntityId) : undefined;
-  }, [realmEntityId]);
+    return realmId ? getRealm(realmId) : undefined;
+  }, [realmId]);
   
   useEffect(() => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;

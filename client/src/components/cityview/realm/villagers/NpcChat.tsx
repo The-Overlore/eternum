@@ -18,6 +18,9 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
   const [messageList, setMessageList] = useState<NpcChatMessageProps[]>(
     JSON.parse(window.localStorage.getItem(chatIdentifier) ?? "[]"),
   );
+  
+  const str_realmId = realmId.toString();
+  
 
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
@@ -42,10 +45,11 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
       return;
     }
     else {
-      let msg_split = JSON.parse(JSON.stringify(lastJsonMessage, null, 2)).split(";;");
-      let msg_id = msg_split[0];
-      let msg_disc = msg_split[1];
-      let msgsArray: string[] = JSON.parse(JSON.stringify(msg_disc)).split("\n\n");
+      let msgObject = JSON.parse(JSON.stringify(lastJsonMessage, null, 2));
+      let msg_id = Object.keys(msgObject)[0];
+      let msg_disc = msgObject[msg_id];
+      // let msgsArray: string[] = JSON.parse(JSON.stringify(msg_disc)).split("\n\n");
+      let msgsArray: string[] = msg_disc.split("\n\n");
       
       if (msgsArray[msgsArray.length - 1] === "") {
         msgsArray.pop();
@@ -79,24 +83,20 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
     }
   }, [lastJsonMessage]);
 
-
-
-
   useEffect(() => {
     if (spawned === -1) {
       return;
     }
 
-    sendJsonMessage({
-      // Replace with this after demo version
-      // user: realm.realm_id,
-      user: 0,
-      day: spawned,
+  sendJsonMessage({
+      str_realmId,
     });
   }, [spawned]);
 
   useEffect(() => {
     console.log("Connection state changed");
+    console.log("realmId")
+    console.log(realmId)
   }, [readyState]);
 
   useEffect(() => {}, []);
