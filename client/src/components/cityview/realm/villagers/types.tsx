@@ -13,3 +13,12 @@ export type Npc = {
   sex: Number;
   realm_id: Number;
 };
+
+export type Message = {
+  sender: string;
+  message: string;
+};
+
+export type storedTownhall = {
+  [key: string]: Message[];
+};
