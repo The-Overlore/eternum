@@ -13,7 +13,7 @@ import useUIStore from "../../../hooks/store/useUIStore";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import RealmCombatComponent from "./RealmCombatComponent";
 import RealmInfoComponent from "./RealmInfoComponent";
-import { NpcProvider } from "../../../NpcContext";
+import { RealmBuildingsComponent } from "./RealmBuildingsComponent";
 
 const RealmManagementComponent = () => {
   const realmEntityId = useRealmStore((state) => state.realmEntityId);
@@ -136,7 +136,7 @@ const RealmManagementComponent = () => {
         component: <RealmCombatComponent />,
       },
       {
-        key: "Crafting",
+        key: "Buildings",
         label: (
           <div
             onMouseEnter={() =>
@@ -144,7 +144,7 @@ const RealmManagementComponent = () => {
                 position: "top",
                 content: (
                   <>
-                    <p className="whitespace-nowrap">Coming Soon</p>
+                    <p className="whitespace-nowrap">Create buildings on your Realm.</p>
                   </>
                 ),
               })
@@ -153,10 +153,10 @@ const RealmManagementComponent = () => {
             className="flex flex-col items-center"
             title="Not implemented"
           >
-            <City className="mb-2 fill-gold" /> <div>Crafting</div>
+            <City className="mb-2 fill-gold" /> <div>Buildings</div>
           </div>
         ),
-        component: <div></div>,
+        component: <RealmBuildingsComponent />,
       },
     ],
     [selectedTab],
