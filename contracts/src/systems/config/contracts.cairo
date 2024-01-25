@@ -8,19 +8,19 @@ mod config_systems {
     use eternum::models::config::{
         LaborCostResources, LaborCostAmount, LaborConfig, CapacityConfig, RoadConfig, SpeedConfig,
         TravelConfig, WeightConfig, WorldConfig, SoldierConfig, HealthConfig, AttackConfig,
-        DefenceConfig, CombatConfig, LevelingConfig, RealmFreeMintConfig, NpcConfig
+        DefenceConfig, CombatConfig, LevelingConfig, RealmFreeMintConfig, LaborBuildingsConfig, NpcConfig
     };
 
     use eternum::systems::config::interface::{
         IWorldConfig, IWeightConfig, ICapacityConfig, ILaborConfig, ITransportConfig,
         IHyperstructureConfig, ICombatConfig, ILevelingConfig, IBankConfig, IRealmFreeMintConfig,
-        INpcConfig
+        IBuildingsConfig, INpcConfig
     };
 
     use eternum::constants::{
         WORLD_CONFIG_ID, LABOR_CONFIG_ID, TRANSPORT_CONFIG_ID, ROAD_CONFIG_ID, SOLDIER_ENTITY_TYPE,
         COMBAT_CONFIG_ID, REALM_LEVELING_CONFIG_ID, HYPERSTRUCTURE_LEVELING_CONFIG_ID,
-        REALM_FREE_MINT_CONFIG_ID, NPC_CONFIG_ID
+        REALM_FREE_MINT_CONFIG_ID, BUILDING_CONFIG_ID, NPC_CONFIG_ID
     };
 
     use eternum::models::hyperstructure::HyperStructure;
@@ -85,7 +85,9 @@ mod config_systems {
 
                         index += 1;
                     },
-                    Option::None => { break; }
+                    Option::None => {
+                        break;
+                    }
                 };
             };
 
@@ -106,7 +108,6 @@ mod config_systems {
             set!(world, (NpcConfig { config_id: NPC_CONFIG_ID, spawn_delay }));
         }
     }
-
 
     #[external(v0)]
     impl CapacityConfigImpl of ICapacityConfig<ContractState> {
@@ -453,8 +454,8 @@ mod config_systems {
     #[external(v0)]
     impl TransportConfigImpl of ITransportConfig<ContractState> {
         fn set_road_config(
-            self: @ContractState, 
-            world: IWorldDispatcher, 
+            self: @ContractState,
+            world: IWorldDispatcher,
             resource_costs: Span<(u8, u128)>,
             speed_up_by: u64
         ) {
@@ -463,20 +464,16 @@ mod config_systems {
             let resource_cost_id = world.uuid().into();
             let mut index = 0;
             loop {
-               
                 if index == resource_costs.len() {
                     break;
                 }
-                let (resource_type, resource_amount) 
-                    = *resource_costs.at(index);
-                set!(world, (
-                    ResourceCost {
-                        entity_id: resource_cost_id,
-                        index,
-                        resource_type,
-                        amount: resource_amount
-                    }
-                ));
+                let (resource_type, resource_amount) = *resource_costs.at(index);
+                set!(
+                    world,
+                    (ResourceCost {
+                        entity_id: resource_cost_id, index, resource_type, amount: resource_amount
+                    })
+                );
 
                 index += 1;
             };
@@ -540,50 +537,47 @@ mod config_systems {
             let mut index = 0;
             loop {
                 match completion_cost.pop_front() {
-                    Option::Some((resource_type, resource_amount)) => {
+                    Option::Some((
+                        resource_type, resource_amount
+                    )) => {
                         assert(*resource_amount > 0, 'amount must not be 0');
 
-                        set!(world, (
-                            ResourceCost {
+                        set!(
+                            world,
+                            (ResourceCost {
                                 entity_id: completion_cost_id,
                                 index,
                                 resource_type: *resource_type,
                                 amount: *resource_amount
-                            }
-                        ));
+                            })
+                        );
 
                         index += 1;
                     },
-                    Option::None => {break;}
+                    Option::None => {
+                        break;
+                    }
                 };
             };
 
-
-            set!(world, (
-                HyperStructure {
-                    entity_id: hyperstructure_id,
-                    hyperstructure_type,
-                    controlling_order: 0,
-                    completed: false,
-                    completion_cost_id,
-                    completion_resource_count
-                },
-                Position {
-                    entity_id: hyperstructure_id,
-                    x: coord.x,
-                    y: coord.y
-                },
-                TownWatch {
-                    entity_id: hyperstructure_id,
-                    town_watch_id: hyperstructure_town_watch_id,
-                },
-                Position {
-                    entity_id: hyperstructure_town_watch_id,
-                    x: coord.x,
-                    y: coord.y
-                },
-            ));  
-
+            set!(
+                world,
+                (
+                    HyperStructure {
+                        entity_id: hyperstructure_id,
+                        hyperstructure_type,
+                        controlling_order: 0,
+                        completed: false,
+                        completion_cost_id,
+                        completion_resource_count
+                    },
+                    Position { entity_id: hyperstructure_id, x: coord.x, y: coord.y },
+                    TownWatch {
+                        entity_id: hyperstructure_id, town_watch_id: hyperstructure_town_watch_id,
+                    },
+                    Position { entity_id: hyperstructure_town_watch_id, x: coord.x, y: coord.y },
+                )
+            );
 
             hyperstructure_id
         }
@@ -632,7 +626,9 @@ mod config_systems {
 
                                     jndex += 1;
                                 },
-                                Option::None => { break; }
+                                Option::None => {
+                                    break;
+                                }
                             };
                         };
 
@@ -648,7 +644,9 @@ mod config_systems {
 
                         index += 1;
                     },
-                    Option::None => { break; }
+                    Option::None => {
+                        break;
+                    }
                 }
             };
 
@@ -703,6 +701,162 @@ mod config_systems {
                 );
 
                 index += 1;
+            };
+        }
+    }
+
+    #[external(v0)]
+    impl BuildingsConfigImpl of IBuildingsConfig<ContractState> {
+        fn set_labor_buildings_config(
+            self: @ContractState,
+            world: IWorldDispatcher,
+            level_multiplier: u128,
+            level_discount_mag: u128,
+            resources_category_1: u128,
+            resources_category_1_count: u8,
+            resources_category_2: u128,
+            resources_category_2_count: u8,
+            resources_category_3: u128,
+            resources_category_3_count: u8,
+            resources_category_4: u128,
+            resources_category_4_count: u8,
+            building_category_1_resource_costs: Span<(u8, u128)>,
+            building_category_2_resource_costs: Span<(u8, u128)>,
+            building_category_3_resource_costs: Span<(u8, u128)>,
+            building_category_4_resource_costs: Span<(u8, u128)>,
+        ) {
+            assert_caller_is_admin(world);
+
+            // set the resources in each category
+            set!(
+                world,
+                (
+                    LaborBuildingsConfig {
+                        config_id: LABOR_CONFIG_ID,
+                        level_multiplier,
+                        level_discount_mag,
+                        resources_category_1,
+                        resources_category_1_count,
+                        resources_category_2,
+                        resources_category_2_count,
+                        resources_category_3,
+                        resources_category_3_count,
+                        resources_category_4,
+                        resources_category_4_count,
+                    },
+                )
+            );
+
+            let mut building_costs = building_category_1_resource_costs;
+            let labor_category = 1;
+            let resource_cost_id: u128 = world.uuid().into();
+            let mut index = 0;
+            loop {
+                match building_costs.pop_front() {
+                    Option::Some((
+                        resource_type, resource_amount
+                    )) => {
+                        let (resource_type, resource_amount) = (*resource_type, *resource_amount);
+
+                        set!(
+                            world,
+                            (ResourceCost {
+                                entity_id: resource_cost_id,
+                                index,
+                                resource_type,
+                                amount: resource_amount
+                            })
+                        );
+                        index += 1;
+                    },
+                    Option::None => {
+                        break;
+                    }
+                }
+            };
+
+            let mut building_costs = building_category_2_resource_costs;
+            let labor_category = 2;
+            let resource_cost_id: u128 = world.uuid().into();
+            let mut index = 0;
+            loop {
+                match building_costs.pop_front() {
+                    Option::Some((
+                        resource_type, resource_amount
+                    )) => {
+                        let (resource_type, resource_amount) = (*resource_type, *resource_amount);
+
+                        set!(
+                            world,
+                            (ResourceCost {
+                                entity_id: resource_cost_id,
+                                index,
+                                resource_type,
+                                amount: resource_amount
+                            })
+                        );
+                        index += 1;
+                    },
+                    Option::None => {
+                        break;
+                    }
+                }
+            };
+
+            let mut building_costs = building_category_3_resource_costs;
+            let labor_category = 3;
+            let resource_cost_id: u128 = world.uuid().into();
+            let mut index = 0;
+            loop {
+                match building_costs.pop_front() {
+                    Option::Some((
+                        resource_type, resource_amount
+                    )) => {
+                        let (resource_type, resource_amount) = (*resource_type, *resource_amount);
+
+                        set!(
+                            world,
+                            (ResourceCost {
+                                entity_id: resource_cost_id,
+                                index,
+                                resource_type,
+                                amount: resource_amount
+                            })
+                        );
+                        index += 1;
+                    },
+                    Option::None => {
+                        break;
+                    }
+                }
+            };
+
+            let mut building_costs = building_category_4_resource_costs;
+            let labor_category = 4;
+            let resource_cost_id: u128 = world.uuid().into();
+            let mut index = 0;
+            loop {
+                match building_costs.pop_front() {
+                    Option::Some((
+                        resource_type, resource_amount
+                    )) => {
+                        let (resource_type, resource_amount) = (*resource_type, *resource_amount);
+
+                        set!(
+                            world,
+                            (ResourceCost {
+                                entity_id: resource_cost_id,
+                                index,
+                                resource_type,
+                                amount: resource_amount
+                            })
+                        );
+                        index += 1;
+                    },
+                    Option::None => {
+                        break;
+                    }
+                }
             };
         }
     }

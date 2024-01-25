@@ -10,5 +10,6 @@ mod name;
 mod bank;
 mod npc;
 mod hyperstructure;
+mod buildings;
 
 mod test;
