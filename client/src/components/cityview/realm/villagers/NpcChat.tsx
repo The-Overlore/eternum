@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import NpcChatMessage from "./NpcChatMessage";
-import { NpcChatMessageProps } from "./NpcChatMessage";
 import { storedTownhall } from "./types"
 
 interface NpcChatProps {
@@ -11,33 +10,12 @@ interface NpcChatProps {
   setSelectedTownhall: (newIndex: string | null) => void; 
 }
 
-// Store chat history in this ;
 const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
   const chatIdentifier: string = `npc_chat_${realmId}`;
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const [messageList, setMessageList] = useState<NpcChatMessageProps[]>(
-    JSON.parse(window.localStorage.getItem(chatIdentifier) ?? "[]"),
-  );
-  
-  const str_realmId = realmId.toString();
-  
-
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
     shouldReconnect: () => true,
   });
-
-  let currkey;
-  const currEntry = localStorage.getItem(chatIdentifier);
-  if (currEntry) {
-    const currObj = JSON.parse(currEntry)
-    const keys = Object.keys(currObj);
-    if (keys.length > 0) {
-      const lastkey = keys[keys.length - 1];
-      if (lastkey)
-        currkey = lastkey;
-    }
-  }
   
   // Runs when a new WebSocket message is received (lastJsonMessage)
   useEffect(() => {
@@ -46,10 +24,9 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
     }
     else {
       let msgObject = JSON.parse(JSON.stringify(lastJsonMessage, null, 2));
-      let msg_id = Object.keys(msgObject)[0];
-      let msg_disc = msgObject[msg_id];
-      // let msgsArray: string[] = JSON.parse(JSON.stringify(msg_disc)).split("\n\n");
-      let msgsArray: string[] = msg_disc.split("\n\n");
+      let msgKey = Object.keys(msgObject)[0];      
+      let msgValue = msgObject[msgKey];    
+      let msgsArray: string[] = msgValue.split("\n");
       
       if (msgsArray[msgsArray.length - 1] === "") {
         msgsArray.pop();
@@ -62,24 +39,17 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
       
       const newArray = [...newMessages];
       const newItem: storedTownhall = {};
-      newItem[msg_id] = newArray;
+      newItem[msgKey] = newArray;
       
       const curr = localStorage.getItem(chatIdentifier);
       if (curr) {
         const currArray: storedTownhall = JSON.parse(curr);
-        currArray[msg_id] = newArray;
+        currArray[msgKey] = newArray;
         localStorage.setItem(chatIdentifier, JSON.stringify(currArray));
       } else {
         localStorage.setItem(chatIdentifier, JSON.stringify(newItem));
       }
-      setSelectedTownhall(msg_id);
-
-      setMessageList(newArray);
-      setTimeout(() => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
-      }, 1);
+      setSelectedTownhall(msgKey);
     }
   }, [lastJsonMessage]);
 
@@ -88,15 +58,13 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
       return;
     }
 
-  sendJsonMessage({
-      realm_id: str_realmId,
+    sendJsonMessage({
+      realm_id: realmId.toString(),
     });
   }, [spawned]);
 
   useEffect(() => {
     console.log("Connection state changed");
-    console.log("realmId")
-    console.log(realmId)
   }, [readyState]);
 
   useEffect(() => {}, []);
@@ -108,14 +76,10 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
         <>
         {
           (() => {
-            // Retrieve and parse the data from localStorage
             const storedData = JSON.parse(localStorage.getItem(chatIdentifier) ?? "{}");
-            // Access the array of messages using selectedTownhall
-            const messagesAtIndex = storedData[selectedTownhall];
-            const idx = selectedTownhall;
-            // Check if messages exist and map through them
+            const messagesAtIndex = selectedTownhall ? storedData[selectedTownhall] : null;
             if (messagesAtIndex && messagesAtIndex.length) {
-              return messagesAtIndex.map((message, index) => (
+              return messagesAtIndex.map((message: any, index: number) => (
                 <NpcChatMessage key={index} {...message} />
               ));
             } else {
@@ -123,7 +87,6 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
             }
           })()
         }  
-          <span className="" ref={bottomRef}></span>
         </>
       </div>
     </div>
