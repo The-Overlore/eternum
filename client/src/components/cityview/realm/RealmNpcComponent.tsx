@@ -39,12 +39,12 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
   const tabs = useMemo(
     () => [
       {
-        key: "Townhall",
+        key: "townhall",
         label: <div>Townhall</div>,
         component: <NpcPanel />,
       },
       {
-        key: "villagers",
+        key: "npcs",
         label: (
           <div 
             onMouseEnter={() => setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Tooltip</p> })}
