@@ -20,7 +20,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const prevTownhall = () => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
     const currEntry = localStorage.getItem(chatIdentifier);
-    if (currEntry) {
+    if (currEntry && selectedTownhall !== null) {
       const currObj = JSON.parse(currEntry);
       const keys = Object.keys(currObj);
       const currentIndex = keys.indexOf(selectedTownhall);
@@ -34,7 +34,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const nextTownhall = () => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
     const currEntry = localStorage.getItem(chatIdentifier);
-    if (currEntry) {
+    if (currEntry && selectedTownhall !== null) {
       const currObj = JSON.parse(currEntry);
       const keys = Object.keys(currObj);
       const currentIndex = keys.indexOf(selectedTownhall);
