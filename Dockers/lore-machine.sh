@@ -1,5 +1,5 @@
-    #!/bin/bash 
+#!/bin/bash 
 
-    make install
+make install
 
-    poetry run lore-machine --mock --address 0.0.0.0
+poetry run lore-machine --mock --address 0.0.0.0
