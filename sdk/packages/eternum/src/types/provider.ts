@@ -227,3 +227,12 @@ export interface ChangeMoodProps extends SystemSigner {
   npc_id: num.BigNumberish;
   mood: num.BigNumberish;
 }
+
+export interface CreateLaborBuildingProps extends SystemSigner {
+  realm_entity_id: num.BigNumberish;
+  building_type: num.BigNumberish;
+}
+
+export interface DestroyLaborBuildingProps extends SystemSigner {
+  realm_entity_id: num.BigNumberish;
+}
