@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import NpcChatMessage from "./NpcChatMessage";
-import { storedTownhall, MessageObject, NpcChatProps } from "./types"
-
-
+import { TownhallRecord, Message, NpcChatProps } from "./types"
 
 const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
   const chatIdentifier: string = `npc_chat_${realmId}`;
@@ -18,32 +16,32 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
       return;
     }
     
-    const msgObject: MessageObject = lastJsonMessage as MessageObject;
-    const msgKey = Object.keys(msgObject)[0];         
-    const msgsArray: string[] = (msgObject[msgKey]).toString().split("\n");
+    const message: Message = lastJsonMessage as Message;
+    const townhallKey = Object.keys(message)[0];         
+    const townhallDiscussion: string[] = (message[townhallKey]).split("\n");
     
-    if (msgsArray[msgsArray.length - 1] === "") {
-      msgsArray.pop();
+    if (townhallDiscussion[townhallDiscussion.length - 1] === "") {
+      townhallDiscussion.pop();
     }
     
-    const newMessages = msgsArray.map((msg) => {
-      const nameMsg = msg.split(":");
-      return { sender: nameMsg[0], message: nameMsg[1] };
+    const discussionSplitByNpc = townhallDiscussion.map((msg) => {
+      const splitMessage = msg.split(":");
+      return { sender: splitMessage[0], message: splitMessage[1] };
     });
     
-    const newArray = [...newMessages];
-    const newItem: storedTownhall = {};
-    newItem[msgKey] = newArray;
+    const discussionsByNpc = [...discussionSplitByNpc];
+    const newEntry: TownhallRecord = {};
+    newEntry[townhallKey] = discussionsByNpc;
     
-    const curr = localStorage.getItem(chatIdentifier);
-    if (curr) {
-      const currArray: storedTownhall = JSON.parse(curr);
-      currArray[msgKey] = newArray;
-      localStorage.setItem(chatIdentifier, JSON.stringify(currArray));
+    const townhallsInLocalStorage = localStorage.getItem(chatIdentifier);
+    if (townhallsInLocalStorage) {
+      const storedTownhalls: TownhallRecord = JSON.parse(townhallsInLocalStorage);
+      storedTownhalls[townhallKey] = discussionsByNpc;
+      localStorage.setItem(chatIdentifier, JSON.stringify(storedTownhalls));
     } else {
-      localStorage.setItem(chatIdentifier, JSON.stringify(newItem));
+      localStorage.setItem(chatIdentifier, JSON.stringify(newEntry));
     }
-    setSelectedTownhall(msgKey); 
+    setSelectedTownhall(townhallKey); 
   }, [lastJsonMessage]);
 
   useEffect(() => {
@@ -69,10 +67,10 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
         <>
         {
           (() => {
-            const storedData = JSON.parse(localStorage.getItem(chatIdentifier) ?? "{}");
-            const messagesAtIndex = selectedTownhall ? storedData[selectedTownhall] : null;
-            if (messagesAtIndex && messagesAtIndex.length) {
-              return messagesAtIndex.map((message: any, index: number) => (
+            const townhallsInLocalStorage = JSON.parse(localStorage.getItem(chatIdentifier) ?? "{}");
+            const townhallDiscussion = selectedTownhall ? townhallsInLocalStorage[selectedTownhall] : null;
+            if (townhallDiscussion && townhallDiscussion.length) {
+              return townhallDiscussion.map((message: any, index: number) => (
                 <NpcChatMessage key={index} {...message} />
               ));
             } else {

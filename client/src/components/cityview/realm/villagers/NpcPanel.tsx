@@ -18,18 +18,18 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
 
   const parseTownhalls = (direction: string) => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
-    const currEntry = localStorage.getItem(chatIdentifier);
+    const townhallsInLocalStorage = localStorage.getItem(chatIdentifier);
     
-    if (currEntry && selectedTownhall !== null) {
-      const currObj = JSON.parse(currEntry);
-      const keys = Object.keys(currObj);
+    if (townhallsInLocalStorage && selectedTownhall !== null) {
+      const townhallsAsObject = JSON.parse(townhallsInLocalStorage);
+      const keys = Object.keys(townhallsAsObject);
       const currentKey = keys.indexOf(selectedTownhall);
-      let newKey = currentKey.toString();
+      let newKey = keys[keys.indexOf(selectedTownhall)];
 
       if (direction == "previous" && currentKey > 0) {
         newKey = keys[currentKey - 1];
       } else if (direction == "next" && currentKey >= 0 && currentKey < keys.length - 1) {
-          newKey = keys[currentKey + 1];
+        newKey = keys[currentKey + 1];
       }
       setSelectedTownhall(newKey);
     }
@@ -41,10 +41,10 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   
   useEffect(() => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
-    const currEntry = localStorage.getItem(chatIdentifier);
-    if (currEntry) {
-      const currObj = JSON.parse(currEntry);
-      const keys = Object.keys(currObj);
+    const townhallsInLocalStorage = localStorage.getItem(chatIdentifier);
+    if (townhallsInLocalStorage) {
+      const townhallsAsObject = JSON.parse(townhallsInLocalStorage);
+      const keys = Object.keys(townhallsAsObject);
       if (keys.length > 0) {
         const lastKey = keys[keys.length - 1];
         setSelectedTownhall(lastKey);

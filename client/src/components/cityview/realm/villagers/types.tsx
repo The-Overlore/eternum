@@ -14,13 +14,13 @@ export type Npc = {
   realm_id: Number;
 };
 
-export type Message = {
+export type NpcTownhallMessage = {
   sender: string;
   message: string;
 };
 
-export type storedTownhall = {
-  [key: string]: Message[];
+export type TownhallRecord = {
+  [key: string]: NpcTownhallMessage[];
 };
 
 export type NpcChatProps = {
@@ -30,6 +30,6 @@ export type NpcChatProps = {
   setSelectedTownhall: (newIndex: string | null) => void; 
 }
 
-export type MessageObject = {
+export type Message = {
   [key: string]: string;
 }
