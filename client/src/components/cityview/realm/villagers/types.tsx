@@ -15,8 +15,8 @@ export type Npc = {
 };
 
 export type NpcTownhallMessage = {
-  sender: string;
-  message: string;
+  npcName: string;
+  dialogueSegment: string;
 };
 
 export type TownhallRecord = {

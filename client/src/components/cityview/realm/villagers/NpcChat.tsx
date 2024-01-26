@@ -24,12 +24,12 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
       townhallDiscussion.pop();
     }
     
-    const discussionSplitByNpc = townhallDiscussion.map((msg) => {
+    const discussionsByNpc = townhallDiscussion.map((msg) => {
       const splitMessage = msg.split(":");
-      return { sender: splitMessage[0], message: splitMessage[1] };
+      return { npcName: splitMessage[0], dialogueSegment: splitMessage[1] };
     });
     
-    const discussionsByNpc = [...discussionSplitByNpc];
+    
     const newEntry: TownhallRecord = {};
     newEntry[townhallKey] = discussionsByNpc;
     
