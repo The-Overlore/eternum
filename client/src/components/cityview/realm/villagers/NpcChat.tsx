@@ -24,9 +24,8 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
     }
     else {
       let msgObject = JSON.parse(JSON.stringify(lastJsonMessage, null, 2));
-      let msgKey = Object.keys(msgObject)[0];      
-      let msgValue = msgObject[msgKey];    
-      let msgsArray: string[] = msgValue.split("\n");
+      let msgKey = Object.keys(msgObject)[0];         
+      let msgsArray: string[] = msgObject[msgKey].split("\n");
       
       if (msgsArray[msgsArray.length - 1] === "") {
         msgsArray.pop();

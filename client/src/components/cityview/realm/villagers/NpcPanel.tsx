@@ -3,8 +3,8 @@ import Button from "../../../../elements/Button";
 import NpcChat from "./NpcChat";
 import useRealmStore from "../../../../hooks/store/useRealmStore";
 import { getRealm } from "../../../../utils/realms";
-import { ReactComponent as ArrowPrev } from "../../../../assets/icons/common/arrow-prev.svg";
-import { ReactComponent as ArrowNext } from "../../../../assets/icons/common/arrow-next.svg";
+import { ReactComponent as ArrowPrev } from "../../../../assets/icons/common/arrow-left.svg";
+import { ReactComponent as ArrowNext } from "../../../../assets/icons/common/arrow-right.svg";
 
 
 type NpcPanelProps = {
@@ -13,36 +13,26 @@ type NpcPanelProps = {
 
 export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const [spawned, setSpawned] = useState(-1);
-  const { realmId } = useRealmStore();
-  
   const [selectedTownhall, setSelectedTownhall] = useState<string | null>(null);
+  const { realmId } = useRealmStore();
 
-  const prevTownhall = () => {
+  const parseTownhalls = (direction: string) => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
     const currEntry = localStorage.getItem(chatIdentifier);
+    
     if (currEntry && selectedTownhall !== null) {
       const currObj = JSON.parse(currEntry);
       const keys = Object.keys(currObj);
-      const currentIndex = keys.indexOf(selectedTownhall);
-      if (currentIndex > 0) {
-        const prevKey = keys[currentIndex - 1];
-        setSelectedTownhall(prevKey);
+      const currentKey = keys.indexOf(selectedTownhall);
+      let newKey = currentKey.toString();
+
+      if (direction == "previous" && currentKey > 0) {
+        newKey = keys[currentKey - 1];
+      } else if (direction == "next" && currentKey >= 0 && currentKey < keys.length - 1) {
+          newKey = keys[currentKey + 1];
       }
+      setSelectedTownhall(newKey);
     }
-  };
-
-  const nextTownhall = () => {
-    const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
-    const currEntry = localStorage.getItem(chatIdentifier);
-    if (currEntry && selectedTownhall !== null) {
-      const currObj = JSON.parse(currEntry);
-      const keys = Object.keys(currObj);
-      const currentIndex = keys.indexOf(selectedTownhall);
-      if (currentIndex >= 0 && currentIndex < keys.length - 1) {
-        const nextKey = keys[currentIndex + 1];
-        setSelectedTownhall(nextKey);
-      }
-    };
   }
 
   const realm = useMemo(() => {
@@ -65,11 +55,11 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   return (
     <div className="flex flex-col h-[250px] relative pb-3">
       <div
-        className="flex flex-row w-[100%] items-center space-y-2"
+        className="flex flex-row w-[100%] items-center justify-between space-y-2"
         style={{ position: "relative", top: "2%" }}
       >
         <Button
-          className="mx-1 top-3 left-3 w-32 bottom-2 !rounded-full"
+          className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
           onClick={() => setSpawned(spawned + 1)}
           variant="primary"
         >
@@ -78,22 +68,18 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
 
         <div className="flex">
           <Button
-            className="mx-1  left-3 w-12  !rounded-md"
-            onClick={prevTownhall} 
-            variant="primary"
+            onClick={() => parseTownhalls("previous")} 
             >
             <ArrowPrev />
           </Button>
           <div className="text-white">{selectedTownhall}</div>
           <Button
-            className="mx-1 top-3 left-3 w-12 bottom-2 !rounded-md"
-            onClick={nextTownhall} 
-            variant="primary"
+            onClick={() => parseTownhalls("next")}
+            className="mr-2" 
             >
             <ArrowNext />
           </Button>
         </div>
-
       </div>
       <NpcChat spawned={spawned} realmId={realm?.realmId ?? BigInt(0)} selectedTownhall={selectedTownhall} setSelectedTownhall={setSelectedTownhall} />
     </div>
