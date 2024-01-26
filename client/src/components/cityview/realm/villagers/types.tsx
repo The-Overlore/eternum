@@ -22,3 +22,14 @@ export type Message = {
 export type storedTownhall = {
   [key: string]: Message[];
 };
+
+export type NpcChatProps = {
+  spawned: number;
+  realmId: bigint;
+  selectedTownhall: string | null;
+  setSelectedTownhall: (newIndex: string | null) => void; 
+}
+
+export type MessageObject = {
+  [key: string]: string;
+}

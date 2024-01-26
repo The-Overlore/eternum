@@ -1,14 +1,9 @@
 import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import NpcChatMessage from "./NpcChatMessage";
-import { storedTownhall } from "./types"
+import { storedTownhall, MessageObject, NpcChatProps } from "./types"
 
-interface NpcChatProps {
-  spawned: number;
-  realmId: bigint;
-  selectedTownhall: string | null;
-  setSelectedTownhall: (newIndex: string | null) => void; 
-}
+
 
 const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
   const chatIdentifier: string = `npc_chat_${realmId}`;
@@ -22,34 +17,33 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
     if (lastJsonMessage === null) {
       return;
     }
-    else {
-      let msgObject = JSON.parse(JSON.stringify(lastJsonMessage, null, 2));
-      let msgKey = Object.keys(msgObject)[0];         
-      let msgsArray: string[] = msgObject[msgKey].split("\n");
-      
-      if (msgsArray[msgsArray.length - 1] === "") {
-        msgsArray.pop();
-      }
-      
-      const newMessages = msgsArray.map((msg) => {
-        const nameMsg = msg.split(":");
-        return { sender: nameMsg[0], message: nameMsg[1] };
-      });
-      
-      const newArray = [...newMessages];
-      const newItem: storedTownhall = {};
-      newItem[msgKey] = newArray;
-      
-      const curr = localStorage.getItem(chatIdentifier);
-      if (curr) {
-        const currArray: storedTownhall = JSON.parse(curr);
-        currArray[msgKey] = newArray;
-        localStorage.setItem(chatIdentifier, JSON.stringify(currArray));
-      } else {
-        localStorage.setItem(chatIdentifier, JSON.stringify(newItem));
-      }
-      setSelectedTownhall(msgKey);
+    
+    const msgObject: MessageObject = lastJsonMessage as MessageObject;
+    const msgKey = Object.keys(msgObject)[0];         
+    const msgsArray: string[] = (msgObject[msgKey]).toString().split("\n");
+    
+    if (msgsArray[msgsArray.length - 1] === "") {
+      msgsArray.pop();
     }
+    
+    const newMessages = msgsArray.map((msg) => {
+      const nameMsg = msg.split(":");
+      return { sender: nameMsg[0], message: nameMsg[1] };
+    });
+    
+    const newArray = [...newMessages];
+    const newItem: storedTownhall = {};
+    newItem[msgKey] = newArray;
+    
+    const curr = localStorage.getItem(chatIdentifier);
+    if (curr) {
+      const currArray: storedTownhall = JSON.parse(curr);
+      currArray[msgKey] = newArray;
+      localStorage.setItem(chatIdentifier, JSON.stringify(currArray));
+    } else {
+      localStorage.setItem(chatIdentifier, JSON.stringify(newItem));
+    }
+    setSelectedTownhall(msgKey); 
   }, [lastJsonMessage]);
 
   useEffect(() => {
