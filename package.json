@@ -9,5 +9,7 @@
     "build-packages": "bun run --cwd sdk/packages/eternum build",
     "build-client": "bun run --cwd ./client build"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react-blurhash": "^0.3.0"
+  }
 }
