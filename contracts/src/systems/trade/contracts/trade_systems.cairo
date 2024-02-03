@@ -29,7 +29,7 @@ mod trade_systems {
     use eternum::constants::{REALM_ENTITY_TYPE, WORLD_CONFIG_ID, FREE_TRANSPORT_ENTITY_TYPE};
 
     use core::poseidon::poseidon_hash_span;
-
+    
     #[derive(Drop, starknet::Event)]
     struct OrderAccepted {
         #[key]
