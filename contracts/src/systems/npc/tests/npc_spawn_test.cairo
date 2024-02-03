@@ -58,7 +58,6 @@ fn test_spawning() {
             5, // regions
             1, // wonder
             1, // order
-            99, // order_hyperstructure_id
             Position { x: 1, y: 1, entity_id: 1_u128 }, // position  
         // x needs to be > 470200 to get zone
         );
