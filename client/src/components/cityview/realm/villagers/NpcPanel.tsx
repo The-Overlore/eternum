@@ -91,6 +91,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       </div>
       <NpcChat
         spawned={spawned}
+        order={realm?.order ?? 0}
         realmId={realm?.realmId ?? BigInt(0)}
         selectedTownhall={selectedTownhall}
         setSelectedTownhall={setSelectedTownhall}

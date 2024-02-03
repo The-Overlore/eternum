@@ -3,7 +3,7 @@ import useWebSocket from "react-use-websocket";
 import { NpcChatMessage, NpcChatMessageProps } from "./NpcChatMessage";
 import { TownhallRecord, Message, NpcChatProps } from "./types";
 
-const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
+const NpcChat = ({ spawned, order, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
   const chatIdentifier: string = `npc_chat_${realmId}`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
@@ -50,6 +50,7 @@ const NpcChat = ({ spawned, realmId, selectedTownhall, setSelectedTownhall }: Np
 
     sendJsonMessage({
       realm_id: realmId.toString(),
+	  order: order
     });
   }, [spawned]);
 

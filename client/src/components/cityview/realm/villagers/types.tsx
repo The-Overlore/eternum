@@ -25,11 +25,12 @@ export type TownhallRecord = {
 
 export type NpcChatProps = {
   spawned: number;
+  order: number;
   realmId: bigint;
   selectedTownhall: string | null;
-  setSelectedTownhall: (newIndex: string | null) => void; 
-}
+  setSelectedTownhall: (newIndex: string | null) => void;
+};
 
 export type Message = {
   [key: string]: string;
-}
+};
