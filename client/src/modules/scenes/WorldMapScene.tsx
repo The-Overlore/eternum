@@ -14,7 +14,7 @@ import { useMemo, useRef } from "react";
 import { useCaravan } from "../../hooks/helpers/useCaravans.js";
 import useRealmStore from "../../hooks/store/useRealmStore.js";
 import { useGetRealm } from "../../hooks/helpers/useRealm.js";
-import { getRealmPositionFromContractPosition } from "../../utils/utils.js";
+import { getUIPositionFromContractPosition } from "../../utils/utils.js";
 import Bank from "../../components/worldmap/banks/models/Bank2.js";
 import banks from "../../data/banks.json";
 
@@ -36,8 +36,8 @@ export const WorldMapScene = () => {
         const { destination: from } = getCaravanInfo(caravanId);
         if (from) {
           return {
-            from: getRealmPositionFromContractPosition(from),
-            to: getRealmPositionFromContractPosition(realm.position),
+            from: getUIPositionFromContractPosition(from),
+            to: getUIPositionFromContractPosition(realm.position),
           };
         }
       })
@@ -54,35 +54,30 @@ export const WorldMapScene = () => {
         </mesh>
       </TransformControls> */}
       <WorldMap ref={worldRef} />
-      <HyperstructureStarted />
-      {/* {hyperstructures.map((hyperstructure, i) => {
+      {/* <HyperstructureStarted /> */}
+      {hyperstructures.map((hyperstructure, i) => {
         if (hyperstructure) {
-          if (hyperstructure.level >= 3) {
+          if (hyperstructure.completed) {
             return (
               <HyperstructureFinished
                 key={i}
                 position={[hyperstructure.uiPosition.x, hyperstructure.uiPosition.y, hyperstructure.uiPosition.z]}
               />
             );
-          } else if (hyperstructure.level == 2) {
+          } else if (hyperstructure.progress > 50) {
             return (
-              <></>
-              // <HyperstructureHalf
-              //   key={i}
-              //   hyperstructure={hyperstructure}
-              //   position={[hyperstructure.uiPosition.x, hyperstructure.uiPosition.y, hyperstructure.uiPosition.z]}
-              // />
-            );
-          } else {
-            return (
-              <HyperstructureStarted
-
+              <HyperstructureHalf
+                key={i}
+                hyperstructure={hyperstructure}
+                position={[hyperstructure.uiPosition.x, hyperstructure.uiPosition.y, hyperstructure.uiPosition.z]}
               />
             );
+          } else {
+            return <HyperstructureStarted />;
           }
         }
         return null;
-      })} */}
+      })}
       {/* {banks.map((bank, i) => {
         return <Bank key={i} position={[bank.x, bank.y, bank.z]} />;
       })} */}

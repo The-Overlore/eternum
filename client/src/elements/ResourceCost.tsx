@@ -4,6 +4,7 @@ import { ResourceIcon } from "./ResourceIcon";
 import clsx from "clsx";
 
 type ResourceCostProps = {
+  isLabor?: boolean;
   resourceId: number;
   amount: number;
   color?: string;
@@ -15,6 +16,7 @@ type ResourceCostProps = {
 
 export const ResourceCost = ({
   type = "horizontal",
+  isLabor = false,
   className,
   withTooltip = false,
   onClick,
@@ -25,13 +27,16 @@ export const ResourceCost = ({
     <div
       className={clsx(
         "relative flex items-center gap-1 px-1 rounded text-lightest",
-        type === "horizontal" ? "flex-row justify-start" : "flex-col justify-center",
+        type === "horizontal" ? "flex-row" : "flex-col justify-center",
         className,
       )}
     >
-      <ResourceIcon withTooltip={withTooltip} resource={trait || ""} size="md" />
+      <ResourceIcon isLabor={isLabor} withTooltip={withTooltip} resource={trait || ""} size="md" />
       <div
-        className={clsx("relative flex flex-col shrink-0", type === "horizontal" ? "ml-1 font-bold" : "items-center")}
+        className={clsx(
+          "relative flex flex-col shrink-0",
+          type === "horizontal" ? "ml-1 font-bold  text-left" : "items-center",
+        )}
       >
         <div onClick={onClick} className={clsx("relative text-xxs", props.color)}>
           {props.color && props.amount > 0 ? "+" : ""}

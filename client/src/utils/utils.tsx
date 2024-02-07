@@ -315,7 +315,7 @@ export const getContractPositionFromRealPosition = (position: Position): Positio
   };
 };
 
-export const getRealmPositionFromContractPosition = (position: Position): Position => {
+export const getUIPositionFromContractPosition = (position: Position): Position => {
   const { x, y } = position;
   return {
     x: (x - 1800000) / 10000,
@@ -334,7 +334,9 @@ export function divideByPrecision(value: number): number {
 }
 
 export function getPosition(realm_id: bigint): { x: number; y: number } {
-  const coords = realmCoords.features[Number(realm_id) - 1].geometry.coordinates.map((value) => parseInt(value));
+  const data = realmCoords.features[Number(realm_id) - 1];
+  if (!data) return { x: 0, y: 0 };
+  const coords = data.geometry.coordinates.map((value) => parseInt(value));
   return { x: coords[0] + 1800000, y: coords[1] + 1800000 };
 }
 
@@ -360,3 +362,17 @@ export function addressToNumber(address: string) {
   // Map the sum to a number between 1 and 10
   return (sum % 5) + 1;
 }
+
+export const calculateDistance = (start: Position, destination: Position): number => {
+  const x: number =
+    start.x > destination.x ? Math.pow(start.x - destination.x, 2) : Math.pow(destination.x - start.x, 2);
+
+  const y: number =
+    start.y > destination.y ? Math.pow(start.y - destination.y, 2) : Math.pow(destination.y - start.y, 2);
+
+  // Using bitwise shift for the square root approximation for BigInt.
+  // we store coords in x * 10000 to get precise distance
+  const distance = (x + y) ** 0.5 / 10000;
+
+  return distance;
+};

@@ -1,4 +1,4 @@
-import { RPCProvider } from "@dojoengine/core";
+import { DojoProvider } from "@dojoengine/core";
 import {
   AcceptOrderProps,
   AttachCaravanProps,
@@ -23,7 +23,8 @@ import {
   AttackProps,
   StealProps,
   LevelUpRealmProps,
-  LevelUpHyperstructureProps,
+  ControlHyperstructureProps,
+  CompleteHyperstructureProps,
   SetAddressNameProps,
   MergeSoldiersProps,
   CreateAndMergeSoldiersProps,
@@ -32,6 +33,10 @@ import {
   SwapBankAndTravelBackProps,
   SpawnNpcProps,
   ChangeMoodProps,
+  MintResourcesProps,
+  DisassembleCaravanAndReturnFreeUnitsProps,
+  CreateLaborBuildingProps,
+  DestroyLaborBuildingProps,
 } from "../types/provider";
 
 import { Call } from "starknet";
@@ -47,7 +52,7 @@ export const getContractByName = (manifest: any, name: string) => {
   );
 };
 
-export class EternumProvider extends RPCProvider {
+export class EternumProvider extends DojoProvider {
   constructor(world_address: string, url?: string, manifest: any = undefined) {
     super(world_address, manifest, url);
   }
@@ -205,6 +210,20 @@ export class EternumProvider extends RPCProvider {
     });
   }
 
+  public async mint_resources(props: MintResourcesProps) {
+    const { receiver_id, resources } = props;
+
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "test_resource_systems"),
+      entrypoint: "mint",
+      calldata: [this.getWorldAddress(), receiver_id, resources.length / 2, ...resources],
+    });
+
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
   public async accept_order(props: AcceptOrderProps) {
     const { taker_id, trade_id, donkeys_quantity, caravan_id, signer } = props;
 
@@ -316,6 +335,25 @@ export class EternumProvider extends RPCProvider {
     });
   }
 
+  public async disassemble_caravan_and_return_free_units(props: DisassembleCaravanAndReturnFreeUnitsProps) {
+    const { caravan_id, unit_ids, signer } = props;
+    const tx = await this.executeMulti(signer, [
+      {
+        contractAddress: getContractByName(this.manifest, "caravan_systems"),
+        entrypoint: "disassemble",
+        calldata: [this.getWorldAddress(), caravan_id],
+      },
+      {
+        contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
+        entrypoint: "return_free_units",
+        calldata: [this.getWorldAddress(), unit_ids.length, ...unit_ids],
+      },
+    ]);
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
   public async attach_caravan(props: AttachCaravanProps) {
     const { realm_id, trade_id, caravan_id, signer } = props;
     const tx = await this.executeMulti(signer, {
@@ -358,7 +396,6 @@ export class EternumProvider extends RPCProvider {
       regions,
       wonder,
       order,
-      order_hyperstructure_id,
       position,
       signer,
     } = props;
@@ -378,7 +415,6 @@ export class EternumProvider extends RPCProvider {
           regions,
           wonder,
           order,
-          order_hyperstructure_id,
           2,
           position.x,
           position.y,
@@ -404,7 +440,6 @@ export class EternumProvider extends RPCProvider {
         regions,
         wonder,
         order,
-        order_hyperstructure_id,
         position,
       } = realm;
 
@@ -423,7 +458,6 @@ export class EternumProvider extends RPCProvider {
             regions,
             wonder,
             order,
-            order_hyperstructure_id, // TODO: issue here we can't pass th BigINt
             2, // entity ID in position struct
             position.x,
             position.y,
@@ -642,11 +676,23 @@ export class EternumProvider extends RPCProvider {
     });
   }
 
-  public async level_up_hyperstructure(props: LevelUpHyperstructureProps) {
+  public async control_hyperstructure(props: ControlHyperstructureProps) {
+    const { hyperstructure_id, order_id, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "hyperstructure_systems"),
+      entrypoint: "control",
+      calldata: [this.getWorldAddress(), hyperstructure_id, order_id],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async complete_hyperstructure(props: CompleteHyperstructureProps) {
     const { hyperstructure_id, signer } = props;
     const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "leveling_systems"),
-      entrypoint: "level_up_hyperstructure",
+      contractAddress: getContractByName(this.manifest, "hyperstructure_systems"),
+      entrypoint: "complete",
       calldata: [this.getWorldAddress(), hyperstructure_id],
     });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
@@ -720,6 +766,32 @@ export class EternumProvider extends RPCProvider {
       contractAddress: getContractByName(this.manifest, "name_systems"),
       entrypoint: "set_address_name",
       calldata: [this.getWorldAddress(), name],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async create_labor_building(props: CreateLaborBuildingProps) {
+    const { realm_entity_id, building_type } = props;
+
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "buildings_systems"),
+      entrypoint: "create",
+      calldata: [this.getWorldAddress(), realm_entity_id, building_type],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async destroy_labor_building(props: DestroyLaborBuildingProps) {
+    const { realm_entity_id } = props;
+
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "buildings_systems"),
+      entrypoint: "destroy",
+      calldata: [this.getWorldAddress(), realm_entity_id],
     });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,

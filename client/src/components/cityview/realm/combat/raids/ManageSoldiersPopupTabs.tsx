@@ -154,14 +154,14 @@ export const ManageSoldiersPopupTabs = ({ headline, selectedRaider, onClose }: M
       </SecondaryPopup.Head>
       <SecondaryPopup.Body width={"376px"}>
         <div className="flex flex-col items-center p-2">
-          <Headline size="big">{headline}</Headline>
+          <Headline>{headline}</Headline>
           <div className="flex relative mt-1 justify-between text-xxs text-lightest w-full">
             <>
               <Tabs
                 selectedIndex={selectedTab}
                 onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
                 variant="default"
-                className="h-full"
+                className="h-full "
               >
                 <Tabs.List>
                   {tabs.map((tab, index) => (

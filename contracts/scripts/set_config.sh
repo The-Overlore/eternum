@@ -60,6 +60,19 @@ commands+=(
     # realm_l2_contract
     "sozo execute $CONFIG_SYSTEMS set_world_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,$DOJO_ACCOUNT_ADDRESS,0"
 
+    ### BUILDINGS CONFIG ###
+    # level_multiplier = 10
+    # discount = 90% = 16602069666338596454
+    # resources 1 = [1, 2, 3, 7, 10, 17] = 1108152355345
+    # resources 1 count = 6
+    # resources 2 = [4, 6, 8, 9, 19, 20] = 4423951127316
+    # resources 2 count = 6
+    # resources 3 =  [11, 12, 13, 14, 18] = 47446822418
+    # resources 3 count = 5
+    # resources 4 = [5, 15, 16, 21, 22] = 21727548694
+    # resources 4 count = 5
+    "sozo execute $CONFIG_SYSTEMS set_labor_buildings_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,10,16602069666338596454,1108152355345,6,4423951127316,6,47446822418,5,21727548694,5,8,1,126000,2,99016,3,96303,7,29622,10,14924,17,3492,254,1890000,255,630000,8,4,66404,6,43742,8,24044,9,22964,19,2337,20,1382,254,1890000,255,630000,7,11,7537,12,6206,13,6005,14,6005,18,2789,254,1890000,255,630000,7,5,55676,15,4321,16,4070,21,930,22,578,254,1890000,255,630000"
+
     # ### LABOR ###
     # # base_labor_units 7200
     # # base_resources_per_cycle 21
@@ -81,10 +94,9 @@ commands+=(
     "sozo execute $CONFIG_SYSTEMS set_capacity_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,256,$((100000 * resource_precision))"
 
     # ### ROAD ###
-    # # fee resource type = 2 # Stone
-    # # fee amount = 10
+    # # 10 wheat, fish, stone and wood per road usage
     # # speed up transit by 2x = 2
-    "sozo execute $CONFIG_SYSTEMS set_road_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,2,$((10 * resource_precision)),2"
+    "sozo execute $CONFIG_SYSTEMS set_road_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,4,1,10000,2,10000,254,10000,255,10000,2"
 
 )
 
@@ -99,7 +111,7 @@ commands+=(
     ## resource_1_costs = 1, 132, 2, 104, 3, 101, 4, 70, 5, 58, 6, 46, 7, 31,
     ## resource_2_costs = 8, 25, 9, 24, 10, 16, 11, 8, 12, 7, 13, 6, 14, 6, 15, 5,
     ## resource_3_costs = 16, 4, 17, 4, 18, 3, 19, 2, 20, 1, 21, 1, 22, 1,
-    "sozo execute $CONFIG_SYSTEMS set_leveling_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,999999999999999993,604800,1000,1844674407370955161,4611686018427387904,25,3780000,1260000,7,1,132000,2,103731,3,100889,4,69566,5,58327,6,45825,7,31033,8,8,25189,9,24057,10,15635,11,7896,12,6501,13,6291,14,6291,15,4527,7,16,4264,17,3659,18,2922,19,2448,20,1448,21,974,22,605"
+    "sozo execute $CONFIG_SYSTEMS set_leveling_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,999999999999999993,604800,1000,1844674407370955161,4611686018427387904,25,11340000,3780000,7,1,756000,2,594097,3,577816,4,398426,5,334057,6,262452,7,177732,8,8,144266,9,137783,10,89544,11,45224,12,37235,13,36029,14,36029,15,25929,7,16,24421,17,20954,18,16733,19,14020,20,8291,21,5578,22,3467"
 )
 
 
@@ -172,16 +184,17 @@ commands+=(
 
 ## LABOR COSTS
 commands+=(
+    ## food is free now
     #resourceId: 254
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_resources --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,66051,3"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,1,171"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,2,134"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,3,131"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_resources --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,66051,3"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,1,171"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,2,134"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,254,3,131"
     # resourceId: 255
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_resources --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,263430,3"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,4,289"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,5,242"
-    "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,6,190"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_resources --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,263430,3"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,4,289"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,5,242"
+    #"sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,255,6,190"
     # resourceId: 1
     "sozo execute $CONFIG_SYSTEMS set_labor_cost_resources --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,33816319,4"
     "sozo execute $CONFIG_SYSTEMS set_labor_cost_amount --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2,3274"
@@ -320,33 +333,17 @@ commands+=(
     # create hyperstructures
     # @dev generated using data/hyperstructures/generateCommands.js
     # data => ./contracts/data/hyperstructures/hyperstructures.json
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1652610,2103276,1"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2621909,1458147,2"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1650208,1764081,3"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2919158,2127177,4"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,740492,1446359,5"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2445183,2275580,6"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1954116,2171570,7"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1412094,1993452,8"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,893997,1873356,9"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2509517,1884363,10"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1097424,1476206,11"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1572668,1517683,12"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1906818,1409047,13"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2072443,1712964,14"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2844078,1697894,15"
-    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,605410,2023632,16"
-
-    ## set leveling config
-    ## 1247400000 wheat (330x the realm leveling amount)
-    ## 415800000 fish (330x the realm leveling amount)
-    ## resources 1 costs
-    ## 1,43608500,2,34269500,3,33330500,4,22982500,5,19269500,6,15138999,7,10252000
-    ## resources 2 costs
-    ## 8,8321500,9,7948000,10,5165000,11,2608500,12,2148000,13,2078500,14,2078500,15,1495500
-    ## resources 3 costs
-    ## 16,1408500,17,1208500,18,965000,19,808500,20,478500,21,321500,22,200000
-    "sozo execute $CONFIG_SYSTEMS set_leveling_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,999999999999999992,604800,4,1844674407370955161,4611686018427387904,25,1247400000,415800000,7,1,43608500,2,34269500,3,33330500,4,22982500,5,19269500,6,15138999,7,10252000,8,8,8321500,9,7948000,10,5165000,11,2608500,12,2148000,13,2078500,14,2078500,15,1495500,7,16,1408500,17,1208500,18,965000,19,808500,20,478500,21,321500,22,200000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1652610,2103276,4,1,9450000,2,7426208,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2621909,1458147,4,3,7222702,4,4980326,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1650208,1764081,4,5,4175714,6,3280649,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2919158,2127177,4,7,2221646,8,1803321,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,740492,1446359,4,9,1722294,10,1119301,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2445183,2275580,4,11,565302,12,465432,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1954116,2171570,4,13,450359,14,450359,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1412094,1993452,4,15,324106,16,305263,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,893997,1873356,4,17,261926,18,209162,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,2509517,1884363,4,19,175246,20,103640,254,45000000,255,15000000"
+    "sozo execute $CONFIG_SYSTEMS create_hyperstructure --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,1,1097424,1476206,4,21,69719,22,43342,254,45000000,255,15000000"
 )
 
 #### SET LABOR AUCTIONS ####
@@ -380,7 +377,7 @@ done
 # Check if the first argument is provided and set it to "dev" or "prod"
 if [[ "$1" == "prod" ]]; then
     commands+=(
-        "sozo execute $CONFIG_SYSTEMS set_mint_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,24,1,872170,2,685390,3,666610,4,459650,5,385390,6,302780,7,205040,8,166430,9,158960,10,103300,11,52170,12,42960,13,41570,14,41570,15,29910,16,28170,17,24170,18,19300,19,16170,20,9570,21,6430,22,4000,254,7560000,255,2520000"
+        "sozo execute $CONFIG_SYSTEMS set_mint_config --account-address $DOJO_ACCOUNT_ADDRESS --calldata $SOZO_WORLD,24,1,378000,2,297049,3,288908,4,199213,5,167029,6,131226,7,88866,8,72133,9,68892,10,44772,11,22612,12,18618,13,18015,14,18015,15,12965,16,12211,17,10477,18,8367,19,7010,20,4146,21,2789,22,1734,254,12474000,255,4158000"
     )
 else
     # Add command for no argument case, which is also treated as dev

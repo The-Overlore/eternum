@@ -7,7 +7,9 @@ import useRealmStore from "../../../../hooks/store/useRealmStore";
 import { useTrade } from "../../../../hooks/helpers/useTrade";
 import { divideByPrecision, multiplyByPrecision } from "../../../../utils/utils";
 import { WEIGHT_PER_DONKEY_KG, MarketInterface } from "@bibliothecadao/eternum";
-import { getTotalResourceWeight } from "./TradeUtils";
+import { getTotalResourceWeight } from "./utils";
+import useMarketStore from "../../../../hooks/store/useMarketStore";
+import { EventType, useNotificationsStore } from "../../../../hooks/store/useNotificationsStore";
 
 type AcceptOfferPopupProps = {
   onClose: () => void;
@@ -16,7 +18,7 @@ type AcceptOfferPopupProps = {
 
 export const AcceptOfferPopup = ({ onClose, selectedTrade }: AcceptOfferPopupProps) => {
   const [selectedCaravan, setSelectedCaravan] = useState<bigint>(0n);
-  const [isNewCaravan, setIsNewCaravan] = useState(false);
+  const [isNewCaravan, setIsNewCaravan] = useState(true);
   const [donkeysCount, setDonkeysCount] = useState(1);
   const [hasEnoughDonkeys, setHasEnoughDonkeys] = useState(false);
 
@@ -54,15 +56,23 @@ export const AcceptOfferPopup = ({ onClose, selectedTrade }: AcceptOfferPopupPro
     }
   };
 
+  const deleteTrade = useMarketStore((state) => state.deleteTrade);
+  const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
+
   const onAccept = () => {
     setIsLoading(true);
     optimisticAcceptOffer(selectedTrade.tradeId, realmEntityId, acceptOffer)();
+    // todo: only delete if success
+    deleteTrade(selectedTrade.tradeId);
+    if (selectedTrade.takerId === realmEntityId) {
+      deleteNotification([selectedTrade.tradeId.toString()], EventType.DirectOffer);
+    }
     onClose();
   };
 
-  const { getTradeResources } = useTrade();
+  const { getTradeResourcesFromEntityViewpoint } = useTrade();
 
-  let { resourcesGive, resourcesGet } = getTradeResources(realmEntityId, selectedTrade.tradeId);
+  let { resourcesGive, resourcesGet } = getTradeResourcesFromEntityViewpoint(realmEntityId, selectedTrade.tradeId);
 
   let resourceWeight = getTotalResourceWeight(resourcesGet);
 

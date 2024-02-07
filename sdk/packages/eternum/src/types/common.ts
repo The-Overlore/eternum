@@ -4,6 +4,13 @@ export enum Winner {
   Target = "Target",
 }
 
+export enum DESTINATION_TYPE {
+  HOME,
+  HYPERSTRUCTURE,
+  REALM,
+  BANK,
+}
+
 export interface CombatResultInterface {
   attackerRealmEntityId: bigint;
   targetRealmEntityId: bigint;
@@ -27,9 +34,11 @@ export interface CombatInfo {
   position?: Position | undefined;
   homePosition?: Position | undefined;
   entityOwnerId?: bigint | undefined;
-  locationRealmEntityId?: bigint | undefined;
+  owner?: bigint | undefined;
+  locationEntityId?: bigint | undefined;
+  locationType?: DESTINATION_TYPE;
   originRealmId?: bigint | undefined;
-  hyperstructureId: bigint | undefined;
+  order: number;
 }
 
 /// TRADING
@@ -40,12 +49,9 @@ export interface MarketInterface {
   // brillance, reflection, ...
   makerOrder: number;
   expiresAt: number;
-  resourcesGet: Resource[];
-  resourcesGive: Resource[];
-  canAccept?: boolean;
+  takerGets: Resource[];
+  makerGets: Resource[];
   ratio: number;
-  distance: number;
-  hasRoad: boolean | undefined;
 }
 
 export interface Trade {
@@ -93,9 +99,12 @@ export interface CaravanInterface {
   arrivalTime: number | undefined;
   pickupArrivalTime: number | undefined;
   capacity: number | undefined;
-  destination: Position | undefined;
+  intermediateDestination: Position | undefined;
   owner: bigint | undefined;
   isMine: boolean;
+  isRoundTrip: boolean;
+  position: Position | undefined;
+  destinationType: DESTINATION_TYPE;
 }
 
 /// REALMS
@@ -107,6 +116,7 @@ export interface SelectableRealmInterface {
   distance: number;
   defence?: CombatInfo;
   level?: number;
+  addressName: string;
 }
 
 export interface RealmInterface {
@@ -168,6 +178,7 @@ export interface UIPosition {
 /// HYPESTRUCTURE
 export interface HyperStructureInterface {
   hyperstructureId: bigint;
+  name: string;
   orderId: number;
   progress: number;
   hyperstructureResources: {
@@ -178,5 +189,9 @@ export interface HyperStructureInterface {
   completed: boolean;
   position: Position;
   uiPosition: UIPosition;
-  level: number;
+  defence: number;
+  attack: number;
+  health: number;
+  watchTowerQuantity: number;
+  distance: number;
 }

@@ -288,6 +288,46 @@ export enum ResourcesIds {
   Fish = 255,
 }
 
+export const Guilds = ["Harvesters", "Miners", "Collectors", "Hunters"];
+
+export const resourcesByGuild = {
+  [Guilds[0]]: [
+    ResourcesIds.Wood,
+    ResourcesIds.Stone,
+    ResourcesIds.Coal,
+    ResourcesIds.Ironwood,
+    ResourcesIds.Hartwood,
+    ResourcesIds.TrueIce,
+  ],
+  [Guilds[1]]: [
+    ResourcesIds.Copper,
+    ResourcesIds.Silver,
+    ResourcesIds.Gold,
+    ResourcesIds.ColdIron,
+    ResourcesIds.AlchemicalSilver,
+    ResourcesIds.Adamantine,
+  ],
+  [Guilds[2]]: [
+    ResourcesIds.Diamonds,
+    ResourcesIds.Sapphire,
+    ResourcesIds.Ruby,
+    ResourcesIds.DeepCrystal,
+    ResourcesIds.TwilightQuartz,
+  ],
+  [Guilds[3]]: [
+    ResourcesIds.Obsidian,
+    ResourcesIds.Ignium,
+    ResourcesIds.EtherealSilica,
+    ResourcesIds.Mithral,
+    ResourcesIds.Dragonhide,
+  ],
+};
+
+// if it's labor, then remove 28 to get the icon resource id
+export const getIconResourceId = (resourceId: number, isLabor: boolean) => {
+  return isLabor ? resourceId - 28 : resourceId;
+};
+
 export const initialResources = [
   872.17, 685.39, 666.61, 459.65, 385.39, 302.78, 205.04, 166.43, 158.96, 103.3, 52.17, 42.96, 41.57, 41.57, 29.91,
   28.17, 24.17, 19.3, 16.17, 9.57, 6.43, 4,
@@ -303,28 +343,68 @@ export const resourceProb = [
 // (415800000 / 43608500) * 0.2018109
 export const foodProb = [5.7727, 1.9242];
 
-// wheat / fish
-export const hyperstructureResourcesPerLevel = [
-  // level 1
-  [254, 1247400000, 255, 415800000],
+const LEVELING_COST_MULTIPLIER = 1.25;
 
-  // level 2
-  [1, 43608500, 2, 34269500, 3, 33330500, 4, 22982500, 5, 19269500, 6, 15138999, 7, 10252000],
+// guild 1, 2, 3, 4
+export const getBuildingsCost = (guild: number) => {
+  const costs = [
+    [1, 126000, 2, 99016, 3, 96303, 7, 29622, 10, 14924, 17, 3492, 254, 1890000, 255, 630000], // guild 1
+    [4, 66404, 6, 43742, 8, 24044, 9, 22964, 19, 2337, 20, 1382, 254, 1890000, 255, 630000], // guild 2
+    [11, 7537, 12, 6206, 13, 6005, 14, 6005, 18, 2789, 254, 1890000, 255, 630000], // guild 3
+    [5, 55676, 15, 4321, 16, 4070, 21, 930, 22, 578, 254, 1890000, 255, 630000], // guild 4
+  ];
 
-  // level 3
-  [8, 8321500, 9, 7948000, 10, 5165000, 11, 2608500, 12, 2148000, 13, 2078500, 14, 2078500, 15, 1495500],
+  const baseAmounts = costs[guild - 1];
 
-  // level 4
-  [16, 1408500, 17, 1208500, 18, 965000, 19, 808500, 20, 478500, 21, 321500, 22, 200000],
-];
-
-export const getHyperstructureResources = (level: number): { resourceId: number; amount: number }[] => {
-  let resourcesList = hyperstructureResourcesPerLevel[level];
-  let resources = [];
-  for (let i = 0; i < resourcesList.length; i += 2) {
-    resources.push({ resourceId: resourcesList[i], amount: resourcesList[i + 1] });
+  const costResources = [];
+  for (let i = 0; i < baseAmounts.length; i = i + 2) {
+    costResources.push({
+      resourceId: baseAmounts[i],
+      amount: Math.floor(baseAmounts[i + 1]),
+    });
   }
-  return resources;
+  return costResources;
+};
+
+export const getLevelingCost = (newLevel: number): { resourceId: number; amount: number }[] => {
+  const costMultiplier = LEVELING_COST_MULTIPLIER ** Math.floor((newLevel - 1) / 4);
+
+  const rem = newLevel % 4;
+
+  const baseAmounts =
+    rem === 0
+      ? // level 4 (resource tier 3)
+        [16, 24421, 17, 20954, 18, 16733, 19, 14020, 20, 8291, 21, 5578, 22, 3467]
+      : rem === 1
+      ? // level 1 (food)
+        [254, 11340000, 255, 3780000]
+      : rem === 2
+      ? // level 2 (resource tier 1)
+        [1, 756000, 2, 594097, 3, 577816, 4, 398426, 5, 334057, 6, 262452, 7, 177732]
+      : rem === 3
+      ? // level 3 (resource tier 2)
+        [8, 144266, 9, 137783, 10, 89544, 11, 45224, 12, 37235, 13, 36029, 14, 36029, 15, 25929]
+      : [];
+
+  const costResources = [];
+  for (let i = 0; i < baseAmounts.length; i = i + 2) {
+    costResources.push({
+      resourceId: baseAmounts[i],
+      amount: Math.floor(baseAmounts[i + 1] * costMultiplier),
+    });
+  }
+  return costResources;
+};
+
+// min number of realms that would be needed to collaborate to build a hyperstructure
+const HYPERSTRUCTURE_LEVELING_MULTIPLIER = 25;
+
+export const getHyperstructureResources = (currentLevel: number): { resourceId: number; amount: number }[] => {
+  let resourcesList = getLevelingCost(currentLevel + 1);
+  return resourcesList.map(({ resourceId, amount }) => ({
+    resourceId,
+    amount: Math.floor(amount * HYPERSTRUCTURE_LEVELING_MULTIPLIER),
+  }));
 };
 
 interface WeightMap {
@@ -338,10 +418,12 @@ export const WEIGHTS: WeightMap = {
   4: 1,
   5: 1,
   6: 1,
+  7: 1,
   8: 1,
   9: 1,
   10: 1,
   11: 1,
+  12: 1,
   13: 1,
   14: 1,
   15: 1,

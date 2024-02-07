@@ -3,6 +3,7 @@ import { SetupNetworkResult } from "./setupNetwork";
 import { Event } from "starknet";
 import { getEntityIdFromKeys } from "../utils/utils";
 import {
+  DisassembleCaravanAndReturnFreeUnitsProps,
   SwapBankAndTravelBackProps,
   AcceptOrderProps,
   AttachCaravanProps,
@@ -26,7 +27,8 @@ import {
   AttackProps,
   StealProps,
   LevelUpRealmProps,
-  LevelUpHyperstructureProps,
+  ControlHyperstructureProps,
+  CompleteHyperstructureProps,
   SetAddressNameProps,
   MergeSoldiersProps,
   CreateAndMergeSoldiersProps,
@@ -35,6 +37,8 @@ import {
   TransferItemsFromMultipleProps,
   SpawnNpcProps,
   ChangeMoodProps,
+  CreateLaborBuildingProps,
+  DestroyLaborBuildingProps,
 } from "@bibliothecadao/eternum";
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
@@ -88,6 +92,13 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
 
   const create_caravan = async (props: CreateCaravanProps) => {
     setComponentsFromEvents(contractComponents, getEvents(await provider.create_caravan(props)));
+  };
+
+  const disassemble_caravan_and_return_free_units = async (props: DisassembleCaravanAndReturnFreeUnitsProps) => {
+    setComponentsFromEvents(
+      contractComponents,
+      getEvents(await provider.disassemble_caravan_and_return_free_units(props)),
+    );
   };
 
   const attach_caravan = async (props: AttachCaravanProps) => {
@@ -146,8 +157,12 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
     setComponentsFromEvents(contractComponents, getEvents(await provider.level_up_realm(props)));
   };
 
-  const level_up_hyperstructure = async (props: LevelUpHyperstructureProps) => {
-    setComponentsFromEvents(contractComponents, getEvents(await provider.level_up_hyperstructure(props)));
+  const control_hyperstructure = async (props: ControlHyperstructureProps) => {
+    setComponentsFromEvents(contractComponents, getEvents(await provider.control_hyperstructure(props)));
+  };
+
+  const complete_hyperstructure = async (props: CompleteHyperstructureProps) => {
+    setComponentsFromEvents(contractComponents, getEvents(await provider.complete_hyperstructure(props)));
   };
 
   const set_address_name = async (props: SetAddressNameProps) => {
@@ -178,6 +193,14 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
     setComponentsFromEvents(contractComponents, getEvents(await provider.transfer_items_from_multiple(props)));
   };
 
+  const create_labor_building = async (props: CreateLaborBuildingProps) => {
+    setComponentsFromEvents(contractComponents, getEvents(await provider.create_labor_building(props)));
+  };
+
+  const destroy_labor_building = async (props: DestroyLaborBuildingProps) => {
+    setComponentsFromEvents(contractComponents, getEvents(await provider.destroy_labor_building(props)));
+  };
+
   const isLive = async () => {
     try {
       await provider.uuid();
@@ -188,11 +211,15 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
   };
 
   return {
+    create_labor_building,
+    destroy_labor_building,
+    control_hyperstructure,
+    complete_hyperstructure,
+    disassemble_caravan_and_return_free_units,
     swap_bank_and_travel_back,
     set_address_name,
     create_and_merge_soldiers,
     level_up_realm,
-    level_up_hyperstructure,
     isLive,
     create_soldiers,
     detach_soldiers,
@@ -242,6 +269,7 @@ export function setComponentFromEvent(components: Components, eventData: string[
 
   // retrieve the component from name
   const component = components[componentName];
+  if (!component) return;
 
   // get keys
   const keysNumber = parseInt(eventData[1]);

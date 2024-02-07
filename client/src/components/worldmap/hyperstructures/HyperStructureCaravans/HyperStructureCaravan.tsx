@@ -4,7 +4,7 @@ import { ReactComponent as Pen } from "../../../../assets/icons/common/pen.svg";
 import { ReactComponent as CaretDownFill } from "../../../../assets/icons/common/caret-down-fill.svg";
 import { ReactComponent as DonkeyIcon } from "../../../../assets/icons/units/donkey-circle.svg";
 import useBlockchainStore from "../../../../hooks/store/useBlockchainStore";
-import { getTotalResourceWeight } from "../../../cityview/realm/trade/TradeUtils";
+import { getTotalResourceWeight } from "../../../cityview/realm/trade/utils";
 import {
   displayAddress,
   divideByPrecision,
@@ -20,9 +20,9 @@ import { CAPACITY_PER_DONKEY, CaravanInterface, HyperStructureInterface } from "
 import { getComponentValue } from "@dojoengine/recs";
 import { useDojo } from "../../../../DojoContext";
 import Button from "../../../../elements/Button";
-import { useHyperstructure } from "../../../../hooks/helpers/useHyperstructure";
-import useUIStore from "../../../../hooks/store/useUIStore";
 import { useResources } from "../../../../hooks/helpers/useResources";
+import { EventType, useNotificationsStore } from "../../../../hooks/store/useNotificationsStore";
+import { useRefreshHyperstructure } from "../../../../hooks/store/useRefreshHyperstructure";
 
 type CaravanProps = {
   caravan: CaravanInterface;
@@ -33,10 +33,9 @@ type CaravanProps = {
 
 export const HyperStructureCaravan = ({ caravan, hyperstructureData, ...props }: CaravanProps) => {
   const { isMine, owner, arrivalTime, capacity } = caravan;
+  const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
   const nextBlockTimestamp = useBlockchainStore((state) => state.nextBlockTimestamp);
-  const hyperstructures = useUIStore((state) => state.hyperstructures);
-  const setHyperstructures = useUIStore((state) => state.setHyperstructures);
-  const { getHyperstructure } = useHyperstructure();
+  const { refreshHyperstructure } = useRefreshHyperstructure();
 
   const [isLoading, setIsLoading] = useState(false);
   const hasArrived = arrivalTime !== undefined && nextBlockTimestamp !== undefined && arrivalTime <= nextBlockTimestamp;
@@ -75,12 +74,11 @@ export const HyperStructureCaravan = ({ caravan, hyperstructureData, ...props }:
       destination_coord_x: returnPosition?.x || 0,
       destination_coord_y: returnPosition?.y || 0,
     });
+    deleteNotification([caravan.caravanId.toString()], EventType.ArrivedAtHyperstructure);
   };
 
   const updateHyperStructure = () => {
-    const newHyperstructure = getHyperstructure(hyperstructureData.orderId, hyperstructureData.uiPosition);
-    hyperstructures[hyperstructureData.orderId - 1] = newHyperstructure;
-    setHyperstructures([...hyperstructures]);
+    refreshHyperstructure(hyperstructureData.hyperstructureId);
   };
 
   const onClick = async () => {

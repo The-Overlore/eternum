@@ -162,52 +162,19 @@ export function defineContractComponents(world: World) {
         },
       );
     })(),
-    BuildingConfig: (() => {
-      return defineComponent(
-        world,
-        { config_id: RecsType.BigInt, base_sqm: RecsType.BigInt, workhut_cost: RecsType.BigInt },
-        {
-          metadata: {
-            name: "BuildingConfig",
-            types: ["u128", "u128", "u128"],
-            customTypes: [],
-          },
-        },
-      );
-    })(),
-    BuildingCost: (() => {
+    LaborBuilding: (() => {
       return defineComponent(
         world,
         {
-          config_id: RecsType.BigInt,
-          building_cost_config_id: RecsType.BigInt,
-          resource_type: RecsType.BigInt,
-          cost: RecsType.BigInt,
+          realm_entity_id: RecsType.BigInt,
+          building_type: RecsType.Number,
+          labor_count: RecsType.BigInt,
+          level: RecsType.BigInt,
         },
         {
           metadata: {
-            name: "BuildingCost",
-            types: ["u128", "u128", "felt252", "u128"],
-            customTypes: [],
-          },
-        },
-      );
-    })(),
-    BuildingTypeConfig: (() => {
-      return defineComponent(
-        world,
-        {
-          config_id: RecsType.BigInt,
-          building_type_config_id: RecsType.BigInt,
-          id: RecsType.BigInt,
-          sqm: RecsType.BigInt,
-          resource_types_packed: RecsType.BigInt,
-          resource_types_count: RecsType.Number,
-        },
-        {
-          metadata: {
-            name: "BuildingTypeConfig",
-            types: ["u128", "u128", "felt252", "u128", "u256", "u8"],
+            name: "LaborBuilding",
+            types: ["u128", "u8", "u128", "u128"],
             customTypes: [],
           },
         },
@@ -473,11 +440,18 @@ export function defineContractComponents(world: World) {
     HyperStructure: (() => {
       return defineComponent(
         world,
-        { entity_id: RecsType.BigInt, hyperstructure_type: RecsType.Number, order: RecsType.Number },
+        {
+          entity_id: RecsType.BigInt,
+          hyperstructure_type: RecsType.Number,
+          controlling_order: RecsType.Number,
+          completed: RecsType.Boolean,
+          completion_cost_id: RecsType.BigInt,
+          completion_resource_count: RecsType.Number,
+        },
         {
           metadata: {
             name: "HyperStructure",
-            types: ["u128", "u8", "u8"],
+            types: ["u128", "u8", "u8", "bool", "u128", "u32"],
             customTypes: [],
           },
         },
@@ -732,12 +706,11 @@ export function defineContractComponents(world: World) {
           regions: RecsType.Number,
           wonder: RecsType.Number,
           order: RecsType.Number,
-          order_hyperstructure_id: RecsType.BigInt,
         },
         {
           metadata: {
             name: "Realm",
-            types: ["u128", "u128", "u128", "u8", "u8", "u8", "u8", "u8", "u8", "u8", "u128"],
+            types: ["u128", "u128", "u128", "u8", "u8", "u8", "u8", "u8", "u8", "u8"],
             customTypes: [],
           },
         },
@@ -879,6 +852,19 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "Weight",
+            types: ["u128", "u128"],
+            customTypes: [],
+          },
+        },
+      );
+    })(),
+    Orders: (() => {
+      return defineComponent(
+        world,
+        { order_id: RecsType.BigInt, hyperstructure_count: RecsType.BigInt },
+        {
+          metadata: {
+            name: "Orders",
             types: ["u128", "u128"],
             customTypes: [],
           },

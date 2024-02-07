@@ -2,6 +2,9 @@
 mod combat_systems {
     use eternum::alias::ID;
 
+    use eternum::models::order::{Orders, OrdersTrait};
+    use eternum::models::resources::{OwnedResourcesTracker, OwnedResourcesTrackerTrait};
+    
     use eternum::models::resources::{Resource, ResourceCost};
     use eternum::models::position::{Position};
     use eternum::models::config::{
@@ -36,7 +39,7 @@ mod combat_systems {
 
     use eternum::constants::{
         WORLD_CONFIG_ID, SOLDIER_ENTITY_TYPE, COMBAT_CONFIG_ID,
-        REALM_LEVELING_CONFIG_ID, get_unzipped_resource_probabilities,
+        REALM_LEVELING_CONFIG_ID,
         LevelIndex, HYPERSTRUCTURE_LEVELING_CONFIG_ID, HYPERSTRUCTURE_LEVELING_START_TIER,
         REALM_LEVELING_START_TIER
     };
@@ -57,7 +60,7 @@ mod combat_systems {
         #[key]
         attacker_realm_entity_id: u128,
         #[key]
-        target_realm_entity_id: u128,
+        target_entity_id: u128,
         attacking_entity_ids: Span<u128>,
         stolen_resources: Span<(u8, u128)>,
         winner: Winner,
@@ -367,17 +370,17 @@ mod combat_systems {
 
             assert(units.len() > 0, 'need at least one unit');
 
-            // ensure caller owns unit
+            // // ensure caller owns unit
             let caller = starknet::get_caller_address();
-            let merge_into_unit_owner = get!(world, merge_into_unit_id, Owner);
-            assert(merge_into_unit_owner.address == caller, 'not unit owner');
+            // let merge_into_unit_owner = get!(world, merge_into_unit_id, Owner);
+            // assert(merge_into_unit_owner.address == caller, 'not unit owner');
  
 
             // check that entity owner is a realm
-            let merge_into_unit_entity_owner = get!(world, merge_into_unit_id, EntityOwner);
-            let merge_into_unit_realm 
-                = get!(world, merge_into_unit_entity_owner.entity_owner_id, Realm);
-            assert(merge_into_unit_realm.realm_id != 0, 'not owned by realm');
+            // let merge_into_unit_entity_owner = get!(world, merge_into_unit_id, EntityOwner);
+            // let merge_into_unit_realm 
+            //     = get!(world, merge_into_unit_entity_owner.entity_owner_id, Realm);
+            // assert(merge_into_unit_realm.realm_id != 0, 'not owned by realm');
 
 
             // ensure unit is not blocked
@@ -415,16 +418,16 @@ mod combat_systems {
                 
                 assert(amount > 0, 'invalid amount');
 
+                // ensure all units are owned by same realm
                 let unit_owner = get!(world, unit_id, Owner);
                 assert(unit_owner.address == caller, 'not unit owner');
 
-                // ensure all units are owned by same realm
-                let unit_entity_owner = get!(world, unit_id, EntityOwner);
-                assert(
-                    unit_entity_owner.entity_owner_id 
-                        == merge_into_unit_entity_owner.entity_owner_id,
-                            'not same entity owner'
-                );
+                // let unit_entity_owner = get!(world, unit_id, EntityOwner);
+                // assert(
+                //     unit_entity_owner.entity_owner_id 
+                //         == merge_into_unit_entity_owner.entity_owner_id,
+                //             'not same entity owner'
+                // );
 
 
                 let mut unit_quantity = get!(world, unit_id, Quantity);
@@ -570,12 +573,12 @@ mod combat_systems {
 
         fn attack(
             self: @ContractState, world: IWorldDispatcher,
-            attacker_ids: Span<u128>, target_realm_entity_id: u128
+            attacker_ids: Span<u128>, target_entity_id: u128
         ) {
             let caller = starknet::get_caller_address();
 
             let target_town_watch_id 
-                = get!(world, target_realm_entity_id, TownWatch).town_watch_id;
+                = get!(world, target_entity_id, TownWatch).town_watch_id;
             
             let mut target_town_watch_health = get!(world, target_town_watch_id, Health);
             assert(target_town_watch_health.value > 0, 'target is dead');
@@ -586,7 +589,7 @@ mod combat_systems {
             let mut attackers_total_attack = 0;
             let mut attackers_total_defence = 0;
             let mut attackers_total_health = 0;
-            let target_realm_position = get!(world, target_realm_entity_id, Position);
+            let target_position = get!(world, target_entity_id, Position);
             loop {
                 if index == attacker_ids.len() {
                     break;
@@ -609,8 +612,8 @@ mod combat_systems {
                 let attacker_position = get!(world, attacker_id, Position);
 
                 assert(
-                    attacker_position.x == target_realm_position.x
-                        && attacker_position.y == target_realm_position.y,
+                    attacker_position.x == target_position.x
+                        && attacker_position.y == target_position.y,
                             'position mismatch'
                 );
                 
@@ -626,43 +629,56 @@ mod combat_systems {
                 = get!(world, *attacker_ids.at(0), EntityOwner).entity_owner_id;
             let attacker_realm = get!(world, attacker_realm_entity_id, Realm );
 
-            let target_realm = get!(world, target_realm_entity_id, Realm);
 
             let mut target_town_watch_attack = get!(world, target_town_watch_id, Attack);
             let mut target_town_watch_defense = get!(world, target_town_watch_id, Defence);
             let mut target_town_watch_health = get!(world, target_town_watch_id, Health);
 
             // TODO: use the leveling helper function to get bonus
+
+
             /////// REALM LEVEL BONUS ///////
             let leveling_config: LevelingConfig = get!(world, REALM_LEVELING_CONFIG_ID, LevelingConfig);
             let attacker_level = get!(world, (attacker_realm_entity_id), Level);
-            let attacker_level_bonus = attacker_level.get_index_multiplier(leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER);
+            let attacker_level_bonus 
+                = attacker_level.get_index_multiplier(
+                    leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER
+                    ) - 100;
 
-            let target_level = get!(world, (target_realm_entity_id), Level);
-            let target_level_bonus = target_level.get_index_multiplier(leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER);
+            let target_level = get!(world, (target_entity_id), Level);
+            let target_level_bonus 
+                = target_level.get_index_multiplier(
+                    leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER
+                    ) - 100;
 
-            ////// HYPERSTRUCTURE LEVEL BONUS //////
-            let hyperstructure_leveling_config = get!(world, HYPERSTRUCTURE_LEVELING_CONFIG_ID, LevelingConfig);
+            ////// ORDER LEVEL BONUS //////
 
-            // attacker order hyperstructure
-            let attacker_order_hyperstructure 
-                = get!(world, attacker_realm.order_hyperstructure_id, HyperStructure);
-            let attacker_hyperstructure_level = get!(world, attacker_realm.order_hyperstructure_id, Level);
-            let attacker_order_level_bonus = attacker_hyperstructure_level.get_index_multiplier(hyperstructure_leveling_config, LevelIndex::COMBAT, HYPERSTRUCTURE_LEVELING_START_TIER);
+            // attacker order bonus
+            let attacker_order = get!(world, attacker_realm.order, Orders);
+            let attacker_order_bonus = attacker_order.get_bonus_multiplier();
+            
 
-            // defender order hyperstructure
-            let target_order_hyperstructure 
-                = get!(world, target_realm.order_hyperstructure_id, HyperStructure);
-            let target_hyperstructure_level = get!(world, target_realm.order_hyperstructure_id, Level);
-            let target_order_level_bonus = target_hyperstructure_level.get_index_multiplier(hyperstructure_leveling_config, LevelIndex::COMBAT, HYPERSTRUCTURE_LEVELING_START_TIER);
+            // defender order bonus (if it is a realm)      
+            let target_realm = get!(world, target_entity_id, Realm);
+            let target_order = get!(world, target_realm.order, Orders);
+            let target_order_bonus = target_order.get_bonus_multiplier();
 
-            // need to divide by 100**2 because level_bonus in precision 100
-            attackers_total_attack = (attackers_total_attack * attacker_level_bonus * attacker_order_level_bonus)/10000;
-            attackers_total_defence = (attackers_total_defence + attacker_level_bonus * attacker_order_level_bonus)/10000;
 
-            // need to divide by 100**2 because level_bonus in precision 100
-            let target_total_attack = (target_town_watch_attack.value * target_level_bonus * target_order_level_bonus)/10000;
-            let target_total_defence = (target_town_watch_defense.value + target_level_bonus * target_order_level_bonus)/10000;
+
+            let attackers_total_attack 
+                    = attackers_total_attack 
+                        + ((attackers_total_attack * attacker_level_bonus) / 100) 
+                        + ((attackers_total_attack * attacker_order_bonus) / attacker_order.get_bonus_denominator());
+
+            let target_total_attack = 
+                    target_town_watch_attack.value 
+                        + ((target_town_watch_attack.value * target_level_bonus) / 100) 
+                        + ((target_town_watch_attack.value * target_order_bonus) / target_order.get_bonus_denominator());
+            let target_total_defence = 
+                    target_town_watch_defense.value 
+                        + ((target_town_watch_defense.value * target_level_bonus) / 100) 
+                        + ((target_town_watch_defense.value * target_order_bonus) / target_order.get_bonus_denominator());
+
 
             let mut damage: u128 = 0; 
 
@@ -706,14 +722,10 @@ mod combat_systems {
                     }
 
                     let attacker_id = *attacker_ids.at(index);
-                    
-                    let mut attacker_attack = get!(world, attacker_id, Attack);
-                    let mut attacker_defence = get!(world, attacker_id, Defence);
                     let mut attacker_health = get!(world, attacker_id, Health);
 
                     attacker_health.value -= min(damage, attacker_health.value);
-
-                    set!(world, (attacker_attack, attacker_defence, attacker_health));
+                    set!(world, (attacker_health));
 
                     index += 1;
                 };
@@ -731,7 +743,7 @@ mod combat_systems {
             emit!(world, CombatOutcome { 
                     attacker_realm_entity_id,
                     attacking_entity_ids: attacker_ids,
-                    target_realm_entity_id,
+                    target_entity_id,
                     stolen_resources: array![].span(),
                     winner,
                     damage,
@@ -744,12 +756,12 @@ mod combat_systems {
 
         fn steal(
             self: @ContractState, world: IWorldDispatcher,
-            attacker_id: u128, target_realm_entity_id: u128
+            attacker_id: u128, target_entity_id: u128
         ) {
             // check that target is a realm
-            let target_realm = get!(world, target_realm_entity_id, Realm);
+            // let target_realm = get!(world, target_entity_id, Realm);
             
-            assert(target_realm.realm_id != 0, 'target not realm');
+            // assert(target_realm.realm_id != 0, 'target not realm');
 
             let caller = starknet::get_caller_address();
             let ts = starknet::get_block_timestamp();
@@ -767,11 +779,11 @@ mod combat_systems {
             );
             
             let attacker_position = get!(world, attacker_id, Position);
-            let target_realm_position = get!(world, target_realm_entity_id, Position);
+            let target_position = get!(world, target_entity_id, Position);
 
             assert(
-                attacker_position.x == target_realm_position.x
-                    && attacker_position.y == target_realm_position.y,
+                attacker_position.x == target_position.x
+                    && attacker_position.y == target_position.y,
                         'position mismatch'
             );
             
@@ -780,7 +792,7 @@ mod combat_systems {
             let mut attacker_defence = get!(world, attacker_id, Defence);
             
             let target_town_watch_id 
-                = get!(world, target_realm_entity_id, TownWatch).town_watch_id;
+                = get!(world, target_entity_id, TownWatch).town_watch_id;
 
             let target_town_watch_health = get!(world, target_town_watch_id, Health);
             let target_town_watch_attack = get!(world, target_town_watch_id, Attack);
@@ -790,8 +802,6 @@ mod combat_systems {
             let attacker_realm = get!(world, attacker_realm_entity_id, Realm );
             let combat_config = get!(world, COMBAT_CONFIG_ID, CombatConfig);
 
-            let target_realm = get!(world, target_realm_entity_id, Realm);
-
             let mut target_town_watch_attack = get!(world, target_town_watch_id, Attack);
             let mut target_town_watch_defense = get!(world, target_town_watch_id, Defence);
             let mut target_town_watch_health = get!(world, target_town_watch_id, Health);
@@ -799,33 +809,46 @@ mod combat_systems {
             /////// REALM LEVEL BONUS ///////
             let leveling_config: LevelingConfig = get!(world, REALM_LEVELING_CONFIG_ID, LevelingConfig);
             let attacker_level = get!(world, (attacker_realm_entity_id), Level);
-            let attacker_level_bonus = attacker_level.get_index_multiplier(leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER);
+            let attacker_level_bonus 
+                = attacker_level.get_index_multiplier(
+                    leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER
+                    ) - 100;
 
-            let target_level = get!(world, (target_realm_entity_id), Level);
-            let target_level_bonus = target_level.get_index_multiplier(leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER);
+            let target_level = get!(world, (target_entity_id), Level);
+            let target_level_bonus 
+                = target_level.get_index_multiplier(
+                    leveling_config, LevelIndex::COMBAT, REALM_LEVELING_START_TIER
+                    ) - 100;
 
-            ////// HYPERSTRUCTURE LEVEL BONUS //////
-            let hyperstructure_leveling_config = get!(world, HYPERSTRUCTURE_LEVELING_CONFIG_ID, LevelingConfig);
 
-            // attacker order hyperstructure
-            let attacker_order_hyperstructure 
-                = get!(world, attacker_realm.order_hyperstructure_id, HyperStructure);
-            let attacker_hyperstructure_level = get!(world, attacker_realm.order_hyperstructure_id, Level);
-            let attacker_order_level_bonus = attacker_hyperstructure_level.get_index_multiplier(hyperstructure_leveling_config, LevelIndex::COMBAT, HYPERSTRUCTURE_LEVELING_START_TIER);
+            ////// ORDER LEVEL BONUS //////
 
-            // defender order hyperstructure
-            let target_order_hyperstructure 
-                = get!(world, target_realm.order_hyperstructure_id, HyperStructure);
-            let target_hyperstructure_level = get!(world, target_realm.order_hyperstructure_id, Level);
-            let target_order_level_bonus = target_hyperstructure_level.get_index_multiplier(hyperstructure_leveling_config, LevelIndex::COMBAT, HYPERSTRUCTURE_LEVELING_START_TIER);
+            // attacker order bonus
+            let attacker_order = get!(world, attacker_realm.order, Orders);
+            let attacker_order_bonus = attacker_order.get_bonus_multiplier();
+            
+
+            // defender order bonus (if it is a realm)      
+            let target_realm = get!(world, target_entity_id, Realm);
+            let target_order = get!(world, target_realm.order, Orders);
+            let target_order_bonus = target_order.get_bonus_multiplier();
 
             // need to divide by 100**2 because level_bonus in precision 100
-            let attackers_total_attack = (attacker_attack.value * attacker_level_bonus * attacker_order_level_bonus)/10000;
-            let attackers_total_defence = (attacker_defence.value + attacker_level_bonus * attacker_order_level_bonus)/10000;
+            let attackers_total_attack 
+                    = attacker_attack.value 
+                        + ((attacker_attack.value * attacker_level_bonus) / 100) 
+                        + ((attacker_attack.value * attacker_order_bonus) / attacker_order.get_bonus_denominator());
 
             // need to divide by 100**2 because level_bonus in precision 100
-            let target_total_attack = (target_town_watch_attack.value * target_level_bonus * target_order_level_bonus)/10000;
-            let target_total_defence = (target_town_watch_defense.value + target_level_bonus * target_order_level_bonus)/10000;
+            let target_total_attack = 
+                    target_town_watch_attack.value 
+                        + ((target_town_watch_attack.value * target_level_bonus) / 100) 
+                        + ((target_town_watch_attack.value * target_order_bonus) / target_order.get_bonus_denominator());
+            let target_total_defence = 
+                    target_town_watch_defense.value 
+                        + ((target_town_watch_defense.value * target_level_bonus) / 100) 
+                        + ((target_town_watch_defense.value * target_order_bonus) / target_order.get_bonus_denominator());
+
 
             let attack_successful: bool = *random::choices(
                 array![true, false].span(), 
@@ -847,11 +870,11 @@ mod combat_systems {
                 let mut fish_burn_amount = combat_config.fish_burn_per_soldier * attacker_quantity.value;
                 
                 let mut target_wheat_resource
-                    = get!(world, (target_realm_entity_id, ResourceTypes::WHEAT), Resource);
+                    = get!(world, (target_entity_id, ResourceTypes::WHEAT), Resource);
                 target_wheat_resource.balance -= min(wheat_burn_amount, target_wheat_resource.balance);
 
                 let mut target_fish_resource 
-                    = get!(world, (target_realm_entity_id, ResourceTypes::FISH), Resource);
+                    = get!(world, (target_entity_id, ResourceTypes::FISH), Resource);
                 target_fish_resource.balance -= min(fish_burn_amount, target_fish_resource.balance);
 
                 set!(world, (target_fish_resource, target_wheat_resource));
@@ -868,18 +891,28 @@ mod combat_systems {
                 let mut attacker_remaining_weight 
                     = attacker_total_weight_capacity - attacker_current_weight; 
 
-                let (resource_types, resource_type_probabilities) 
-                    = get_unzipped_resource_probabilities();
+                // get all the (stealable) resources that the target owns
+                // and the probabilities of each resource's ocurence
+                let entitys_resources = get!(world, target_entity_id, OwnedResourcesTracker);
+                let (stealable_resource_types, stealable_resources_probs) 
+                    =  entitys_resources.get_owned_resources_and_probs();
+
+
+
+                let mut chosen_resource_types: Span<u8> = stealable_resource_types;
+                if combat_config.stealing_trial_count.into() <= stealable_resource_types.len() {
+                    // above, we use <= and not just < because if there are 2 resources and we want to choose 2
+                    // we still want to pick the more probable resource first (and not just the first one)
+
+                    // here we choose x number of resources that the attacker can get away with 
+                    let choose_with_replacement = false;
+                    chosen_resource_types = random::choices(
+                        stealable_resource_types, stealable_resources_probs, 
+                        array![].span(), combat_config.stealing_trial_count.into(), choose_with_replacement
+                    );
+                }
 
                 let mut index = 0;
-                let choose_with_replacement = false;
-
-                // here we choose x number of resources (without replacement)
-                // that the attacker can get away with 
-                let chosen_resource_types: Span<u8> = random::choices(
-                    resource_types, resource_type_probabilities, 
-                    array![].span(), combat_config.stealing_trial_count.into(), choose_with_replacement
-                );
 
                 loop {
 
@@ -893,7 +926,7 @@ mod combat_systems {
                         = get!(world, (WORLD_CONFIG_ID, resource_type), WeightConfig).weight_gram;
 
                     let target_resource 
-                        = get!(world, (target_realm_entity_id, resource_type), Resource);
+                        = get!(world, (target_entity_id, resource_type), Resource);
                     let target_resource_weight = resource_weight * target_resource.balance;
 
                     if target_resource_weight > 0 {
@@ -926,7 +959,7 @@ mod combat_systems {
 
                     InternalResourceSystemsImpl::transfer(
                         world,
-                        target_realm_entity_id,
+                        target_entity_id,
                         attacker_id,
                         stolen_resources.span()
                     );
@@ -940,7 +973,7 @@ mod combat_systems {
                 emit!(world, CombatOutcome { 
                         attacker_realm_entity_id,
                         attacking_entity_ids: array![attacker_id].span(),
-                        target_realm_entity_id,
+                        target_entity_id,
                         stolen_resources: stolen_resources.span(),
                         winner: Winner::Attacker,
                         damage: 0,
@@ -968,7 +1001,7 @@ mod combat_systems {
                 emit!(world, CombatOutcome { 
                         attacker_realm_entity_id,
                         attacking_entity_ids: array![attacker_id].span(),
-                        target_realm_entity_id,
+                        target_entity_id,
                         stolen_resources: array![].span(),
                         winner: Winner::Target,
                         damage,

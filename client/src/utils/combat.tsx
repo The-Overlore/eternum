@@ -1,6 +1,5 @@
-import { EventType, NotificationType } from "../hooks/store/useNotificationsStore";
+import { CombatResultInterface, Resource, Winner } from "@bibliothecadao/eternum";
 import { Event } from "../services/eventPoller";
-import { Resource, CombatResultInterface, Winner } from "@bibliothecadao/eternum";
 
 // note: placeholder
 export const calculateSuccess = (
@@ -12,11 +11,6 @@ export const calculateSuccess = (
   const total_weight = attacker_weight + defender.defence * defender.health;
   const success = attacker_weight / total_weight;
   return success;
-};
-
-// note: placeholder
-export const calculateDamages = (attackers: number, defenders: number | undefined) => {
-  return 1;
 };
 
 export const getBuildResourceCost = (quantity: number): { resourceId: number; amount: number }[] => {
@@ -65,18 +59,5 @@ export const parseCombatEvent = (event: Event): CombatResultInterface => {
     stolenResources: stolen_resources,
     damage,
     attackTimestamp,
-  };
-};
-
-export const createCombatNotification = (result: CombatResultInterface): NotificationType => {
-  let eventType = EventType.Attacked;
-  if (result.stolenResources.length > 0) {
-    eventType = EventType.StolenResource;
-  }
-  return {
-    eventType,
-    // to have a unique key for each notification
-    keys: [result.attackTimestamp.toString()],
-    data: result,
   };
 };

@@ -1,6 +1,7 @@
 { 
     "TEST_RESOURCE_SYSTEMS": [
-        "Resource"
+        "Resource",
+        "OwnedResourcesTracker"
     ],
     "REALM_SYSTEMS": [
         "Owner",
@@ -12,7 +13,8 @@
         "Capacity",
         "Movable",
         "QuantityTracker",
-        "Resource"
+        "Resource",
+        "OwnedResourcesTracker"
     ],
     "CARAVAN_SYSTEMS": [
         "Movable",
@@ -38,13 +40,16 @@
     "LABOR_SYSTEMS": [
         "Labor",
         "Resource",
-        "LaborAuction"
+        "OwnedResourcesTracker",
+        "LaborAuction",
+        "LaborBuilding"
     ],
     "TRADE_SYSTEMS": [
         "Caravan",
         "Movable",
         "Trade",
         "Resource",
+        "OwnedResourcesTracker",
         "Status",
         "ArrivalTime",
         "Position",
@@ -58,10 +63,12 @@
     ],
     "ROAD_SYSTEMS": [
         "Road",
-        "Resource"
+        "Resource",
+        "OwnedResourcesTracker"
     ],
     "RESOURCE_SYSTEMS": [
         "Resource",
+        "OwnedResourcesTracker",
         "ResourceAllowance",
         "Owner",
         "Weight",
@@ -73,10 +80,12 @@
     "TRAVEL_SYSTEMS": [
         "ArrivalTime",
         "Position",
-        "Road"
+        "Road",
+        "Movable"
     ],
     "COMBAT_SYSTEMS": [
         "Resource",
+        "OwnedResourcesTracker",
         "Owner",
         "EntityOwner",
         "Health",
@@ -96,7 +105,8 @@
     ],
     "LEVELING_SYSTEMS": [
         "Level",
-        "Resource"
+        "Resource",
+        "OwnedResourcesTracker"
     ],
     "NAME_SYSTEMS": [
         "AddressName"
@@ -104,6 +114,7 @@
     "BANK_SYSTEMS": [
         "BankAuction",
         "Resource",
+        "OwnedResourcesTracker",
         "ResourceAllowance",
         "Owner",
         "Weight",
@@ -112,5 +123,14 @@
         "ForeignKey",
         "Inventory"
     ],
-    "NPC_SYSTEMS": ["Npc", "LastSpawned"]
+    "NPC_SYSTEMS": ["Npc", "LastSpawned"],
+    "HYPERSTRUCTURE_SYSTEMS": [
+        "Orders",
+        "HyperStructure"
+    ],
+    "BUILDINGS_SYSTEMS": [
+        "Resource",
+        "OwnedResourcesTracker",
+        "LaborBuilding"
+    ]
 }

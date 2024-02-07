@@ -22,3 +22,5 @@ mod level;
 mod name;
 mod bank;
 mod npc;
+mod order;
+mod buildings;

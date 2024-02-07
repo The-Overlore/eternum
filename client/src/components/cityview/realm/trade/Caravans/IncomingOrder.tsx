@@ -11,7 +11,6 @@ import { getRealmIdByPosition, getRealmNameById, getRealmOrderNameById } from ".
 import { useResources } from "../../../../../hooks/helpers/useResources";
 import { useCaravan } from "../../../../../hooks/helpers/useCaravans";
 import { divideByPrecision } from "../../../../../utils/utils";
-import { EventType, useNotificationsStore } from "../../../../../hooks/store/useNotificationsStore";
 
 type IncomingOrderProps = {
   caravanId: bigint;
@@ -23,22 +22,20 @@ export const IncomingOrder = ({ caravanId, ...props }: IncomingOrderProps) => {
   const { getResourcesFromInventory, offloadChests } = useResources();
   const { getCaravanInfo } = useCaravan();
 
-  const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
-
-  const { destination, arrivalTime } = getCaravanInfo(caravanId);
+  const { intermediateDestination, arrivalTime } = getCaravanInfo(caravanId);
 
   const resourcesGet = getResourcesFromInventory(caravanId);
 
   const offload = async () => {
     setIsLoading(true);
-    // todo: change caravanId to entityId (also raiders can offload resources here)
     await offloadChests(realmEntityId, caravanId, resourcesGet.indices, resourcesGet.resources);
-    deleteNotification([caravanId.toString()], EventType.EmptyChest);
   };
 
   const nextBlockTimestamp = useBlockchainStore((state) => state.nextBlockTimestamp);
 
-  const pickupRealmId = destination ? getRealmIdByPosition({ x: destination.x, y: destination.y }) : undefined;
+  const pickupRealmId = intermediateDestination
+    ? getRealmIdByPosition({ x: intermediateDestination.x, y: intermediateDestination.y })
+    : undefined;
   const pickupRealmName = pickupRealmId ? getRealmNameById(pickupRealmId) : undefined;
   const hasArrivedOriginalPosition =
     arrivalTime !== undefined && nextBlockTimestamp !== undefined && arrivalTime <= nextBlockTimestamp;
@@ -79,7 +76,7 @@ export const IncomingOrder = ({ caravanId, ...props }: IncomingOrderProps) => {
                     key={resource.resourceId}
                     type="vertical"
                     color="text-order-brilliance"
-                    className="!w-5 mt-0.5"
+                    className="!w-9 mt-0.5"
                     resourceId={resource.resourceId}
                     amount={divideByPrecision(resource.amount)}
                   />

@@ -35,16 +35,7 @@ export const RealmSwitch = ({ className }: RealmSwitchProps) => {
   const [showRealms, setShowRealms] = useState(false);
   const [yourRealms, setYourRealms] = useState<RealmBubble[]>([]);
 
-  const {
-    realmEntityId,
-    realmId,
-    setRealmId,
-    setRealmEntityId,
-    realmEntityIds,
-    setRealmEntityIds,
-    hyperstructureId,
-    setHyperstructureId,
-  } = useRealmStore();
+  const { realmEntityId, realmId, setRealmId, setRealmEntityId, realmEntityIds, setRealmEntityIds } = useRealmStore();
 
   const entityIds = useEntityQuery([Has(Realm), HasValue(Owner, { address: BigInt(account.address) })]);
 
@@ -56,9 +47,6 @@ export const RealmSwitch = ({ className }: RealmSwitchProps) => {
         if (realm) {
           // const owner = getComponentValue(Owner, id);
           // console.log({ owner });
-          if (hyperstructureId !== realm.order_hyperstructure_id) {
-            setHyperstructureId(realm.order_hyperstructure_id);
-          }
           return { realmEntityId: realm.entity_id, realmId: realm.realm_id };
         }
       })
@@ -84,6 +72,7 @@ export const RealmSwitch = ({ className }: RealmSwitchProps) => {
     const fetchedYourRealms: RealmBubble[] = [];
     realmEntityIds.forEach(({ realmEntityId, realmId }) => {
       const realm = getRealm(realmId);
+      if (!realm) return;
       const name = realmsNames.features[Number(realm.realmId) - 1].name;
       fetchedYourRealms.push({
         id: realmEntityId,

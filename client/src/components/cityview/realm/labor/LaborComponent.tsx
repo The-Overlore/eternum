@@ -13,21 +13,26 @@ import { useComponentValue } from "@dojoengine/react";
 import useRealmStore from "../../../../hooks/store/useRealmStore";
 import { LevelIndex, useLevel } from "../../../../hooks/helpers/useLevel";
 import { EventType, useNotificationsStore } from "../../../../hooks/store/useNotificationsStore";
+import { FoodType, useLabor } from "../../../../hooks/helpers/useLabor";
+import useUIStore from "../../../../hooks/store/useUIStore";
+import { ReactComponent as People } from "../../../../assets/icons/common/people.svg";
 
 type LaborComponentProps = {
+  hasGuild: boolean;
   resourceId: number;
   realm: RealmInterface;
+  setBuildResource: (resourceId: number) => void;
   buildLoadingStates: { [key: number]: boolean };
   setBuildLoadingStates: (prevStates: any) => void;
-  onBuild: () => void;
   className?: string;
   locked?: boolean;
 };
 
 export const LaborComponent = ({
+  hasGuild,
   resourceId,
   realm,
-  onBuild,
+  setBuildResource,
   setBuildLoadingStates,
   buildLoadingStates,
   className,
@@ -44,7 +49,8 @@ export const LaborComponent = ({
 
   const nextBlockTimestamp = useBlockchainStore((state) => state.nextBlockTimestamp);
 
-  const { realmEntityId, hyperstructureId } = useRealmStore();
+  const realmEntityId = useRealmStore((state) => state.realmEntityId);
+  const setTooltip = useUIStore((state) => state.setTooltip);
 
   const labor = useComponentValue(Labor, getEntityIdFromKeys([BigInt(realmEntityId), BigInt(resourceId)]));
 
@@ -64,9 +70,12 @@ export const LaborComponent = ({
 
   const { play: playHarvest } = useUiSounds(soundSelector.harvest);
 
+  const { onBuildFood } = useLabor();
+
   const isFood = useMemo(() => [254, 255].includes(resourceId), [resourceId]);
 
-  const { getEntityLevel, getRealmLevelBonus, getHyperstructureLevelBonus } = useLevel();
+  const { getEntityLevel, getRealmLevelBonus } = useLevel();
+  const conqueredHyperstructureNumber = useUIStore((state) => state.conqueredHyperstructureNumber);
 
   const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
 
@@ -74,14 +83,18 @@ export const LaborComponent = ({
   const [levelBonus, hyperstructureLevelBonus] = useMemo(() => {
     const level = getEntityLevel(realmEntityId)?.level || 0;
     const levelBonus = getRealmLevelBonus(level, isFood ? LevelIndex.FOOD : LevelIndex.RESOURCE);
-    if (!hyperstructureId) return [levelBonus, undefined];
-    const hyperstructureLevel = getEntityLevel(hyperstructureId)?.level || 0;
-    const hyperstructureLevelBonus = getHyperstructureLevelBonus(
-      hyperstructureLevel,
-      isFood ? LevelIndex.FOOD : LevelIndex.RESOURCE,
-    );
-    return [levelBonus, hyperstructureLevelBonus];
+    return [levelBonus, conqueredHyperstructureNumber * 25 + 100];
   }, [realmEntityId, isFood]);
+
+  const onBuild = async () => {
+    if (resourceId == ResourcesIds["Wheat"]) {
+      await onBuildFood(FoodType.Wheat, realm);
+    } else if (resourceId == ResourcesIds["Fish"]) {
+      await onBuildFood(FoodType.Fish, realm);
+    } else {
+      setBuildResource(resourceId);
+    }
+  };
 
   const onHarvest = () => {
     if (hyperstructureLevelBonus) {
@@ -175,6 +188,25 @@ export const LaborComponent = ({
                   <div className="px-2">{`${laborLeft > 0 && labor ? labor.multiplier : 0}/${realm?.harbors}`}</div>
                 )}
                 {/* // TODO: show visual cue that it's disabled */}
+                {hasGuild && (
+                  <div
+                    onMouseEnter={() =>
+                      setTooltip({
+                        position: "bottom",
+                        content: (
+                          <>
+                            <p className="whitespace-nowrap">Has guild for this resource</p>
+                          </>
+                        ),
+                      })
+                    }
+                    onMouseLeave={() => setTooltip(null)}
+                    className="flex flex-col justify-center align-center w-full items-center mr-2"
+                  >
+                    <People className="stroke-2 h-3 stroke-gold "></People>
+                    {/* <div className="w-full text-center">0</div> */}
+                  </div>
+                )}
                 <Button
                   variant="outline"
                   className="px-2 py-1"

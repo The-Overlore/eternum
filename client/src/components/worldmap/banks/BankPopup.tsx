@@ -24,7 +24,7 @@ import { NumberInput } from "../../../elements/NumberInput";
 import { getLordsAmountFromBankAuction } from "./utils";
 import useBlockchainStore from "../../../hooks/store/useBlockchainStore";
 import { useLevel } from "../../../hooks/helpers/useLevel";
-import { getTotalResourceWeight } from "../../cityview/realm/trade/TradeUtils";
+import { getTotalResourceWeight } from "../../cityview/realm/trade/utils";
 
 type BankPopupProps = {
   onClose: () => void;
@@ -202,7 +202,7 @@ const SwapResourcesPanel = ({
   bankPrice: number;
 }) => {
   const [selectedCaravan, setSelectedCaravan] = useState<bigint>(0n);
-  const [isNewCaravan, setIsNewCaravan] = useState(false);
+  const [isNewCaravan, setIsNewCaravan] = useState(true);
   const [donkeysCount, setDonkeysCount] = useState(1);
   const [hasEnoughDonkeys, setHasEnoughDonkeys] = useState(false);
   const [step, setStep] = useState<number>(1);
@@ -294,7 +294,7 @@ const SwapResourcesPanel = ({
 
   const canGoToNextStep = useMemo(() => {
     if (step === 3) {
-      return selectedCaravan !== 0n || (hasEnoughDonkeys && isNewCaravan);
+      return (selectedCaravan !== 0n || (hasEnoughDonkeys && isNewCaravan)) && resourceWeight > 0;
     } else if (step == 2) {
       return false;
     } else {
@@ -377,7 +377,7 @@ const SwapResourcesPanel = ({
               <img src={`/images/buildings/bank.png`} className="object-cover w-full h-full rounded-[10px]" />
               <div className="flex flex-col p-2 absolute left-2 bottom-2 rounded-[10px] bg-black/60">
                 <div className="mb-1 ml-1 italic text-light-pink text-xxs"></div>
-                <div className="mb-1 ml-1 italic text-light-pink text-xxs">Price per Shekel:</div>
+                <div className="mb-1 ml-1 italic text-light-pink text-xxs">Price per Lord :</div>
                 {bank && (
                   <div className="grid grid-cols-4 gap-1">
                     {[
@@ -396,7 +396,7 @@ const SwapResourcesPanel = ({
                 )}
               </div>
             </div>
-            <Headline size="big"> Swap Food for Lords</Headline>
+            <Headline> Swap Food for Lords</Headline>
             <div className="text-xxs mb-2 italic text-gold">
               {`
                 To swap wheat or fish for Lords at the bank, you can send any amount you want. The amount of Lords you get in return depends on the market price of wheat and fish at that specific bank.
@@ -409,7 +409,7 @@ const SwapResourcesPanel = ({
       )}
       {step == 2 && (
         <div className="flex flex-col w-full space-y-2">
-          <Headline size="big">Select Realm - Step {step}</Headline>
+          <Headline>Select Realm - Step {step}</Headline>
           <div className="text-xxs mb-2 italic text-gold">
             {`Press "Set the amounts" on any Realm with required resources, to set amounts and send caravan to Hyperstructure.`}
           </div>

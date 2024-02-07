@@ -1,22 +1,34 @@
-import { Has, HasValue, NotValue, getComponentValue } from "@dojoengine/recs";
+import { Entity, Has, HasValue, NotValue, getComponentValue, runQuery } from "@dojoengine/recs";
 import { useDojo } from "../../DojoContext";
 import useRealmStore from "../store/useRealmStore";
 import { getEntityIdFromKeys, getForeignKeyEntityId } from "../../utils/utils";
 import { useEntityQuery } from "@dojoengine/react";
 import { BigNumberish } from "starknet";
 import { Resource } from "@bibliothecadao/eternum";
+import { EventType, useNotificationsStore } from "../store/useNotificationsStore";
 
 export function useResources() {
   const {
     account: { account },
     setup: {
-      components: { Inventory, ForeignKey, ResourceChest, DetachedResource, Resource, CaravanMembers, Position },
+      components: {
+        Inventory,
+        ForeignKey,
+        ResourceChest,
+        DetachedResource,
+        Resource,
+        CaravanMembers,
+        Position,
+        ResourceCost,
+        Realm,
+      },
       optimisticSystemCalls: { optimisticOffloadResources },
       systemCalls: { transfer_items },
     },
   } = useDojo();
 
   const realmEntityId = useRealmStore((state) => state.realmEntityId);
+  const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
 
   // for any entity that has a resourceChest in its inventory,
   const getResourcesFromInventory = (entityId: bigint): { resources: Resource[]; indices: number[] } => {
@@ -70,6 +82,17 @@ export function useResources() {
     return foreignKey?.entity_id;
   };
 
+  const getResourceCosts = (costUuid: bigint, count: number) => {
+    let resourceCosts = [];
+    for (let i = 0; i < count; i++) {
+      let resourceCost = getComponentValue(ResourceCost, getEntityIdFromKeys([costUuid, BigInt(i)]));
+      if (resourceCost) {
+        resourceCosts.push({ resourceId: resourceCost.resource_type, amount: Number(resourceCost.amount) });
+      }
+    }
+    return resourceCosts;
+  };
+
   const getFoodResources = (entityId: bigint): Resource[] => {
     const wheat = getComponentValue(Resource, getEntityIdFromKeys([entityId, 254n]));
     const fish = getComponentValue(Resource, getEntityIdFromKeys([entityId, 255n]));
@@ -94,6 +117,32 @@ export function useResources() {
         balance: Number(resource.balance),
       };
     }
+  };
+
+  const getRealmsWithSpecificResource = (
+    resourceId: number,
+    minAmount: number,
+  ): { realmEntityId: bigint; realmId: bigint; amount: number }[] => {
+    const allRealms = Array.from(runQuery([Has(Realm)]));
+
+    const realmsWithResource = allRealms
+      .map((id: Entity) => {
+        const realm = getComponentValue(Realm, id);
+        const resource = realm
+          ? getComponentValue(Resource, getEntityIdFromKeys([realm?.entity_id, BigInt(resourceId)]))
+          : undefined;
+
+        if (resource && resource.balance > minAmount) {
+          return {
+            realmEntityId: realm?.entity_id,
+            realmId: realm?.realm_id,
+            amount: Number(resource.balance),
+          };
+        }
+      })
+      .filter(Boolean) as { realmEntityId: bigint; realmId: bigint; amount: number }[];
+
+    return realmsWithResource;
   };
 
   //  caravans coming your way with a resource chest in their inventory
@@ -131,7 +180,7 @@ export function useResources() {
     optimisticResourcesGet?: Resource[],
   ) => {
     if (optimisticResourcesGet) {
-      return await optimisticOffloadResources(
+      await optimisticOffloadResources(
         optimisticResourcesGet,
         transfer_items,
       )({
@@ -140,21 +189,25 @@ export function useResources() {
         sender_id: transport_id,
         indices: entity_index_in_inventory,
       });
+    } else {
+      await transfer_items({
+        signer: account,
+        sender_id: transport_id,
+        receiver_id: receiving_entity_id,
+        indices: entity_index_in_inventory,
+      });
     }
-    return await transfer_items({
-      signer: account,
-      sender_id: transport_id,
-      receiver_id: receiving_entity_id,
-      indices: entity_index_in_inventory,
-    });
+    deleteNotification([transport_id.toString()], EventType.EmptyChest);
   };
 
   return {
+    getRealmsWithSpecificResource,
     getResourcesFromInventory,
     offloadChests,
     getFoodResources,
     getResourceChestIdFromInventoryIndex,
     getBalance,
     getCaravansWithResourcesChest,
+    getResourceCosts,
   };
 }

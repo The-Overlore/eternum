@@ -44,7 +44,11 @@ export interface StealProps extends SystemSigner {
   target_id: num.BigNumberish;
 }
 
-export interface LevelUpHyperstructureProps extends SystemSigner {
+export interface ControlHyperstructureProps extends SystemSigner {
+  hyperstructure_id: num.BigNumberish;
+  order_id: num.BigNumberish;
+}
+export interface CompleteHyperstructureProps extends SystemSigner {
   hyperstructure_id: num.BigNumberish;
 }
 
@@ -130,7 +134,7 @@ export interface HarvestAllLaborProps extends SystemSigner {
 }
 
 export interface MintResourcesProps extends SystemSigner {
-  entity_id: num.BigNumberish;
+  receiver_id: num.BigNumberish;
   resources: num.BigNumberish[];
 }
 
@@ -152,6 +156,11 @@ export interface CreateFreeTransportUnitProps extends SystemSigner {
 
 export interface CreateCaravanProps extends SystemSigner {
   entity_ids: num.BigNumberish[];
+}
+
+export interface DisassembleCaravanAndReturnFreeUnitsProps extends SystemSigner {
+  caravan_id: num.BigNumberish;
+  unit_ids: num.BigNumberish[];
 }
 
 export interface AttachCaravanProps extends SystemSigner {
@@ -183,7 +192,6 @@ interface Realm {
   regions: num.BigNumberish;
   wonder: num.BigNumberish;
   order: num.BigNumberish;
-  order_hyperstructure_id: num.BigNumberish;
   position: {
     x: num.BigNumberish;
     y: num.BigNumberish;
@@ -218,4 +226,13 @@ export interface ChangeMoodProps extends SystemSigner {
   realm_id: num.BigNumberish;
   npc_id: num.BigNumberish;
   mood: num.BigNumberish;
+}
+
+export interface CreateLaborBuildingProps extends SystemSigner {
+  realm_entity_id: num.BigNumberish;
+  building_type: num.BigNumberish;
+}
+
+export interface DestroyLaborBuildingProps extends SystemSigner {
+  realm_entity_id: num.BigNumberish;
 }

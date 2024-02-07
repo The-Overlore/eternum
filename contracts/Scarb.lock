@@ -2,9 +2,37 @@
 version = 1
 
 [[package]]
-name = "alexandria_math"
+name = "alexandria_data_structures"
+version = "0.2.0"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=98aadc7e3f12dbb026e853604fe2cc061451cc8a#98aadc7e3f12dbb026e853604fe2cc061451cc8a"
+dependencies = [
+ "alexandria_encoding",
+]
+
+[[package]]
+name = "alexandria_encoding"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=e1aa42853815f04ff00e4ed3507cfd74d7b0c644#e1aa42853815f04ff00e4ed3507cfd74d7b0c644"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=98aadc7e3f12dbb026e853604fe2cc061451cc8a#98aadc7e3f12dbb026e853604fe2cc061451cc8a"
+dependencies = [
+ "alexandria_math",
+ "alexandria_numeric",
+]
+
+[[package]]
+name = "alexandria_math"
+version = "0.2.0"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=98aadc7e3f12dbb026e853604fe2cc061451cc8a#98aadc7e3f12dbb026e853604fe2cc061451cc8a"
+dependencies = [
+ "alexandria_data_structures",
+]
+
+[[package]]
+name = "alexandria_numeric"
+version = "0.1.0"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=98aadc7e3f12dbb026e853604fe2cc061451cc8a#98aadc7e3f12dbb026e853604fe2cc061451cc8a"
+dependencies = [
+ "alexandria_math",
+]
 
 [[package]]
 name = "cubit"
@@ -13,8 +41,8 @@ source = "git+https://github.com/akhercha/cubit?rev=d3869a3f0c47e5ed229bbbfe2fce
 
 [[package]]
 name = "dojo"
-version = "0.4.0"
-source = "git+https://github.com/dojoengine/dojo?tag=v0.4.0#17c1b42910cb751fe3986ed44ce4e3a6a16b1e51"
+version = "0.4.1"
+source = "git+https://github.com/dojoengine/dojo?tag=v0.4.1#e0a16635d1b833e0f5b89a9bdf358d784751c1b4"
 dependencies = [
  "dojo_plugin",
 ]

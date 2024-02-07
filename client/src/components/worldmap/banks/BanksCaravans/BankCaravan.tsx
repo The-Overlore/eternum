@@ -4,7 +4,7 @@ import { ReactComponent as Pen } from "../../../../assets/icons/common/pen.svg";
 import { ReactComponent as CaretDownFill } from "../../../../assets/icons/common/caret-down-fill.svg";
 import { ReactComponent as DonkeyIcon } from "../../../../assets/icons/units/donkey-circle.svg";
 import useBlockchainStore from "../../../../hooks/store/useBlockchainStore";
-import { getTotalResourceWeight } from "../../../cityview/realm/trade/TradeUtils";
+import { getTotalResourceWeight } from "../../../cityview/realm/trade/utils";
 import {
   displayAddress,
   divideByPrecision,
@@ -23,6 +23,7 @@ import Button from "../../../../elements/Button";
 import { BANK_AUCTION_DECAY, targetPrices } from "../../../../hooks/helpers/useBanks";
 import { useResources } from "../../../../hooks/helpers/useResources";
 import { getLordsAmountFromBankAuction } from "../utils";
+import { EventType, useNotificationsStore } from "../../../../hooks/store/useNotificationsStore";
 
 type BankCaravanProps = {
   caravan: CaravanInterface;
@@ -45,6 +46,8 @@ export const BankCaravan = ({ caravan, bank, ...props }: BankCaravanProps) => {
       components: { CaravanMembers, EntityOwner, ForeignKey, Position },
     },
   } = useDojo();
+
+  const deleteNotification = useNotificationsStore((state) => state.deleteNotification);
 
   const { getResourcesFromInventory } = useResources();
 
@@ -131,6 +134,7 @@ export const BankCaravan = ({ caravan, bank, ...props }: BankCaravanProps) => {
       destination_coord_x: returnPosition?.x || 0,
       destination_coord_y: returnPosition?.y || 0,
     });
+    deleteNotification([caravan.caravanId.toString()], EventType.ArrivedAtBank);
   };
 
   const onClick = async () => {
