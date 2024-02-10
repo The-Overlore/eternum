@@ -5,21 +5,27 @@ import useRealmStore from "../../../../hooks/store/useRealmStore";
 import { getRealm } from "../../../../utils/realms";
 import { ReactComponent as ArrowPrev } from "../../../../assets/icons/common/arrow-left.svg";
 import { ReactComponent as ArrowNext } from "../../../../assets/icons/common/arrow-right.svg";
-
+import { useDojo } from "../../../../DojoContext";
 
 type NpcPanelProps = {
   type?: "all" | "farmers" | "miners";
 };
 
 export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
+  const {
+    setup: {
+      systemCalls: { spawn_npc },
+    },
+    account: { account },
+  } = useDojo();
   const [spawned, setSpawned] = useState(-1);
   const [selectedTownhall, setSelectedTownhall] = useState<string | null>(null);
-  const { realmId } = useRealmStore();
+  const { realmId, realmEntityId } = useRealmStore();
 
   const parseTownhalls = (direction: string) => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
     const townhallsInLocalStorage = localStorage.getItem(chatIdentifier);
-    
+
     if (townhallsInLocalStorage && selectedTownhall !== null) {
       const townhallsAsObject = JSON.parse(townhallsInLocalStorage);
       const keys = Object.keys(townhallsAsObject);
@@ -33,12 +39,16 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       }
       setSelectedTownhall(newKey);
     }
-  }
+  };
 
   const realm = useMemo(() => {
     return realmId ? getRealm(realmId) : undefined;
   }, [realmId]);
-  
+
+  const spawnNpc = async () => {
+    let npcId = await spawn_npc({ signer: account, realm_id: realmEntityId });
+  };
+
   useEffect(() => {
     const chatIdentifier = `npc_chat_${realm?.realmId ?? BigInt(0)}`;
     const townhallsInLocalStorage = localStorage.getItem(chatIdentifier);
@@ -58,6 +68,9 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         className="flex flex-row w-[100%] items-center justify-between space-y-2"
         style={{ position: "relative", top: "2%" }}
       >
+        {/* <Button className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full" onClick={spawnNpc} variant="primary">
+          Spawn villager
+        </Button> */}
         <Button
           className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
           onClick={() => setSpawned(spawned + 1)}
@@ -67,21 +80,21 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         </Button>
 
         <div className="flex">
-          <Button
-            onClick={() => parseTownhalls("previous")} 
-            >
+          <Button onClick={() => parseTownhalls("previous")}>
             <ArrowPrev />
           </Button>
           <div className="text-white">{selectedTownhall}</div>
-          <Button
-            onClick={() => parseTownhalls("next")}
-            className="mr-2" 
-            >
+          <Button onClick={() => parseTownhalls("next")} className="mr-2">
             <ArrowNext />
           </Button>
         </div>
       </div>
-      <NpcChat spawned={spawned} realmId={realm?.realmId ?? BigInt(0)} selectedTownhall={selectedTownhall} setSelectedTownhall={setSelectedTownhall} />
+      <NpcChat
+        spawned={spawned}
+        realmId={realm?.realmId ?? BigInt(0)}
+        selectedTownhall={selectedTownhall}
+        setSelectedTownhall={setSelectedTownhall}
+      />
     </div>
   );
 };
