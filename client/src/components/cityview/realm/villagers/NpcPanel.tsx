@@ -18,8 +18,8 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     },
     account: { account },
   } = useDojo();
-  const [spawned, setSpawned] = useState(-1);
-  const [selectedTownhall, setSelectedTownhall] = useState<string | null>(null);
+  const [townHallRequest, setTownHallRequest] = useState(-1);
+  const [selectedTownhall, setSelectedTownhall] = useState<number | null>(null);
   const { realmId, realmEntityId } = useRealmStore();
 
   const parseTownhalls = (direction: string) => {
@@ -29,15 +29,15 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     if (townhallsInLocalStorage && selectedTownhall !== null) {
       const townhallsAsObject = JSON.parse(townhallsInLocalStorage);
       const keys = Object.keys(townhallsAsObject);
-      const currentKey = keys.indexOf(selectedTownhall);
-      let newKey = keys[keys.indexOf(selectedTownhall)];
+      const currentKey = keys.indexOf(String(selectedTownhall));
+      let newKey = keys[keys.indexOf(String(selectedTownhall))];
 
       if (direction == "previous" && currentKey > 0) {
         newKey = keys[currentKey - 1];
       } else if (direction == "next" && currentKey >= 0 && currentKey < keys.length - 1) {
         newKey = keys[currentKey + 1];
       }
-      setSelectedTownhall(newKey);
+      setSelectedTownhall(Number(newKey));
     }
   };
 
@@ -56,7 +56,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       const townhallsAsObject = JSON.parse(townhallsInLocalStorage);
       const keys = Object.keys(townhallsAsObject);
       if (keys.length > 0) {
-        const lastKey = keys[keys.length - 1];
+        const lastKey = Number(keys[keys.length - 1]);
         setSelectedTownhall(lastKey);
       }
     }
@@ -73,7 +73,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         </Button> */}
         <Button
           className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
-          onClick={() => setSpawned(spawned + 1)}
+          onClick={() => setTownHallRequest(townHallRequest + 1)}
           variant="primary"
         >
           Gather villagers
@@ -90,7 +90,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         </div>
       </div>
       <NpcChat
-        spawned={spawned}
+        townHallRequest={townHallRequest}
         order={realm?.order ?? 0}
         realmId={realm?.realmId ?? BigInt(0)}
         selectedTownhall={selectedTownhall}
