@@ -3,7 +3,15 @@ import useWebSocket from "react-use-websocket";
 import { NpcChatMessage } from "./NpcChatMessage";
 import { StorageTownhalls, StorageTownhall, Message, NpcChatProps } from "./types";
 
-const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelectedTownhall, loadingTownhall, setLoadingTownhall }: NpcChatProps) => {
+const NpcChat = ({
+  townHallRequest,
+  order,
+  realmId,
+  selectedTownhall,
+  setSelectedTownhall,
+  loadingTownhall,
+  setLoadingTownhall,
+}: NpcChatProps) => {
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
@@ -87,45 +95,45 @@ const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelecte
     <div className="relative flex flex-col h-full overflow-auto">
       <div className="relative flex flex-col h-full overflow-auto relative top-3 flex flex-col h-full center mx-auto w-[96%] mb-3 overflow-auto border border-gold">
         <>
-          {
-            loadingTownhall ? (
-            <div className="absolute h-full bg-black w-[100%] text-white text-center flex justify-center">
+          {loadingTownhall ? (
+            <div className="absolute h-full w-[100%] overflow-hidden text-white text-center flex justify-center">
               <div className="self-center">
                 <img src="/images/eternum-logo_animated.png" className="invert scale-50" />
               </div>
             </div>
-          ) :
-          (() => {
-            const townhallsInLocalStorage: StorageTownhalls = JSON.parse(
-              localStorage.getItem(LOCAL_STORAGE_ID) ?? "{}",
-            );
+          ) : (
+            (() => {
+              const townhallsInLocalStorage: StorageTownhalls = JSON.parse(
+                localStorage.getItem(LOCAL_STORAGE_ID) ?? "{}",
+              );
 
-            const storageTownhall: StorageTownhall | null =
-              selectedTownhall != null ? townhallsInLocalStorage[selectedTownhall] : null;
+              const storageTownhall: StorageTownhall | null =
+                selectedTownhall != null ? townhallsInLocalStorage[selectedTownhall] : null;
 
-            if (storageTownhall && storageTownhall["discussion"].length) {
-              const isViewed = storageTownhall["viewed"];
+              if (storageTownhall && storageTownhall["discussion"].length) {
+                const isViewed = storageTownhall["viewed"];
 
-              return storageTownhall["discussion"].map((message: any, index: number) => {
-                if (!isViewed && index > lastMessageDisplayedIndex) {
-                  return <></>;
-                }
-                return (
-                  <NpcChatMessage
-                    key={index}
-                    index={index}
-                    lastMessageDisplayedIndex={lastMessageDisplayedIndex}
-                    setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
-                    bottomRef={bottomRef}
-                    viewed={isViewed}
-                    {...message}
-                  />
-                );
-              });
-            } else {
-              return <div></div>;
-            }
-          })()}
+                return storageTownhall["discussion"].map((message: any, index: number) => {
+                  if (!isViewed && index > lastMessageDisplayedIndex) {
+                    return <></>;
+                  }
+                  return (
+                    <NpcChatMessage
+                      key={index}
+                      index={index}
+                      lastMessageDisplayedIndex={lastMessageDisplayedIndex}
+                      setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
+                      bottomRef={bottomRef}
+                      viewed={isViewed}
+                      {...message}
+                    />
+                  );
+                });
+              } else {
+                return <div></div>;
+              }
+            })()
+          )}
           <span className="" ref={bottomRef}></span>;
         </>
       </div>
