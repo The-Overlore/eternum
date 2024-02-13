@@ -42,6 +42,8 @@ const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelecte
       return;
     }
 
+    setLastMessageDisplayedIndex(0);
+
     const message: Message = lastJsonMessage as Message;
     const townhallKey = message["id"];
     const townhallDiscussion: string[] = message["townhall"].split(/\n+/);
