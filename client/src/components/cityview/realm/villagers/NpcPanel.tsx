@@ -20,6 +20,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   } = useDojo();
   const [townHallRequest, setTownHallRequest] = useState(-1);
   const [selectedTownhall, setSelectedTownhall] = useState<number | null>(null);
+  const [loadingTownhall, setLoadingTownhall] = useState<boolean>(false);
   const { realmId, realmEntityId } = useRealmStore();
 
   const parseTownhalls = (direction: string) => {
@@ -62,6 +63,11 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     }
   }, [realm?.realmId]);
 
+  const gatherVillagers = () => {
+    setTownHallRequest(townHallRequest + 1);
+    setLoadingTownhall(true);
+  }
+
   return (
     <div className="flex flex-col h-[250px] relative pb-3">
       <div
@@ -73,7 +79,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         </Button> */}
         <Button
           className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
-          onClick={() => setTownHallRequest(townHallRequest + 1)}
+          onClick={gatherVillagers}
           variant="primary"
         >
           Gather villagers
@@ -95,7 +101,8 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         realmId={realm?.realmId ?? BigInt(0)}
         selectedTownhall={selectedTownhall}
         setSelectedTownhall={setSelectedTownhall}
-      />
+        loadingTownhall={loadingTownhall} 
+        setLoadingTownhall={setLoadingTownhall} />
     </div>
   );
 };

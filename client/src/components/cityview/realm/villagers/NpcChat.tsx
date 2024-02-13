@@ -3,7 +3,7 @@ import useWebSocket from "react-use-websocket";
 import { NpcChatMessage } from "./NpcChatMessage";
 import { StorageTownhalls, StorageTownhall, Message, NpcChatProps } from "./types";
 
-const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelectedTownhall }: NpcChatProps) => {
+const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelectedTownhall, loadingTownhall, setLoadingTownhall }: NpcChatProps) => {
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
@@ -62,6 +62,7 @@ const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelecte
     storedTownhalls[townhallKey] = newEntry;
     localStorage.setItem(LOCAL_STORAGE_ID, JSON.stringify(storedTownhalls));
     setSelectedTownhall(townhallKey);
+    setLoadingTownhall(false);
   }, [lastJsonMessage]);
 
   useEffect(() => {
@@ -84,7 +85,15 @@ const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelecte
     <div className="relative flex flex-col h-full overflow-auto">
       <div className="relative flex flex-col h-full overflow-auto relative top-3 flex flex-col h-full center mx-auto w-[96%] mb-3 overflow-auto border border-gold">
         <>
-          {(() => {
+          {
+            loadingTownhall ? (
+            <div className="absolute h-full bg-black w-[100%] text-white text-center flex justify-center">
+              <div className="self-center">
+                <img src="/images/eternum-logo_animated.png" className="invert scale-50" />
+              </div>
+            </div>
+          ) :
+          (() => {
             const townhallsInLocalStorage: StorageTownhalls = JSON.parse(
               localStorage.getItem(LOCAL_STORAGE_ID) ?? "{}",
             );
