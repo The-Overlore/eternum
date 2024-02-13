@@ -80,7 +80,8 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         <Button
           className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
           onClick={gatherVillagers}
-          variant="primary"
+          variant={loadingTownhall ? "default" : "primary"}
+          disabled={loadingTownhall}
         >
           Gather villagers
         </Button>
