@@ -34,7 +34,9 @@ export type NpcChatProps = {
   realmId: bigint;
   selectedTownhall: number | null;
   setSelectedTownhall: (newIndex: number | null) => void;
-};
+  loadingTownhall: boolean;
+  setLoadingTownhall: (loading: boolean) => void;
+}
 
 export type Message = {
   id: number;
