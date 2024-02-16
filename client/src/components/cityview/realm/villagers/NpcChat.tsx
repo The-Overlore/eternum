@@ -85,11 +85,16 @@ const NpcChat = ({ townHallRequest, order, realmId, selectedTownhall, setSelecte
   useEffect(() => {}, []);
   return (
     <div className="relative flex flex-col h-full overflow-auto">
-      <div className="relative flex flex-col h-full overflow-auto relative top-3 flex flex-col h-full center mx-auto w-[96%] mb-3 overflow-auto border border-gold">
+      <div 
+        className="relative flex flex-col h-full overflow-auto top-3 center mx-auto w-[96%] mb-3  border border-gold"
+        style={{scrollbarWidth:"unset"} }
+      >
         <>
           {
             loadingTownhall ? (
-            <div className="absolute h-full bg-black w-[100%] text-white text-center flex justify-center">
+            <div 
+              className="absolute h-full w-[100%] text-white text-center flex justify-center overflow-hidden	"
+            >
               <div className="self-center">
                 <img src="/images/eternum-logo_animated.png" className="invert scale-50" />
               </div>
