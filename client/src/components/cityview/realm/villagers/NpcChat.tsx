@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useWebSocket from "react-use-websocket";
 import { NpcChatMessage } from "./NpcChatMessage";
 import { StorageTownhalls, StorageTownhall, Message, NpcChatProps } from "./types";
@@ -11,13 +11,14 @@ const NpcChat = ({
   setSelectedTownhall,
   loadingTownhall,
   setLoadingTownhall,
+  lastMessageDisplayedIndex, 
+  setLastMessageDisplayedIndex
 }: NpcChatProps) => {
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
     shouldReconnect: () => true,
   });
-  const [lastMessageDisplayedIndex, setLastMessageDisplayedIndex] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,6 +127,7 @@ const NpcChat = ({
                       index={index}
                       lastMessageDisplayedIndex={lastMessageDisplayedIndex}
                       setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
+                      selectedTownhall={selectedTownhall}
                       bottomRef={bottomRef}
                       viewed={isViewed}
                       {...message}
