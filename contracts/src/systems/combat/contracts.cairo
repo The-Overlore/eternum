@@ -60,7 +60,11 @@ mod combat_systems {
         #[key]
         attacker_realm_entity_id: u128,
         #[key]
-        target_entity_id: u128,
+        attacker_realm_id: u128,
+        #[key]
+        target_realm_entity_id: u128,
+        #[key]
+        target_realm_id: u128,
         attacking_entity_ids: Span<u128>,
         stolen_resources: Span<(u8, u128)>,
         winner: Winner,
@@ -738,12 +742,12 @@ mod combat_systems {
                 Winner::Target
             };
 
-            let attacker_realm_entity_id 
-                = get!(world, *attacker_ids.at(0), EntityOwner).entity_owner_id;
             emit!(world, CombatOutcome { 
-                    attacker_realm_entity_id,
+                    attacker_realm_entity_id: attacker_realm.entity_id,
+                    attacker_realm_id: attacker_realm.realm_id,
+                    target_realm_entity_id: target_realm.entity_id,
+                    target_realm_id: target_realm.realm_id,
                     attacking_entity_ids: attacker_ids,
-                    target_entity_id,
                     stolen_resources: array![].span(),
                     winner,
                     damage,
@@ -860,6 +864,8 @@ mod combat_systems {
             )[0];
             
 
+            let mut damage_event = 0;
+            let mut stolen_resources_event = array![].span();
             if attack_successful {
 
 
@@ -954,6 +960,8 @@ mod combat_systems {
                     index += 1;                
                 };
 
+                stolen_resources_event = stolen_resources.span();
+
                 if stolen_resources.len() > 0 {
                     // give stolen resources to attacker
 
@@ -966,21 +974,6 @@ mod combat_systems {
                     
                 }
 
-        
-       
-                let attacker_realm_entity_id 
-                    = get!(world, attacker_id, EntityOwner).entity_owner_id;
-                emit!(world, CombatOutcome { 
-                        attacker_realm_entity_id,
-                        attacking_entity_ids: array![attacker_id].span(),
-                        target_entity_id,
-                        stolen_resources: stolen_resources.span(),
-                        winner: Winner::Attacker,
-                        damage: 0,
-                        ts
-                });
-
-            
             } else {
                 
                 // attack failed && target deals damage to attacker
@@ -995,19 +988,28 @@ mod combat_systems {
 
                 set!(world, (attacker_health));
 
+                damage_event = damage;
+            }
 
-                let attacker_realm_entity_id 
-                    = get!(world, attacker_id, EntityOwner).entity_owner_id;
-                emit!(world, CombatOutcome { 
-                        attacker_realm_entity_id,
-                        attacking_entity_ids: array![attacker_id].span(),
-                        target_entity_id,
-                        stolen_resources: array![].span(),
-                        winner: Winner::Target,
-                        damage,
-                        ts
-                });
-            }    
+            // emit combat event
+            let winner = if attack_successful {
+                Winner::Attacker
+            } else {
+                Winner::Target
+            };
+
+            emit!(world, CombatOutcome { 
+                    attacker_realm_entity_id: attacker_realm.entity_id,
+                    attacker_realm_id: attacker_realm.realm_id,
+                    target_realm_entity_id: target_realm.entity_id,
+                    target_realm_id: target_realm.realm_id,
+                    attacking_entity_ids: array![attacker_id].span(),
+                    stolen_resources: stolen_resources_event,
+                    winner,
+                    damage: damage_event,
+                    ts
+            });
+
 
 
             // send attacker back to home realm

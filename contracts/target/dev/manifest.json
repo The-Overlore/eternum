@@ -1263,7 +1263,7 @@
     {
       "name": "eternum::systems::combat::contracts::combat_systems",
       "address": "0x1b0a83a27a357e0574393ab06c0c774db7312a0993538cc0186d054f75ee84e",
-      "class_hash": "0x173ca5c49724c074eb62ba686acf36ebd2c849769f6787476e59efd3545166f",
+      "class_hash": "0xfea2bc2c006a0d6ff4b092d34cc9b95e73ca047e100ab47dd13a662ab7bbe7",
       "abi": [
         {
           "type": "impl",
@@ -1560,7 +1560,17 @@
               "kind": "key"
             },
             {
-              "name": "target_entity_id",
+              "name": "attacker_realm_id",
+              "type": "core::integer::u128",
+              "kind": "key"
+            },
+            {
+              "name": "target_realm_entity_id",
+              "type": "core::integer::u128",
+              "kind": "key"
+            },
+            {
+              "name": "target_realm_id",
               "type": "core::integer::u128",
               "kind": "key"
             },
@@ -3104,7 +3114,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0xb2dfe183e0130e90e90d4a39ac39a4cd541cd023cef1e3020308215ac23310",
+      "class_hash": "0x374c434ce18c9d1bdf559c84b64ae37ba9b1b72c05d9962101cc4a71b90ab63",
       "abi": [
         {
           "type": "impl",
@@ -3157,14 +3167,46 @@
                 },
                 {
                   "name": "realm_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "character_trait",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "name",
                   "type": "core::felt252"
                 }
               ],
               "outputs": [
                 {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "change_character_trait",
+              "inputs": [
+                {
+                  "name": "world",
+                  "type": "dojo::world::IWorldDispatcher"
+                },
+                {
+                  "name": "realm_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "npc_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "character_trait",
                   "type": "core::felt252"
                 }
               ],
+              "outputs": [],
               "state_mutability": "view"
             }
           ]
@@ -3229,12 +3271,34 @@
         },
         {
           "type": "event",
+          "name": "eternum::systems::npc::contracts::npc_systems::NpcSpawned",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "realm_id",
+              "type": "core::integer::u128",
+              "kind": "key"
+            },
+            {
+              "name": "npc_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "eternum::systems::npc::contracts::npc_systems::Event",
           "kind": "enum",
           "variants": [
             {
               "name": "UpgradeableEvent",
               "type": "dojo::components::upgradeable::upgradeable::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "NpcSpawned",
+              "type": "eternum::systems::npc::contracts::npc_systems::NpcSpawned",
               "kind": "nested"
             }
           ]
@@ -3873,7 +3937,7 @@
     {
       "name": "eternum::systems::trade::contracts::trade_systems::trade_systems",
       "address": "0x63cbe849cf6325e727a8d6f82f25fad7dc7eb9433767f5c1b8c59189e36c9b6",
-      "class_hash": "0x601d3faf5e5a48f28e5eb8b83d6f44dca82b44a9d6539ed6c60d7a09e92b573",
+      "class_hash": "0x346aeaf4cbd6d151e18a80f0765b830acc141ae8ebac987bde94953380806ab",
       "abi": [
         {
           "type": "impl",
@@ -4077,12 +4141,22 @@
               "kind": "key"
             },
             {
-              "name": "maker_id",
+              "name": "maker_realm_entity_id",
               "type": "core::integer::u128",
               "kind": "data"
             },
             {
-              "name": "taker_id",
+              "name": "maker_realm_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "taker_realm_entity_id",
+              "type": "core::integer::u128",
+              "kind": "data"
+            },
+            {
+              "name": "taker_realm_id",
               "type": "core::integer::u128",
               "kind": "data"
             },
@@ -11232,7 +11306,7 @@
       "members": [
         {
           "name": "realm_id",
-          "type": "felt252",
+          "type": "u128",
           "key": true
         },
         {
@@ -11241,7 +11315,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x627a3d24d75c413fce54cc39dcce06387e7a312b30010a600540c3eebd8c73b",
+      "class_hash": "0x20a64f117f8967cc1d0612f3e094216b0ebaada972626ea486f78c2a5a6b64e",
       "abi": [
         {
           "type": "function",
@@ -12496,21 +12570,31 @@
       "members": [
         {
           "name": "entity_id",
-          "type": "felt252",
+          "type": "u128",
           "key": true
         },
         {
           "name": "realm_id",
-          "type": "felt252",
+          "type": "u128",
           "key": false
         },
         {
           "name": "characteristics",
           "type": "felt252",
           "key": false
+        },
+        {
+          "name": "character_trait",
+          "type": "felt252",
+          "key": false
+        },
+        {
+          "name": "name",
+          "type": "felt252",
+          "key": false
         }
       ],
-      "class_hash": "0x121b85bc995c5651333ee0217add464b9b8f9454bf70fd36b33c2017dd41d2c",
+      "class_hash": "0x5d86fec68248c560af3280829abf3abff39e7bf570f838a1ec59101c261e3e2",
       "abi": [
         {
           "type": "function",
