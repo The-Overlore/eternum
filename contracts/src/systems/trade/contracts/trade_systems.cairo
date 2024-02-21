@@ -325,8 +325,8 @@ mod trade_systems {
                 maker_realm_id: maker_realm.realm_id,
                 taker_realm_entity_id: taker_realm.entity_id,
                 taker_realm_id: taker_realm.realm_id,
-                maker_resources: resource_chest::get_contents(world, trade.maker_resource_chest_id),
-                taker_resources: resource_chest::get_contents(world, trade.taker_resource_chest_id),
+                    maker_resources: resource_chest::get_contents(world, trade.taker_resource_chest_id),
+                    taker_resources: resource_chest::get_contents(world, trade.maker_resource_chest_id),
                 timestamp: ts
             });
 
