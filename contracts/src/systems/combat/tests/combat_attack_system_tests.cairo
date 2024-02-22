@@ -267,7 +267,11 @@ fn test_combat_outcome_event() {
     starknet::testing::set_contract_address(
         contract_address_const::<'attacker'>()
     );
-
+    
+    let target_unit_health = get!(world, target_town_watch_id, Health);
+    
+    let initial_health = target_unit_health.value;
+    
     // attack target
     combat_systems_dispatcher
         .attack(
@@ -278,7 +282,8 @@ fn test_combat_outcome_event() {
 
     let attacker_unit_health = get!(world, attacker_unit_id, Health);
     let target_unit_health = get!(world, target_town_watch_id, Health);
-   
+    
+    let actual_damages = initial_health - target_unit_health.value;
 
     assert(
         attacker_unit_health.value < 100 * ATTACKER_SOLDIER_COUNT 
@@ -328,7 +333,7 @@ fn test_combat_outcome_event() {
 
                 assert(winner == 0, 'wrong winner');
 
-                assert(damage == 105, 'wrong damages');
+                assert(damage == actual_damages.into(), 'wrong damages');
 
                 assert(timestamp == 0, 'wrong timestamp');
                 break;

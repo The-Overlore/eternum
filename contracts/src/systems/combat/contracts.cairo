@@ -685,6 +685,7 @@ mod combat_systems {
 
 
             let mut damage: u128 = 0; 
+            let mut damage_value_for_event: u128 = 0;
 
             let attack_successful: bool = *random::choices(
                 array![true, false].span(), 
@@ -704,6 +705,8 @@ mod combat_systems {
                 damage = (attackers_total_attack * damage_percent) / 100;
 
                 target_town_watch_health.value -= min(damage, target_town_watch_health.value);
+
+                damage_value_for_event = min(damage, target_town_watch_health.value);
 
                 set!(world, (target_town_watch_attack, target_town_watch_defense, target_town_watch_health));
 
@@ -731,6 +734,7 @@ mod combat_systems {
                     attacker_health.value -= min(damage, attacker_health.value);
                     set!(world, (attacker_health));
 
+                    damage_value_for_event += min(damage, attacker_health.value);
                     index += 1;
                 };
             }
@@ -750,7 +754,7 @@ mod combat_systems {
                     attacking_entity_ids: attacker_ids,
                     stolen_resources: array![].span(),
                     winner,
-                    damage,
+                    damage: damage_value_for_event,
                     ts,
              });
 
@@ -864,7 +868,7 @@ mod combat_systems {
             )[0];
             
 
-            let mut damage_event = 0;
+            let mut damage_value_for_event = 0;
             let mut stolen_resources_event = array![].span();
             if attack_successful {
 
@@ -988,7 +992,7 @@ mod combat_systems {
 
                 set!(world, (attacker_health));
 
-                damage_event = damage;
+                damage_value_for_event = min(damage, attacker_health.value);
             }
 
             // emit combat event
@@ -1006,7 +1010,7 @@ mod combat_systems {
                     attacking_entity_ids: array![attacker_id].span(),
                     stolen_resources: stolen_resources_event,
                     winner,
-                    damage: damage_event,
+                    damage: damage_value_for_event,
                     ts
             });
 
