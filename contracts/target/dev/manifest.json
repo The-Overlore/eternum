@@ -1263,7 +1263,7 @@
     {
       "name": "eternum::systems::combat::contracts::combat_systems",
       "address": "0x1b0a83a27a357e0574393ab06c0c774db7312a0993538cc0186d054f75ee84e",
-      "class_hash": "0x67f3d5f6a18a9c69c9ae7ebc7e20655667c8725c7ec0a0f73e77bed11aaa8b3",
+      "class_hash": "0x52c31b1a7257c260198e115e9ed5a70e9d74d33c5f85e68ad762273cccc5438",
       "abi": [
         {
           "type": "impl",

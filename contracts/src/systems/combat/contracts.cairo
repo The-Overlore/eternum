@@ -704,9 +704,9 @@ mod combat_systems {
                 let damage_percent = random::random(salt, 100 + 1 );
                 damage = (attackers_total_attack * damage_percent) / 100;
 
-                target_town_watch_health.value -= min(damage, target_town_watch_health.value);
-
                 damage_value_for_event = min(damage, target_town_watch_health.value);
+
+                target_town_watch_health.value -= min(damage, target_town_watch_health.value);
 
                 set!(world, (target_town_watch_attack, target_town_watch_defense, target_town_watch_health));
 
@@ -731,10 +731,11 @@ mod combat_systems {
                     let attacker_id = *attacker_ids.at(index);
                     let mut attacker_health = get!(world, attacker_id, Health);
 
+                    damage_value_for_event += min(damage, attacker_health.value);
+
                     attacker_health.value -= min(damage, attacker_health.value);
                     set!(world, (attacker_health));
 
-                    damage_value_for_event += min(damage, attacker_health.value);
                     index += 1;
                 };
             }
@@ -988,11 +989,11 @@ mod combat_systems {
                 let damage_percent = random::random(salt, 100 + 1 );
                 let damage = (target_total_attack * damage_percent) / 100;
 
+                damage_value_for_event = min(damage, attacker_health.value);
+
                 attacker_health.value -= min(damage, attacker_health.value);
 
                 set!(world, (attacker_health));
-
-                damage_value_for_event = min(damage, attacker_health.value);
             }
 
             // emit combat event
