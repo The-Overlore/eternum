@@ -36,6 +36,8 @@ export type NpcChatProps = {
   setSelectedTownhall: (newIndex: number | null) => void;
   loadingTownhall: boolean;
   setLoadingTownhall: (loading: boolean) => void;
+  lastMessageDisplayedIndex: number;
+  setLastMessageDisplayedIndex: (newIndex: number) => void;
 }
 
 export type Message = {

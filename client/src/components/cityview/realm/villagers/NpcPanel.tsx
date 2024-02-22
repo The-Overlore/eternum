@@ -21,6 +21,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const [townHallRequest, setTownHallRequest] = useState(-1);
   const [selectedTownhall, setSelectedTownhall] = useState<number | null>(null);
   const [loadingTownhall, setLoadingTownhall] = useState<boolean>(false);
+  const [lastMessageDisplayedIndex, setLastMessageDisplayedIndex] = useState(0);
   const { realmId, realmEntityId } = useRealmStore();
 
   const parseTownhalls = (direction: string) => {
@@ -38,7 +39,10 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       } else if (direction == "next" && currentKey >= 0 && currentKey < keys.length - 1) {
         newKey = keys[currentKey + 1];
       }
-      setSelectedTownhall(Number(newKey));
+      if (Number(newKey) != selectedTownhall) {
+        setLastMessageDisplayedIndex(0);
+        setSelectedTownhall(Number(newKey));
+      }
     }
   };
 
@@ -103,7 +107,10 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
         selectedTownhall={selectedTownhall}
         setSelectedTownhall={setSelectedTownhall}
         loadingTownhall={loadingTownhall} 
-        setLoadingTownhall={setLoadingTownhall} />
+        setLoadingTownhall={setLoadingTownhall}
+        lastMessageDisplayedIndex={lastMessageDisplayedIndex}
+        setLastMessageDisplayedIndex={setLastMessageDisplayedIndex} 
+        />
     </div>
   );
 };
