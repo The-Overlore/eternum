@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../../elements/Button";
 import NpcChat from "./NpcChat";
 import useRealmStore from "../../../../hooks/store/useRealmStore";
-import { getRealm } from "../../../../utils/realms";
 import { ReactComponent as ArrowPrev } from "../../../../assets/icons/common/arrow-left.svg";
 import { ReactComponent as ArrowNext } from "../../../../assets/icons/common/arrow-right.svg";
 import { useDojo } from "../../../../DojoContext";
-import { NpcProvider, useNpcContext } from "./NpcContext";
+import { useNpcContext } from "./NpcContext";
 import { StorageTownhalls } from "./types";
 
 type NpcPanelProps = {
