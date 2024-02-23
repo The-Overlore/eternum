@@ -30,15 +30,13 @@ export type StorageTownhalls = {
 
 export type NpcChatProps = {
   townHallRequest: number;
-  order: number;
-  realmId: bigint;
   selectedTownhall: number | null;
   setSelectedTownhall: (newIndex: number | null) => void;
   loadingTownhall: boolean;
   setLoadingTownhall: (loading: boolean) => void;
   lastMessageDisplayedIndex: number;
   setLastMessageDisplayedIndex: (newIndex: number) => void;
-}
+};
 
 export type Message = {
   id: number;

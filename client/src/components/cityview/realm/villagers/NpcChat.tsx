@@ -1,24 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import useWebSocket from "react-use-websocket";
 import { NpcChatMessage } from "./NpcChatMessage";
 import { StorageTownhalls, StorageTownhall, Message, NpcChatProps } from "./types";
+import useRealmStore from "../../../../hooks/store/useRealmStore";
+import { getRealm } from "../../../../utils/realms";
 
 const NpcChat = ({
   townHallRequest,
-  order,
-  realmId,
   selectedTownhall,
   setSelectedTownhall,
   loadingTownhall,
   setLoadingTownhall,
-  lastMessageDisplayedIndex, 
-  setLastMessageDisplayedIndex
+  lastMessageDisplayedIndex,
+  setLastMessageDisplayedIndex,
 }: NpcChatProps) => {
+  const { realmId } = useRealmStore();
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(import.meta.env.VITE_OVERLORE_WS_URL, {
     share: false,
     shouldReconnect: () => true,
   });
+
+  const realm = useMemo(() => {
+    return realmId ? getRealm(realmId) : undefined;
+  }, [realmId]);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,8 +88,8 @@ const NpcChat = ({
     }
 
     sendJsonMessage({
-      realm_id: realmId.toString(),
-      order: order,
+      realm_id: realmId!.toString(),
+      orderId: realm!.order,
     });
   }, [townHallRequest]);
 
@@ -94,9 +100,9 @@ const NpcChat = ({
   useEffect(() => {}, []);
   return (
     <div className="relative flex flex-col h-full overflow-auto">
-      <div 
+      <div
         className="relative flex flex-col h-full overflow-auto top-3 center mx-auto w-[96%] mb-3  border border-gold"
-        style={{scrollbarWidth:"unset"} }
+        style={{ scrollbarWidth: "unset" }}
       >
         <>
           {loadingTownhall ? (
