@@ -70,19 +70,16 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   const gatherVillagers = () => {
     setTownHallRequest(townHallRequest + 1);
     setLoadingTownhall(true);
-  }
+  };
 
   return (
     <div className="flex flex-col h-[250px] relative pb-3">
-      <div
-        className="flex flex-row w-[100%] items-center justify-between space-y-2"
-        style={{ position: "relative", top: "2%" }}
-      >
-        {/* <Button className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full" onClick={spawnNpc} variant="primary">
+      <div className="flex flex-row w-[100%] items-center justify-between" style={{ position: "relative", top: "2%" }}>
+        <Button className="mx-2 w-32 bottom-2 !rounded-full" onClick={spawnNpc} variant="primary">
           Spawn villager
-        </Button> */}
+        </Button>
         <Button
-          className="mx-2 top-3 left-3 w-32 bottom-2 !rounded-full"
+          className="mx-2 w-32 bottom-2 !rounded-full"
           onClick={gatherVillagers}
           variant={loadingTownhall ? "default" : "primary"}
           disabled={loadingTownhall}
@@ -90,7 +87,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
           Gather villagers
         </Button>
 
-        <div className="flex">
+        <div className="flex relative">
           <Button onClick={() => parseTownhalls("previous")}>
             <ArrowPrev />
           </Button>
@@ -102,15 +99,13 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       </div>
       <NpcChat
         townHallRequest={townHallRequest}
-        order={realm?.order ?? 0}
-        realmId={realm?.realmId ?? BigInt(0)}
         selectedTownhall={selectedTownhall}
         setSelectedTownhall={setSelectedTownhall}
-        loadingTownhall={loadingTownhall} 
+        loadingTownhall={loadingTownhall}
         setLoadingTownhall={setLoadingTownhall}
         lastMessageDisplayedIndex={lastMessageDisplayedIndex}
-        setLastMessageDisplayedIndex={setLastMessageDisplayedIndex} 
-        />
+        setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
+      />
     </div>
   );
 };
