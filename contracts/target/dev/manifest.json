@@ -3114,7 +3114,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x374c434ce18c9d1bdf559c84b64ae37ba9b1b72c05d9962101cc4a71b90ab63",
+      "class_hash": "0x3ba48e98d6bb747f2f6a135d583ea4ccc5e9ad1abafbedaa730d5c667a2b3b0",
       "abi": [
         {
           "type": "impl",
@@ -3168,6 +3168,10 @@
                 {
                   "name": "realm_id",
                   "type": "core::integer::u128"
+                },
+                {
+                  "name": "characteristics",
+                  "type": "core::felt252"
                 },
                 {
                   "name": "character_trait",

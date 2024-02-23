@@ -5,7 +5,7 @@ mod npc_systems {
 
     use eternum::constants::NPC_CONFIG_ID;
     use eternum::models::realm::{Realm, RealmTrait};
-    use eternum::models::npc::{Npc, pack_characs, random_characteristics};
+    use eternum::models::npc::{Npc};
     use eternum::models::last_spawned::{LastSpawned, ShouldSpawnImpl};
     use eternum::systems::npc::utils::assert_ownership;
     use eternum::models::config::NpcConfig;
@@ -28,7 +28,6 @@ mod npc_systems {
 
     #[generate_trait]
     impl InternalFunctions of InternalFunctionsTrait {
-        // trigger the mood changes based on when the user clicks on the harvest weat/fish
         fn change_characteristics(
             self: @ContractState,
             world: IWorldDispatcher,
@@ -57,7 +56,14 @@ mod npc_systems {
 
     #[external(v0)]
     impl NpcImpl of INpc<ContractState> {
-        fn spawn_npc(self: @ContractState, world: IWorldDispatcher, realm_id: u128, character_trait: felt252, name: felt252) -> u128 {
+        fn spawn_npc(
+            self: @ContractState,
+            world: IWorldDispatcher,
+            realm_id: u128,
+            characteristics: felt252,
+            character_trait: felt252,
+            name: felt252
+        ) -> u128 {
             // check that entity is a realm
             let realm = get!(world, realm_id, (Realm));
             assert(realm.realm_id != 0, 'not a realm');
@@ -74,27 +80,11 @@ mod npc_systems {
                 let block: BlockInfo = starknet::get_block_info().unbox();
                 let ts: u128 = starknet::get_block_timestamp().into();
                 let mut randomness = array![ts, Into::<u64, u128>::into(block.block_number)];
-                let characteristics = random_characteristics(@randomness.span());
-                let packed_characteristics = pack_characs(characteristics);
                 let entity_id: u128 = world.uuid().into();
 
-                set!(
-                    world,
-                    (Npc {
-                        entity_id,
-                        realm_id,
-                        characteristics: packed_characteristics,
-                        character_trait,
-                        name,
-                    })
-                );
+                set!(world, (Npc { entity_id, realm_id, characteristics, character_trait, name, }));
                 set!(world, (LastSpawned { realm_id, last_spawned_ts: ts }));
-                emit!(
-                    world,
-                    NpcSpawned {
-                        realm_id, npc_id: entity_id
-                    }
-                );
+                emit!(world, NpcSpawned { realm_id, npc_id: entity_id });
                 entity_id
             } else {
                 0

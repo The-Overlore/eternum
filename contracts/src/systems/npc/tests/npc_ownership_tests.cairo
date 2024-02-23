@@ -65,12 +65,12 @@ fn test_ownership() {
 
     // naive call should work
     //   
-    let npc_id = npc_dispatcher.spawn_npc(world, realm_entity_id, 'brave', 'john');
+    let npc_id = npc_dispatcher.spawn_npc(world, realm_entity_id, 0x1, 'brave', 'john');
 
     let npc = get!(world, (realm_entity_id, npc_id), (Npc));
     assert(npc.entity_id == npc_id, 'should allow npc spawning');
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
     // call should not work
-    let npc_id = npc_dispatcher.spawn_npc(world, realm_entity_id, 'brave', 'john');
+    let npc_id = npc_dispatcher.spawn_npc(world, realm_entity_id, 0x1, 'brave', 'john');
 }
