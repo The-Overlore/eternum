@@ -55,6 +55,7 @@ use eternum::constants::{REALM_LEVELING_CONFIG_ID, HYPERSTRUCTURE_LEVELING_CONFI
 use dojo::world::{ IWorldDispatcher, IWorldDispatcherTrait};
 
 use starknet::contract_address_const;
+use starknet::testing::pop_log_raw;
 
 use core::array::{ArrayTrait, SpanTrait};
 use core::traits::Into;
@@ -594,6 +595,144 @@ fn test_steal_success_with_order_boost() {
 }
 
 
+#[test]
+#[available_gas(3000000000000)]
+fn test_steal_combat_outcome_event() {
+
+    // the attacker attacks and successfully steals resources
+    let (
+        world, 
+        attacker_realm_entity_id, attacker_unit_id,
+        target_realm_entity_id, target_town_watch_id, 
+        combat_systems_dispatcher
+    ) = setup();
+    
+    starknet::testing::set_contract_address(world.executor());
+
+    // make the target completely defenceless 
+    // so that the attacker's victory is assured
+    set!(world, (
+        Defence {
+            entity_id: target_town_watch_id,
+            value: 0
+        }
+    ));
+
+    starknet::testing::set_contract_address(
+        contract_address_const::<'attacker'>()
+    );
+
+    // steal from target
+    combat_systems_dispatcher
+        .steal(
+            world, attacker_unit_id, target_realm_entity_id
+            );
+
+    let attacker_unit_health = get!(world, attacker_unit_id, Health);
+    let target_unit_health = get!(world, target_town_watch_id, Health);
+
+    // ensure attacker's health is intact
+    assert(
+        attacker_unit_health.value == 100 * ATTACKER_SOLDIER_COUNT,
+                'wrong health value'
+    );
+
+    // ensure that food was burned
+    let target_realm_wheat_resource = get!(world, (target_realm_entity_id, ResourceTypes::WHEAT), Resource);
+    assert(
+        target_realm_wheat_resource.balance == INITIAL_RESOURCE_BALANCE - ( WHEAT_BURN_PER_SOLDIER_DURING_ATTACK * ATTACKER_SOLDIER_COUNT),
+                'wrong wheat value'
+    );
+
+    let target_realm_fish_resource = get!(world, (target_realm_entity_id, ResourceTypes::FISH), Resource);
+    assert(
+        target_realm_fish_resource.balance == INITIAL_RESOURCE_BALANCE - ( FISH_BURN_PER_SOLDIER_DURING_ATTACK * ATTACKER_SOLDIER_COUNT),
+                'wrong fish value'
+    );
+
+    // ensure stolen resources are added to attacker's inventory
+    let attacker_inventory = get!(world, attacker_unit_id, Inventory);
+    assert(attacker_inventory.items_count == 1, 'no inventory items');
+
+    // check that attacker inventory has items
+    let attacker_resource_chest_foreign_key
+        = InternalInventorySystemsImpl::get_foreign_key(
+            attacker_inventory, 0
+            );
+    let attacker_resource_chest_id 
+        = get!(world, attacker_resource_chest_foreign_key, ForeignKey).entity_id; 
+
+    // check that resource chest in inventory is filled
+    let attacker_resource_chest_weight
+        = get!(world, attacker_resource_chest_id, Weight);
+    assert(attacker_resource_chest_weight.value > 0, 'wrong chest weight');
+
+    let combat_outcome_hash = 0x1736c207163ad481e2a196c0fb6394f90c66c2e2b52e0c03d4a077ac6cea918;
+    
+    let mut found = false;
+    loop {
+        let mut event_option = pop_log_raw(world.contract_address);
+        match event_option {
+            Option::Some(val) => {
+                let (mut keys, mut data) = val;
+
+                let event_selector = *keys.at(0);
+
+                if (event_selector != combat_outcome_hash) {
+                    continue;
+                }
+
+                found = true;
+
+                let attacker_realm_entity_id = (*keys.at(1));
+                let attacker_realm_id = (*keys.at(2));
+
+                let target_realm_entity_id = (*keys.at(3));
+                let target_realm_id = (*keys.at(4));
+
+                let attacking_entity_ids_len = (*data.at(0));
+                let attacking_entity_id_0 = (*data.at(1));
+
+                let stolen_resources_len = (*data.at(2));
+                let stolen_resources_0_type = (*data.at(3));
+                let stolen_resources_0_amount = (*data.at(4));
+                let stolen_resources_1_type = (*data.at(5));
+                let stolen_resources_1_amount = (*data.at(6));
+
+                let winner = (*data.at(7));
+
+                let damage = (*data.at(8));
+
+                let timestamp = (*data.at(9));
+
+                assert(
+                    attacker_realm_entity_id == attacker_realm_entity_id,
+                    'wrong attacker_realm_entity_id'
+                );
+                assert(attacker_realm_id == 1, 'wrong attacker_realm_id');
+
+                assert(
+                    target_realm_entity_id == target_realm_entity_id, 'wrong target_realm_entity_id'
+                );
+                assert(target_realm_id == 1, 'wrong target_realm_id');
+
+                assert(stolen_resources_len != 0, 'wrong len of stolen resources');
+
+                assert(winner == 0, 'wrong winner');
+
+                assert(damage == 0, 'wrong damages');
+
+                assert(timestamp == 1000, 'wrong timestamp');
+                break;
+            },
+            Option::None => {
+                break;
+            },
+        }
+    };
+    assert(found == true, 'CombatOutcome not found');
+
+}
 
 
 #[test]

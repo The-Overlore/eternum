@@ -433,7 +433,7 @@ mod resource_systems {
             let mut index = 0;
             loop {
                 if index == resource_chest.resources_count {
-                    break ();
+                    break;
                 }
                 let detached_resource = get!(world, (chest_id, index), DetachedResource);
                 resources.append((detached_resource.resource_type, detached_resource.resource_amount));

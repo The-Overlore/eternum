@@ -60,7 +60,11 @@ mod combat_systems {
         #[key]
         attacker_realm_entity_id: u128,
         #[key]
-        target_entity_id: u128,
+        attacker_realm_id: u128,
+        #[key]
+        target_realm_entity_id: u128,
+        #[key]
+        target_realm_id: u128,
         attacking_entity_ids: Span<u128>,
         stolen_resources: Span<(u8, u128)>,
         winner: Winner,
@@ -681,6 +685,7 @@ mod combat_systems {
 
 
             let mut damage: u128 = 0; 
+            let mut damage_value_for_event: u128 = 0;
 
             let attack_successful: bool = *random::choices(
                 array![true, false].span(), 
@@ -698,6 +703,8 @@ mod combat_systems {
                 let salt: u128 = ts.into();
                 let damage_percent = random::random(salt, 100 + 1 );
                 damage = (attackers_total_attack * damage_percent) / 100;
+
+                damage_value_for_event = min(damage, target_town_watch_health.value);
 
                 target_town_watch_health.value -= min(damage, target_town_watch_health.value);
 
@@ -724,6 +731,8 @@ mod combat_systems {
                     let attacker_id = *attacker_ids.at(index);
                     let mut attacker_health = get!(world, attacker_id, Health);
 
+                    damage_value_for_event += min(damage, attacker_health.value);
+
                     attacker_health.value -= min(damage, attacker_health.value);
                     set!(world, (attacker_health));
 
@@ -738,15 +747,15 @@ mod combat_systems {
                 Winner::Target
             };
 
-            let attacker_realm_entity_id 
-                = get!(world, *attacker_ids.at(0), EntityOwner).entity_owner_id;
             emit!(world, CombatOutcome { 
-                    attacker_realm_entity_id,
+                    attacker_realm_entity_id: attacker_realm.entity_id,
+                    attacker_realm_id: attacker_realm.realm_id,
+                    target_realm_entity_id: target_realm.entity_id,
+                    target_realm_id: target_realm.realm_id,
                     attacking_entity_ids: attacker_ids,
-                    target_entity_id,
                     stolen_resources: array![].span(),
                     winner,
-                    damage,
+                    damage: damage_value_for_event,
                     ts,
              });
 
@@ -860,6 +869,8 @@ mod combat_systems {
             )[0];
             
 
+            let mut damage_value_for_event = 0;
+            let mut stolen_resources_event = array![].span();
             if attack_successful {
 
 
@@ -954,6 +965,8 @@ mod combat_systems {
                     index += 1;                
                 };
 
+                stolen_resources_event = stolen_resources.span();
+
                 if stolen_resources.len() > 0 {
                     // give stolen resources to attacker
 
@@ -966,21 +979,6 @@ mod combat_systems {
                     
                 }
 
-        
-       
-                let attacker_realm_entity_id 
-                    = get!(world, attacker_id, EntityOwner).entity_owner_id;
-                emit!(world, CombatOutcome { 
-                        attacker_realm_entity_id,
-                        attacking_entity_ids: array![attacker_id].span(),
-                        target_entity_id,
-                        stolen_resources: stolen_resources.span(),
-                        winner: Winner::Attacker,
-                        damage: 0,
-                        ts
-                });
-
-            
             } else {
                 
                 // attack failed && target deals damage to attacker
@@ -991,23 +989,32 @@ mod combat_systems {
                 let damage_percent = random::random(salt, 100 + 1 );
                 let damage = (target_total_attack * damage_percent) / 100;
 
+                damage_value_for_event = min(damage, attacker_health.value);
+
                 attacker_health.value -= min(damage, attacker_health.value);
 
                 set!(world, (attacker_health));
+            }
 
+            // emit combat event
+            let winner = if attack_successful {
+                Winner::Attacker
+            } else {
+                Winner::Target
+            };
 
-                let attacker_realm_entity_id 
-                    = get!(world, attacker_id, EntityOwner).entity_owner_id;
-                emit!(world, CombatOutcome { 
-                        attacker_realm_entity_id,
-                        attacking_entity_ids: array![attacker_id].span(),
-                        target_entity_id,
-                        stolen_resources: array![].span(),
-                        winner: Winner::Target,
-                        damage,
-                        ts
-                });
-            }    
+            emit!(world, CombatOutcome { 
+                    attacker_realm_entity_id: attacker_realm.entity_id,
+                    attacker_realm_id: attacker_realm.realm_id,
+                    target_realm_entity_id: target_realm.entity_id,
+                    target_realm_id: target_realm.realm_id,
+                    attacking_entity_ids: array![attacker_id].span(),
+                    stolen_resources: stolen_resources_event,
+                    winner,
+                    damage: damage_value_for_event,
+                    ts
+            });
+
 
 
             // send attacker back to home realm

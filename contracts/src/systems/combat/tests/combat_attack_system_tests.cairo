@@ -46,6 +46,7 @@ use eternum::constants::SOLDIER_ENTITY_TYPE;
 use dojo::world::{ IWorldDispatcher, IWorldDispatcherTrait};
 
 use starknet::contract_address_const;
+use starknet::testing::pop_log_raw;
 
 use core::array::{ArrayTrait, SpanTrait};
 use core::traits::Into;
@@ -250,6 +251,100 @@ fn test_attack() {
             || target_unit_health.value < 100 * TARGET_SOLDIER_COUNT,
                 'wrong health value'
     );
+
+}
+
+#[test]
+#[available_gas(3000000000000)]
+fn test_combat_outcome_event() {
+    let (
+        world, 
+        attacker_realm_entity_id, attacker_unit_id, 
+        target_realm_entity_id, target_town_watch_id, 
+        combat_systems_dispatcher
+    ) = setup();
+    
+    starknet::testing::set_contract_address(
+        contract_address_const::<'attacker'>()
+    );
+    
+    let target_unit_health = get!(world, target_town_watch_id, Health);
+    
+    let initial_health = target_unit_health.value;
+    
+    // attack target
+    combat_systems_dispatcher
+        .attack(
+            world, 
+            array![attacker_unit_id].span(),
+            target_realm_entity_id
+        );
+
+    let attacker_unit_health = get!(world, attacker_unit_id, Health);
+    let target_unit_health = get!(world, target_town_watch_id, Health);
+    
+    let actual_damages = initial_health - target_unit_health.value;
+
+    assert(
+        attacker_unit_health.value < 100 * ATTACKER_SOLDIER_COUNT 
+            || target_unit_health.value < 100 * TARGET_SOLDIER_COUNT,
+                'wrong health value'
+    );
+
+    let combat_outcome_hash = 0x1736c207163ad481e2a196c0fb6394f90c66c2e2b52e0c03d4a077ac6cea918;
+    
+    let mut found = false;
+    loop {
+        let mut event_option = pop_log_raw(world.contract_address);
+        match event_option {
+            Option::Some(val) => {
+                let (mut keys, mut data) = val;
+                
+                let event_selector = *keys.at(0);
+
+                if (event_selector != combat_outcome_hash) {
+                    continue;
+                }
+                
+                found = true;
+
+                let attacker_realm_entity_id = (*keys.at(1));
+                let attacker_realm_id = (*keys.at(2));
+
+                let target_realm_entity_id = (*keys.at(3));
+                let target_realm_id = (*keys.at(4));
+
+                let attacking_entity_ids_len = (*data.at(0));
+                let attacking_entity_id_0 = (*data.at(1));
+
+                let stolen_resources_len = (*data.at(2));
+
+                let winner = (*data.at(3));
+                let damage = (*data.at(4));
+                let timestamp = (*data.at(5));
+
+                assert(attacker_realm_entity_id == attacker_realm_entity_id, 'wrong attacker_realm_entity_id');
+                assert(attacker_realm_id == 1, 'wrong attacker_realm_id');
+
+                assert(target_realm_entity_id == target_realm_entity_id, 'wrong target_realm_entity_id');
+                assert(target_realm_id == 1, 'wrong target_realm_id');
+
+                assert(stolen_resources_len == 0, 'wrong of stolen resources');
+
+                assert(winner == 0, 'wrong winner');
+
+                assert(damage == actual_damages.into(), 'wrong damages');
+
+                assert(timestamp == 0, 'wrong timestamp');
+                break;
+            },
+            Option::None => {
+                break;
+            },
+        }
+    };
+
+    assert(found == true, 'CombatOutcome not found');
 
 }
 

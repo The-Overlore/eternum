@@ -33,13 +33,15 @@ mod trade_systems {
     use eternum::constants::{REALM_ENTITY_TYPE, WORLD_CONFIG_ID, FREE_TRANSPORT_ENTITY_TYPE};
 
     use core::poseidon::poseidon_hash_span;
-    
+
     #[derive(Drop, starknet::Event)]
     struct OrderAccepted {
         #[key]
         trade_id: u128,
-        maker_id: u128,
-        taker_id: u128,
+        maker_realm_entity_id: u128,
+        maker_realm_id: u128,
+        taker_realm_entity_id: u128,
+        taker_realm_id: u128,
         maker_resources: Span<(u8, u128)>,
         taker_resources: Span<(u8, u128)>,
         timestamp: u64
@@ -314,16 +316,19 @@ mod trade_systems {
                 ));
             };
 
+            let maker_realm = get!(world, trade.maker_id, Realm );
+            let taker_realm = get!(world, trade.taker_id, Realm );
 
             emit!(world, OrderAccepted {
                 trade_id, 
-                maker_id: trade.maker_id,
-                taker_id, 
-                maker_resources: resource_chest::get_contents(world, trade.maker_resource_chest_id),
-                taker_resources: resource_chest::get_contents(world, trade.taker_resource_chest_id),
+                maker_realm_entity_id: maker_realm.entity_id,
+                maker_realm_id: maker_realm.realm_id,
+                taker_realm_entity_id: taker_realm.entity_id,
+                taker_realm_id: taker_realm.realm_id,
+                    maker_resources: resource_chest::get_contents(world, trade.taker_resource_chest_id),
+                    taker_resources: resource_chest::get_contents(world, trade.maker_resource_chest_id),
                 timestamp: ts
             });
-
 
             /////////  Update Trade   ///////////////
             //////////////////////////////////////////
