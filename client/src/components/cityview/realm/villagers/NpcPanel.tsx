@@ -20,12 +20,23 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     account: { account },
   } = useDojo();
 
+  const [spawned, setSpawned] = useState(0);
   const { realmId, realmEntityId } = useRealmStore();
 
   const LOCAL_STORAGE_ID = `npc_chat_${realmId}`;
 
-  const { selectedTownhall, setSelectedTownhall, setLastMessageDisplayedIndex, loadingTownhall, setLoadingTownhall } =
-    useNpcContext();
+  const realm = useMemo(() => {
+    return realmEntityId ? getRealm(realmId!) : undefined;
+  }, [realmEntityId]);
+
+  const {
+    selectedTownhall,
+    setSelectedTownhall,
+    setLastMessageDisplayedIndex,
+    loadingTownhall,
+    setLoadingTownhall,
+    npcs,
+  } = useNpcContext();
 
   const [townHallRequest, setTownHallRequest] = useState(-1);
 
@@ -41,7 +52,15 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   };
 
   const spawnNpc = async () => {
-    let _npcId = await spawn_npc({ signer: account, realm_id: realmEntityId });
+    // TODO make call to lore-machine backend to generate random name, ?characteristics? and character_trait (https://github.com/The-Overlore/eternum/issues/40)
+    let npcId = await spawn_npc({
+      signer: account,
+      realm_id: realmEntityId,
+      characteristics: 0,
+      character_trait: "Helpful",
+      name: "John",
+    });
+    setSpawned(spawned + 1);
   };
 
   useEffect(() => {
