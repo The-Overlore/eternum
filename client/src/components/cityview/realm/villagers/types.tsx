@@ -35,7 +35,7 @@ export type StorageTownhalls = {
 };
 
 export type NpcChatProps = {
-  townHallRequest: number;
+  LastWsMessage: any;
 };
 
 export type TownhallResponse = {
