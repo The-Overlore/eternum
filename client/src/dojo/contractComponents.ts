@@ -490,32 +490,34 @@ export function defineContractComponents(world: World) {
       );
     })(),
     Npc: (() => {
-      const name = "Npc";
       return defineComponent(
         world,
         {
-          realm_id: RecsType.Number,
-          mood: RecsType.Number,
-          role: RecsType.Number,
-          sex: RecsType.Number,
+          realm_id: RecsType.BigInt,
+          characteristics: RecsType.BigInt,
+          character_trait: RecsType.String,
+          name: RecsType.String,
         },
         {
           metadata: {
-            name: name,
+            name: "Npc",
+            types: ["u128", "u128", "felt252", "felt252", "felt252"],
+            customTypes: [],
           },
         },
       );
     })(),
     LastSpawned: (() => {
-      const name = "LastSpawned";
       return defineComponent(
         world,
         {
-          last_spawned_ts: RecsType.Number,
+          last_spawned_ts: RecsType.BigInt,
         },
         {
           metadata: {
-            name: name,
+            name: "LastSpawned",
+            types: ["u128", "u128"],
+            customTypes: [],
           },
         },
       );
