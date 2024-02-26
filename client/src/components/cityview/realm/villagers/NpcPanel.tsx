@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Button from "../../../../elements/Button";
 import NpcChat from "./NpcChat";
 import useRealmStore from "../../../../hooks/store/useRealmStore";
@@ -7,6 +7,7 @@ import { ReactComponent as ArrowNext } from "../../../../assets/icons/common/arr
 import { useDojo } from "../../../../DojoContext";
 import { useNpcContext } from "./NpcContext";
 import { StorageTownhalls } from "./types";
+import { getRealm } from "../../../../utils/realms";
 
 type NpcPanelProps = {
   type?: "all" | "farmers" | "miners";
