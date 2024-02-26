@@ -35,7 +35,9 @@ const NpcChat = ({ LastWsMessage }: NpcChatProps) => {
   }, [selectedTownhall]);
 
   useEffect(() => {
-    scrollToElement(bottomRef);
+    if (lastMessageDisplayedIndex !== 0) {
+      scrollToElement(bottomRef);
+    }
 
     if (selectedTownhall === null) {
       return;
@@ -54,7 +56,6 @@ const NpcChat = ({ LastWsMessage }: NpcChatProps) => {
     setSelectedTownhall(townhallKey);
     setLoadingTownhall(false);
   }, [LastWsMessage]);
-
 
   useEffect(() => {}, []);
   return (

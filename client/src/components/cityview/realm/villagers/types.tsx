@@ -14,7 +14,7 @@ export type Characteristics = {
 
 export type Npc = {
   entityId: BigNumberish;
-  realmId: Number;
+  realmEntityId: Number;
   characteristics: Characteristics;
   characterTrait: string;
   name: string;

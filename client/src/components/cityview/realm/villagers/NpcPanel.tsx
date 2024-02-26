@@ -85,9 +85,13 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
   }, [realmId]);
 
   const gatherVillagers = () => {
+    const npcsNoBigInt = npcs.map((npc): any => {
+      return { ...npc, entityId: npc.entityId.valueOf() };
+    });
     sendJsonMessage({
       realm_id: realmId!.toString(),
       orderId: realm!.order,
+      npcs: npcsNoBigInt,
     });
     setLoadingTownhall(true);
   };
