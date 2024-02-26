@@ -35,7 +35,7 @@ const NpcChat = ({ townHallRequest }: NpcChatProps) => {
     if (selectedTownhall === null) {
       return;
     }
-
+    setLastMessageDisplayedIndex(0);
     scrollToElement(topRef);
   }, [selectedTownhall]);
 

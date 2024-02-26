@@ -17,10 +17,18 @@ export function useTypingEffect(
   bottomRef: RefObject<HTMLElement>,
   textToType: string,
   interKeyStrokeDurationInMs: number,
+  setTypingCompleted: (state: boolean) => void,
+  wasAlreadyViewed: boolean
 ) {
   const [displayedText, setDisplayedText] = useState("");
   const { selectedTownhall, setLastMessageDisplayedIndex } = useNpcContext();
   useEffect(() => {
+    
+    if (wasAlreadyViewed) {
+      setDisplayedText(textToType);
+      return;
+    }
+
     setDisplayedText("");
 
     const intervalId = setInterval(() => {
@@ -36,7 +44,7 @@ export function useTypingEffect(
           return textToType.slice(0, prev.length + 1);
         }
         clearInterval(intervalId);
-        setLastMessageDisplayedIndex(msgIndex + 1);
+        setTypingCompleted(true);
         return prev;
       });
     }, interKeyStrokeDurationInMs);
@@ -50,10 +58,17 @@ export function useTypingEffect(
 
 export const NpcChatMessage = (props: NpcChatMessageProps) => {
   const { msgIndex, npcName, dialogueSegment, bottomRef, viewed: wasAlreadyViewed } = props;
+  const { setLastMessageDisplayedIndex } = useNpcContext();
+  const [typingCompleted, setTypingCompleted] = useState(false);
 
-  const displayedDialogSegment = wasAlreadyViewed
-    ? dialogueSegment
-    : useTypingEffect(msgIndex, bottomRef, dialogueSegment, INTERKEY_STROKEN_DURATION_MS);
+  const displayedDialogSegment = useTypingEffect(msgIndex, bottomRef, dialogueSegment, INTERKEY_STROKEN_DURATION_MS, setTypingCompleted, wasAlreadyViewed);
+
+  useEffect(() => {
+    if (typingCompleted) {
+      setLastMessageDisplayedIndex(msgIndex + 1);
+      setTypingCompleted(false);
+    }
+  }, [typingCompleted, msgIndex, setLastMessageDisplayedIndex]);
 
   return (
     <div className="flex flex-col px-2 mb-3 py-1">
