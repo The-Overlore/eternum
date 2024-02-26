@@ -5,6 +5,7 @@ import { NpcListPanel } from "./villagers/NpcListPanel";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
+import { NpcProvider } from "./villagers/NpcContext";
 
 type RealmVillagersComponentProps = {};
 
@@ -46,8 +47,10 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
       {
         key: "npcs",
         label: (
-          <div 
-            onMouseEnter={() => setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Tooltip</p> })}
+          <div
+            onMouseEnter={() =>
+              setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Tooltip</p> })
+            }
             onMouseLeave={() => setTooltip(null)}
             className="flex relative group flex-col items-center"
           >
@@ -56,13 +59,12 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
         ),
         component: <NpcListPanel />,
       },
-      
     ],
     [selectedTab],
   );
 
   return (
-    <>
+    <NpcProvider>
       <Tabs
         selectedIndex={selectedTab}
         onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
@@ -80,7 +82,7 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
           ))}
         </Tabs.Panels>
       </Tabs>
-    </>
+    </NpcProvider>
   );
 };
 
