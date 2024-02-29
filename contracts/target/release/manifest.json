@@ -3114,7 +3114,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x3ba48e98d6bb747f2f6a135d583ea4ccc5e9ad1abafbedaa730d5c667a2b3b0",
+      "class_hash": "0x2335d50fde01e08d7b50f2f5643ec51936c1bd92ce20bd1d18c1eb1e2eb5bcd",
       "abi": [
         {
           "type": "impl",
@@ -3154,6 +3154,16 @@
           "interface_name": "eternum::systems::npc::interface::INpc"
         },
         {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "eternum::systems::npc::interface::INpc",
           "items": [
@@ -3166,7 +3176,7 @@
                   "type": "dojo::world::IWorldDispatcher"
                 },
                 {
-                  "name": "realm_id",
+                  "name": "realm_entity_id",
                   "type": "core::integer::u128"
                 },
                 {
@@ -3180,6 +3190,10 @@
                 {
                   "name": "name",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "signature",
+                  "type": "core::array::Span::<core::felt252>"
                 }
               ],
               "outputs": [
@@ -3198,7 +3212,7 @@
                   "type": "dojo::world::IWorldDispatcher"
                 },
                 {
-                  "name": "realm_id",
+                  "name": "realm_entity_id",
                   "type": "core::integer::u128"
                 },
                 {
@@ -3279,7 +3293,7 @@
           "kind": "struct",
           "members": [
             {
-              "name": "realm_id",
+              "name": "realm_entity_id",
               "type": "core::integer::u128",
               "kind": "key"
             },
@@ -11309,7 +11323,7 @@
       "name": "eternum::models::last_spawned::last_spawned",
       "members": [
         {
-          "name": "realm_id",
+          "name": "realm_entity_id",
           "type": "u128",
           "key": true
         },
@@ -11319,7 +11333,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x20a64f117f8967cc1d0612f3e094216b0ebaada972626ea486f78c2a5a6b64e",
+      "class_hash": "0x404785a047adb9d5f6c1824f37610e1beb50c1924126f59219861b70863711c",
       "abi": [
         {
           "type": "function",
@@ -12578,7 +12592,7 @@
           "key": true
         },
         {
-          "name": "realm_id",
+          "name": "realm_entity_id",
           "type": "u128",
           "key": false
         },
@@ -12598,7 +12612,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x5d86fec68248c560af3280829abf3abff39e7bf570f838a1ec59101c261e3e2",
+      "class_hash": "0x49d0da7c0198404234a00a27208c200e3052e3d52c03a44e4fb444e7181c0e6",
       "abi": [
         {
           "type": "function",

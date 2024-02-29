@@ -1,5 +1,6 @@
 import { useState, useEffect, RefObject } from "react";
 import { useNpcContext } from "./NpcContext";
+import { scrollToElement } from "./utils";
 
 const INTERKEY_STROKEN_DURATION_MS = 35;
 const CHARACTER_NUMBER_PER_LINE = 64;
@@ -9,12 +10,12 @@ export interface NpcChatMessageProps {
   dialogueSegment: string;
   msgIndex: number;
   viewed: boolean;
-  bottomRef: RefObject<HTMLElement>;
+  bottomRef: RefObject<HTMLDivElement>;
 }
 
 export function useTypingEffect(
   msgIndex: number,
-  bottomRef: RefObject<HTMLElement>,
+  bottomRef: RefObject<HTMLDivElement>,
   textToType: string,
   interKeyStrokeDurationInMs: number,
   setTypingCompleted: (state: boolean) => void,
@@ -22,10 +23,6 @@ export function useTypingEffect(
 ) {
   const [displayedText, setDisplayedText] = useState("");
   const { selectedTownhall, setLastMessageDisplayedIndex } = useNpcContext();
-
-  if (textToType === undefined) {
-    return;
-  }
 
   useEffect(() => {
     if (wasAlreadyViewed) {
@@ -39,11 +36,7 @@ export function useTypingEffect(
       setDisplayedText((prev) => {
         if (prev.length < textToType.length) {
           if (prev.length % CHARACTER_NUMBER_PER_LINE == 0) {
-            setTimeout(() => {
-              if (bottomRef.current) {
-                bottomRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-              }
-            }, 1);
+            scrollToElement(bottomRef!);
           }
           return textToType.slice(0, prev.length + 1);
         }
@@ -54,8 +47,6 @@ export function useTypingEffect(
     }, interKeyStrokeDurationInMs);
     return () => clearInterval(intervalId);
   }, [msgIndex, textToType, setLastMessageDisplayedIndex, interKeyStrokeDurationInMs, selectedTownhall]);
-
-  if (textToType === undefined) return "";
 
   return displayedText;
 }

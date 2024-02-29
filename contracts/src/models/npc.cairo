@@ -32,7 +32,7 @@ fn unpack_characs(value: felt252) -> Characteristics {
 struct Npc {
     #[key]
     entity_id: u128,
-    realm_id: u128,
+    realm_entity_id: u128,
     characteristics: felt252,
     character_trait: felt252,
     name: felt252,

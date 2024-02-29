@@ -6,6 +6,7 @@ import { getLastLoginTimestamp } from "../hooks/store/useNotificationsStore";
 const MAX_EVENTS = 50;
 
 const client = new GraphQLClient(import.meta.env.VITE_TORII_GRAPHQL!);
+const wsClient = createClient({ url: import.meta.env.VITE_TORII_WS });
 
 type Event = {
   id: string[];
@@ -23,8 +24,6 @@ type getEventsQuery = {
 };
 
 export async function createEventSubscription(keys: string[]): Promise<Observable<Event | null>> {
-  const wsClient = createClient({ url: import.meta.env.VITE_TORII_WS });
-
   const lastUpdate$ = new ReplaySubject<Event | null>();
 
   const formattedKeys = keys.map((key) => `"${key}"`).join(",");
