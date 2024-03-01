@@ -32,7 +32,6 @@ import {
   HarvestAllLaborProps,
   SwapBankAndTravelBackProps,
   SpawnNpcProps,
-  ChangeMoodProps,
   MintResourcesProps,
   DisassembleCaravanAndReturnFreeUnitsProps,
   CreateLaborBuildingProps,
@@ -91,23 +90,11 @@ export class EternumProvider extends DojoProvider {
   }
 
   public async spawn_npc(props: SpawnNpcProps) {
-    const { realm_id, characteristics, character_trait, name, signer } = props;
+    const { realm_entity_id, characteristics, character_trait, full_name, signature, signer } = props;
     const tx = await this.executeMulti(signer, {
       contractAddress: getContractByName(this.manifest, "npc_systems"),
       entrypoint: "spawn_npc",
-      calldata: [this.getWorldAddress(), realm_id, characteristics, character_trait, name],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async change_mood(props: ChangeMoodProps) {
-    const { realm_id, npc_id, mood, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "npc_systems"),
-      entrypoint: "change_mood",
-      calldata: [this.getWorldAddress(), realm_id, npc_id, mood],
+      calldata: [this.getWorldAddress(), realm_entity_id, characteristics, character_trait, full_name, signature],
     });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,

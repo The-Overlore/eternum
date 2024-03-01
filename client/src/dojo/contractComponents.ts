@@ -493,10 +493,10 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
-          realm_id: RecsType.BigInt,
+          realm_entity_id: RecsType.BigInt,
           characteristics: RecsType.BigInt,
           character_trait: RecsType.BigInt,
-          name: RecsType.BigInt,
+          full_name: RecsType.BigInt,
         },
         {
           metadata: {
