@@ -48,7 +48,7 @@ mod npc_systems {
                     realm_entity_id,
                     characteristics,
                     character_trait: old_npc.character_trait,
-                    name: old_npc.name
+                    full_name: old_npc.full_name
                 })
             );
         }
@@ -62,7 +62,7 @@ mod npc_systems {
             realm_entity_id: u128,
             characteristics: felt252,
             character_trait: felt252,
-            name: felt252,
+            full_name: felt252,
             signature: Span<felt252>
         ) -> u128 {
             // check that entity is a realm
@@ -83,7 +83,7 @@ mod npc_systems {
                 let mut randomness = array![ts, Into::<u64, u128>::into(block.block_number)];
                 let entity_id: u128 = world.uuid().into();
 
-                set!(world, (Npc { entity_id, realm_entity_id, characteristics, character_trait, name, }));
+                set!(world, (Npc { entity_id, realm_entity_id, characteristics, character_trait, full_name, }));
                 set!(world, (LastSpawned { realm_entity_id, last_spawned_ts: ts }));
                 emit!(world, NpcSpawned { realm_entity_id, npc_id: entity_id });
                 entity_id
@@ -110,7 +110,7 @@ mod npc_systems {
                     realm_entity_id,
                     characteristics: old_npc.characteristics,
                     character_trait,
-                    name: old_npc.name
+                    full_name: old_npc.full_name
                 })
             );
         }

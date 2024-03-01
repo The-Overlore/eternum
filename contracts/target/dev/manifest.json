@@ -3114,7 +3114,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x2335d50fde01e08d7b50f2f5643ec51936c1bd92ce20bd1d18c1eb1e2eb5bcd",
+      "class_hash": "0x46740cba963f8b22bc83e035795fdd7294e9023604afdb0be50156d4ee4dc9e",
       "abi": [
         {
           "type": "impl",
@@ -3188,7 +3188,7 @@
                   "type": "core::felt252"
                 },
                 {
-                  "name": "name",
+                  "name": "full_name",
                   "type": "core::felt252"
                 },
                 {
@@ -12607,12 +12607,12 @@
           "key": false
         },
         {
-          "name": "name",
+          "name": "full_name",
           "type": "felt252",
           "key": false
         }
       ],
-      "class_hash": "0x49d0da7c0198404234a00a27208c200e3052e3d52c03a44e4fb444e7181c0e6",
+      "class_hash": "0x24da8ad2a9dc1e127b0a7ff06c7b95e3f86c99fa551f589703f2f39a949b035",
       "abi": [
         {
           "type": "function",

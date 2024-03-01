@@ -222,7 +222,7 @@ export interface SpawnNpcProps extends SystemSigner {
   realm_entity_id: num.BigNumberish;
   characteristics: num.BigNumberish;
   character_trait: num.BigNumberish;
-  name: num.BigNumberish;
+  full_name: num.BigNumberish;
   signature: num.BigNumberish[];
 }
 

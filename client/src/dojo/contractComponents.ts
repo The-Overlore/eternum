@@ -496,7 +496,7 @@ export function defineContractComponents(world: World) {
           realm_entity_id: RecsType.BigInt,
           characteristics: RecsType.BigInt,
           character_trait: RecsType.BigInt,
-          name: RecsType.BigInt,
+          full_name: RecsType.BigInt,
         },
         {
           metadata: {

@@ -35,5 +35,5 @@ struct Npc {
     realm_entity_id: u128,
     characteristics: felt252,
     character_trait: felt252,
-    name: felt252,
+    full_name: felt252,
 }

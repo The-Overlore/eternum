@@ -123,7 +123,7 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
       realm_entity_id: realmEntityId,
       characteristics: packCharacteristics(response.npc.characteristics),
       character_trait: shortString.encodeShortString(response.npc.character_trait),
-      name: shortString.encodeShortString(response.npc.full_name),
+      full_name: shortString.encodeShortString(response.npc.full_name),
       signature: response.signature as BigNumberish[],
     });
     setSpawned(spawned + 1);

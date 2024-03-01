@@ -71,7 +71,7 @@ const getNpcs = (realmEntityId: BigInt, NpcComponent: any): Npc[] => {
       realmEntityId: BigInt(npc!.realm_entity_id),
       characteristics: unpackCharacteristics(npc!.characteristics),
       characterTrait: shortString.decodeShortString(npc!.character_trait.toString()),
-      fullName: shortString.decodeShortString(npc!.name.toString()),
+      fullName: shortString.decodeShortString(npc!.full_name.toString()),
     };
   });
   return npcs;

@@ -8,7 +8,7 @@ trait INpc<TContractState> {
         realm_entity_id: u128,
         characteristics: felt252,
         character_trait: felt252,
-        name: felt252,
+        full_name: felt252,
         signature: Span<felt252>
     ) -> u128;
     fn change_character_trait(
