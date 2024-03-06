@@ -199,7 +199,9 @@ struct NpcConfig {
     #[key]
     config_id: u128,
     spawn_delay: u128,
+    pub_key: felt252
 }
+
 
 #[derive(Model, Copy, Drop, Serde)]
 struct LaborBuildingsConfig {

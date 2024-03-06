@@ -1626,7 +1626,7 @@
     {
       "name": "eternum::systems::config::contracts::config_systems",
       "address": "0x7fff06bbcbe4f42f22c86b14e7a80604495c8b2034d14cbb10d32402c933ca8",
-      "class_hash": "0x5b31a256033026dcf38d8cbff161926faf3e771f65f28d6e43144a9ed6e7528",
+      "class_hash": "0x1ad75a6f46587a9e28705547ab0c4ceafbcd3cf857ea071751fecfabb43125a",
       "abi": [
         {
           "type": "impl",
@@ -1739,7 +1739,7 @@
           "items": [
             {
               "type": "function",
-              "name": "set_spawn_config",
+              "name": "set_npc_config",
               "inputs": [
                 {
                   "name": "world",
@@ -1748,6 +1748,10 @@
                 {
                   "name": "spawn_delay",
                   "type": "core::integer::u128"
+                },
+                {
+                  "name": "pub_key",
+                  "type": "core::felt252"
                 }
               ],
               "outputs": [],
@@ -3114,7 +3118,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x46740cba963f8b22bc83e035795fdd7294e9023604afdb0be50156d4ee4dc9e",
+      "class_hash": "0x44027fcf41ba10379f1e2dd2cfd9210f688d065dabdc971efe64fe9d3dd2d30",
       "abi": [
         {
           "type": "impl",
@@ -9087,9 +9091,14 @@
           "name": "spawn_delay",
           "type": "u128",
           "key": false
+        },
+        {
+          "name": "pub_key",
+          "type": "felt252",
+          "key": false
         }
       ],
-      "class_hash": "0x72effd454ce11b1d64f3c28fabdbbf0e1ca8bd893bfac9fbd0c37ff22b547da",
+      "class_hash": "0x607b6e0bbe60731a9a7249d9f6b6093376642001d699f1308ec92c92479d04e",
       "abi": [
         {
           "type": "function",
