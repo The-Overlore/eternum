@@ -30,8 +30,6 @@ export NAME_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | sel
 
 export BANK_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::bank::contracts::bank_systems" ).address')
 
-export NPC_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::npc::contracts::npc_systems" ).address')
-
 export HYPERSTRUCTURE_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::hyperstructure::contracts::hyperstructure_systems" ).address')
 
 export BUILDINGS_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::buildings::contracts::buildings_systems" ).address')
@@ -52,6 +50,5 @@ echo combat : $COMBAT_SYSTEMS
 echo leveling : $LEVELING_SYSTEMS
 echo name : $NAME_SYSTEMS
 echo bank : $BANK_SYSTEMS
-echo npc : $NPC_SYSTEMS
 echo hyperstructure : $HYPERSTRUCTURE_SYSTEMS
 echo buildings : $BUILDINGS_SYSTEMS

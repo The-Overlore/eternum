@@ -123,7 +123,6 @@
         "ForeignKey",
         "Inventory"
     ],
-    "NPC_SYSTEMS": ["Npc", "LastSpawned"],
     "HYPERSTRUCTURE_SYSTEMS": [
         "Orders",
         "HyperStructure"
