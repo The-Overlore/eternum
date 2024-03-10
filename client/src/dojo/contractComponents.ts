@@ -493,6 +493,7 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
+          entity_id: RecsType.BigInt,
           realm_entity_id: RecsType.BigInt,
           characteristics: RecsType.BigInt,
           character_trait: RecsType.BigInt,

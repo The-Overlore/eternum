@@ -19,6 +19,7 @@ import {
 import { getRealm } from "../../../../utils/realms";
 import { packCharacteristics } from "./utils";
 import { BigNumberish, shortString } from "starknet";
+import { getEntityIdFromKeys } from "@dojoengine/utils";
 
 type NpcPanelProps = {
   type?: "all" | "farmers" | "miners";
@@ -62,6 +63,9 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     spawned,
     setSpawned,
   } = useNpcContext();
+
+  console.log(npcs);
+  console.log(getEntityIdFromKeys([BigInt(103)]));
 
   const setSelectedTownhallFromDirection = (direction: number) => {
     const newKey = getNewTownhallKeyFromDirection(selectedTownhall, direction, LOCAL_STORAGE_ID);
