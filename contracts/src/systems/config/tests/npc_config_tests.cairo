@@ -1,13 +1,15 @@
-use eternum::utils::testing::{spawn_eternum, deploy_system};
-
-use eternum::systems::config::contracts::config_systems;
-use eternum::systems::config::interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait};
+use eternum::{
+    models::config::{WorldConfig, NpcConfig},
+    systems::{
+        config::{
+            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait}
+        },
+        npc::tests::npc_spawn_tests::{PUB_KEY, SPAWN_DELAY}
+    },
+    utils::testing::{spawn_eternum, deploy_system},
+};
 
 use dojo::world::{IWorldDispatcherTrait, IWorldDispatcher};
-
-use eternum::models::config::WorldConfig;
-use eternum::models::config::NpcConfig;
-use eternum::systems::npc::tests::npc_spawn_tests::{PUB_KEY, SPAWN_DELAY};
 
 const NEW_PUB_KEY: felt252 = 0x111111111111111111111111111111111111111111111111111111111111111;
 

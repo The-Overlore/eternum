@@ -1,28 +1,26 @@
-use eternum::alias::ID;
-use eternum::constants::ResourceTypes;
-use eternum::models::resources::Resource;
-use eternum::models::labor::Labor;
-use eternum::models::position::Position;
-use eternum::models::npc::{Npc, Npcs, Characteristics};
-use eternum::systems::npc::utils::{pack_characs};
-
-use eternum::utils::testing::{spawn_eternum, deploy_system};
-
 use core::traits::Into;
 use core::option::OptionTrait;
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-use eternum::systems::realm::contracts::realm_systems;
+use eternum::{
+    models::{position::Position, npc::{Npc, Npcs, Characteristics}},
+    systems::{
+        npc::{
+            utils::{pack_characs}, contracts::{npc_systems},
+            interface::{INpcDispatcher, INpcDispatcherTrait}
+        },
+        realm::{
+            contracts::realm_systems,
+            interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,}
+        },
+        config::{
+            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait}
+        }
+    },
+    utils::testing::{spawn_eternum, deploy_system},
+};
 
-use eternum::systems::realm::interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,};
-
-
-use eternum::systems::config::contracts::config_systems;
-use eternum::systems::config::interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait};
-
-use eternum::systems::npc::contracts::{npc_systems};
-use eternum::systems::npc::interface::{INpcDispatcher, INpcDispatcherTrait,};
 
 const PUB_KEY: felt252 = 0x141a26313bd3355fe4c4f3dda7e40dfb77ce54aea5f62578b4ec5aad8dd63b1;
 const SPAWN_DELAY: u64 = 100;
@@ -63,7 +61,7 @@ fn test_spawn_single() {
         // x needs to be > 470200 to get zone
         );
     let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 }
 
 #[test]
@@ -103,7 +101,7 @@ fn test_spawn_too_early() {
         );
 
     let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 
     let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 10, 1);
 }
@@ -144,19 +142,19 @@ fn test_spawn_multiple() {
         );
 
     let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 
     let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
-    assert(npcs.npc_1 == npc_1.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_1 == npc_1.entity_id, 'wrong index of npc in struct');
 
     let (npc_2, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
-    assert(npcs.npc_2 == npc_2.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_2 == npc_2.entity_id, 'wrong index of npc in struct');
 
     let (npc_3, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
-    assert(npcs.npc_3 == npc_3.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_3 == npc_3.entity_id, 'wrong index of npc in struct');
 
     let (npc_4, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
-    assert(npcs.npc_4 == npc_4.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_4 == npc_4.entity_id, 'wrong index of npc in struct');
 
     assert(npc_0.entity_id != npc_1.entity_id, 'same entity_id 0 1');
     assert(npc_0.entity_id != npc_2.entity_id, 'same entity_id 0 2');

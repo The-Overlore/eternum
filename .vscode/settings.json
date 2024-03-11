@@ -1,6 +1,5 @@
 {
-    "cairo1.languageServerPath": "/Users/timothyedison/.dojo/bin/dojo-language-server",
+    "cairo1.languageServerPath": "~/.dojo/bin/dojo-language-server",
     "cairo1.enableLanguageServer": true,
-	"cairo1.enableScarb": false,
-	"cairo1.scarbPath": "/Users/timothyedison/.asdf/shims/scarb"
+    "cairo1.enableScarb": true
 }

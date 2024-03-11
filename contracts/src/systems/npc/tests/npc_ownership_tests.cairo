@@ -1,30 +1,27 @@
-use eternum::alias::ID;
-use eternum::constants::ResourceTypes;
-use eternum::models::resources::Resource;
-use eternum::models::labor::Labor;
-use eternum::models::position::Position;
-use eternum::models::npc::{Npc, Npcs, Characteristics};
-use eternum::systems::npc::utils::{pedersen_hash_many, pack_characs};
-
-use eternum::utils::testing::{spawn_eternum, deploy_system};
+use traits::Into;
+use option::OptionTrait;
 use starknet::contract_address_const;
-
-use core::traits::Into;
-use core::option::OptionTrait;
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
-use eternum::systems::realm::contracts::realm_systems;
-use eternum::systems::realm::interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,};
-
-
-use eternum::systems::config::contracts::config_systems;
-use eternum::systems::config::interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait};
-
-use eternum::systems::npc::contracts::npc_systems;
-use eternum::systems::npc::interface::{INpcDispatcher, INpcDispatcherTrait,};
-use eternum::systems::npc::tests::npc_spawn_tests::{spawn_npc, PUB_KEY, SPAWN_DELAY};
-
+use eternum::{
+    models::{position::Position, npc::{Npc, Npcs, Characteristics}},
+    systems::{
+        npc::{
+            utils::{pedersen_hash_many, pack_characs}, contracts::npc_systems,
+            interface::{INpcDispatcher, INpcDispatcherTrait,},
+            tests::npc_spawn_tests::{spawn_npc, PUB_KEY, SPAWN_DELAY}
+        },
+        realm::{
+            contracts::realm_systems,
+            interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,}
+        },
+        config::{
+            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait}
+        }
+    },
+    utils::testing::{spawn_eternum, deploy_system}
+};
 
 #[test]
 #[should_panic(expected: ('Realm does not belong to player', 'ENTRYPOINT_FAILED',))]
@@ -64,13 +61,13 @@ fn test_spawn_ownership() {
     let npc_dispatcher = INpcDispatcher { contract_address: npc_address };
 
     let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
     // call should not work
 
     let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 }
 
 #[test]

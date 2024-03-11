@@ -1,33 +1,36 @@
-use eternum::models::{
-    owner::{Owner, EntityOwner}, config::NpcConfig, last_spawned::{LastSpawned, ShouldSpawnImpl},
-    npc::{Npcs}
+use eternum::{
+    models::{
+        owner::{Owner, EntityOwner}, config::NpcConfig,
+        last_spawned::{LastSpawned, ShouldSpawnImpl}, npc::{Npcs}
+    },
+    systems::npc::constants::MAX_NUM_NPCS, constants::NPC_CONFIG_ID
 };
+
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use eternum::constants::NPC_CONFIG_ID;
 
 #[dojo::contract]
 mod npc_systems {
-    use super::{assert_is_allowed_to_spawn, set_npc_to_free_slot};
-    use starknet::{get_caller_address};
-    use starknet::info::BlockInfo;
-    use starknet::info::v2::ExecutionInfo;
-    use starknet::info::get_execution_info;
-
-    use eternum::constants::NPC_CONFIG_ID;
-    use eternum::models::{
-        npc::{Npc, Npcs}, position::Position, movable::Movable, owner::{Owner, EntityOwner},
-        last_spawned::{LastSpawned, ShouldSpawnImpl},
-    };
-    use eternum::systems::npc::utils::{
-        assert_existance_and_ownership, pedersen_hash_many, format_args_to_span, unpack_characs
-    };
-    use eternum::systems::npc::interface::INpc;
-    use eternum::models::config::NpcConfig;
-
-    use core::Into;
-    use core::ecdsa::check_ecdsa_signature;
-
+    use core::{Into, ecdsa::check_ecdsa_signature};
     use box::BoxTrait;
+
+    use starknet::{get_caller_address, info::{BlockInfo, v2::ExecutionInfo, get_execution_info}};
+
+    use super::{assert_is_allowed_to_spawn, set_npc_to_free_slot};
+
+    use eternum::{
+        models::{
+            npc::{Npc, Npcs}, position::Position, movable::Movable, owner::{Owner, EntityOwner},
+            last_spawned::{LastSpawned, ShouldSpawnImpl}, config::NpcConfig
+        },
+        constants::NPC_CONFIG_ID,
+        systems::npc::{
+            utils::{
+                assert_existance_and_ownership, pedersen_hash_many, format_args_to_span,
+                unpack_characs
+            },
+            interface::INpc
+        }
+    };
 
 
     #[derive(Drop, starknet::Event)]
@@ -172,7 +175,7 @@ fn assert_is_allowed_to_spawn(world: IWorldDispatcher, realm_entity_id: u128, np
 
     assert(can_spawn == true, 'too early to spawn');
 
-    assert(npcs_num < 5, 'max num npcs reached');
+    assert(npcs_num < MAX_NUM_NPCS, 'max num npcs reached');
 }
 
 fn set_npc_to_free_slot(world: IWorldDispatcher, npcs: Npcs, entity_id: u128) {
