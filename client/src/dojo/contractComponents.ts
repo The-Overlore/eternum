@@ -521,7 +521,7 @@ export function defineContractComponents(world: World) {
         },
         {
           metadata: {
-            name: "Npc",
+            name: "Npcs",
             types: ["u128", "u8", "u128", "u128", "u128", "u128", "u128"],
             customTypes: [],
           },
@@ -532,12 +532,13 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
+          realm_entity_id: RecsType.BigInt,
           last_spawned_ts: RecsType.BigInt,
         },
         {
           metadata: {
             name: "LastSpawned",
-            types: ["u128", "u128"],
+            types: ["u128", "u64"],
             customTypes: [],
           },
         },
