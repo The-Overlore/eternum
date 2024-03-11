@@ -64,9 +64,6 @@ export const NpcPanel = ({ type = "all" }: NpcPanelProps) => {
     setSpawned,
   } = useNpcContext();
 
-  console.log(npcs);
-  console.log(getEntityIdFromKeys([BigInt(103)]));
-
   const setSelectedTownhallFromDirection = (direction: number) => {
     const newKey = getNewTownhallKeyFromDirection(selectedTownhall, direction, LOCAL_STORAGE_ID);
 

@@ -7,13 +7,11 @@ mod npc_systems {
 
     use eternum::constants::NPC_CONFIG_ID;
     use eternum::models::realm::{Realm, RealmTrait};
-    use eternum::models::npc::{Npc};
     use eternum::models::last_spawned::{LastSpawned, ShouldSpawnImpl};
-    use eternum::systems::npc::utils::assert_ownership;
-    use eternum::systems::npc::utils::pedersen_hash_many;
-    use eternum::systems::npc::utils::format_data_to_hash;
-    use eternum::models::config::NpcConfig;
+    use eternum::models::npc::{Npc, unpack_characs};
+    use eternum::systems::npc::utils::{assert_ownership, pedersen_hash_many, format_args_to_span};
     use eternum::systems::npc::interface::INpc;
+    use eternum::models::config::NpcConfig;
 
     use core::Into;
     use core::ecdsa::check_ecdsa_signature;
@@ -82,9 +80,9 @@ mod npc_systems {
             let npc_config = get!(world, NPC_CONFIG_ID, (NpcConfig));
         
             let hash = pedersen_hash_many(
-                format_data_to_hash(
+                format_args_to_span(
                     get_execution_info().unbox().tx_info.unbox().nonce, 
-                    characteristics, 
+                    unpack_characs(characteristics),
                     character_trait, 
                     full_name
                 )
