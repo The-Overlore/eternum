@@ -23,7 +23,8 @@ use eternum::models::config::{
     labor_cost_amount, LaborCostAmount,
     labor_cost_resources, LaborCostResources,
     weight_config, WeightConfig,
-    road_config, RoadConfig
+    road_config, RoadConfig,
+    npc_config, NpcConfig
 
 };
 use eternum::models::quantity::{
@@ -42,6 +43,9 @@ use eternum::models::trade::{
     trade, Trade,
 };
 
+use eternum::models::npc::{
+    npc, Npc,
+};
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::test_utils::spawn_test_world;
@@ -85,6 +89,8 @@ fn spawn_eternum() -> IWorldDispatcher {
         labor_auction::TEST_CLASS_HASH,
         road_config::TEST_CLASS_HASH,
         hyper_structure::TEST_CLASS_HASH,
+        npc_config::TEST_CLASS_HASH,
+        npc::TEST_CLASS_HASH,
     ];
 
     spawn_test_world(models)

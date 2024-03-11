@@ -74,8 +74,11 @@ trait ICombatConfig<TContractState> {
 
 #[starknet::interface]
 trait INpcConfig<TContractState> {
-    fn set_spawn_config(
-        self: @TContractState, world: IWorldDispatcher, spawn_delay: u128
+    fn set_npc_config(
+        self: @TContractState,
+        world: IWorldDispatcher,
+        spawn_delay: u128,
+        pub_key: felt252
     );
 }
 
