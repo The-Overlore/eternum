@@ -25,14 +25,13 @@ use eternum::systems::npc::contracts::{npc_systems};
 use eternum::systems::npc::interface::{INpcDispatcher, INpcDispatcherTrait,};
 
 const PUB_KEY: felt252 = 0x141a26313bd3355fe4c4f3dda7e40dfb77ce54aea5f62578b4ec5aad8dd63b1;
-const SPAWN_DELAY: u128 = 100;
+const SPAWN_DELAY: u64 = 100;
 
 
 #[test]
 #[available_gas(3000000000)]
 fn test_spawn_single() {
     let world = spawn_eternum();
-    starknet::testing::set_block_timestamp(1);
 
     let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
     let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
@@ -63,7 +62,7 @@ fn test_spawn_single() {
             Position { x: 1, y: 1, entity_id: 1_u128 }, // position  
         // x needs to be > 470200 to get zone
         );
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
     assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
 }
 
@@ -72,7 +71,6 @@ fn test_spawn_single() {
 #[should_panic(expected: ('too early to spawn', 'ENTRYPOINT_FAILED'))]
 fn test_spawn_too_early() {
     let world = spawn_eternum();
-    starknet::testing::set_block_timestamp(1);
 
     let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
     let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
@@ -104,11 +102,10 @@ fn test_spawn_too_early() {
         // x needs to be > 470200 to get zone
         );
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
     assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
 
-    starknet::testing::set_block_timestamp(10);
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 1);
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 10, 1);
 }
 
 #[test]
@@ -146,19 +143,19 @@ fn test_spawn_multiple() {
         // x needs to be > 470200 to get zone
         );
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
     assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
 
-    let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, 1);
+    let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
     assert(npcs.npc_1 == npc_1.entity_id, 'wrond index of npc in struct');
 
-    let (npc_2, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, 2);
+    let (npc_2, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
     assert(npcs.npc_2 == npc_2.entity_id, 'wrond index of npc in struct');
 
-    let (npc_3, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, 3);
+    let (npc_3, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
     assert(npcs.npc_3 == npc_3.entity_id, 'wrond index of npc in struct');
 
-    let (npc_4, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, 4);
+    let (npc_4, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
     assert(npcs.npc_4 == npc_4.entity_id, 'wrond index of npc in struct');
 
     assert(npc_0.entity_id != npc_1.entity_id, 'same entity_id 0 1');

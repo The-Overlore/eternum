@@ -1626,7 +1626,7 @@
     {
       "name": "eternum::systems::config::contracts::config_systems",
       "address": "0x7fff06bbcbe4f42f22c86b14e7a80604495c8b2034d14cbb10d32402c933ca8",
-      "class_hash": "0x1ad75a6f46587a9e28705547ab0c4ceafbcd3cf857ea071751fecfabb43125a",
+      "class_hash": "0xcfa15bebef8f4950e84daca476bbef55e0bb28627d885b7fe7a0f500e2986a",
       "abi": [
         {
           "type": "impl",
@@ -1747,7 +1747,7 @@
                 },
                 {
                   "name": "spawn_delay",
-                  "type": "core::integer::u128"
+                  "type": "core::integer::u64"
                 },
                 {
                   "name": "pub_key",
@@ -3118,7 +3118,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x26ad4b60eb61760d35cf5d552c138f7142c1896f44945ed37b6fc10e9a7b775",
+      "class_hash": "0x4d72353934d892476a6cb30aea6def2baaae92bdff2f09273af95a1318c3d14",
       "abi": [
         {
           "type": "impl",
@@ -9089,7 +9089,7 @@
         },
         {
           "name": "spawn_delay",
-          "type": "u128",
+          "type": "u64",
           "key": false
         },
         {
@@ -9098,7 +9098,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x607b6e0bbe60731a9a7249d9f6b6093376642001d699f1308ec92c92479d04e",
+      "class_hash": "0x246fb8eaf33ecbe580bb3dadb56813a494429415aaf907f70a46e6ef35fbcbd",
       "abi": [
         {
           "type": "function",
@@ -11338,11 +11338,11 @@
         },
         {
           "name": "last_spawned_ts",
-          "type": "u128",
+          "type": "u64",
           "key": false
         }
       ],
-      "class_hash": "0x404785a047adb9d5f6c1824f37610e1beb50c1924126f59219861b70863711c",
+      "class_hash": "0x5c81803f83bad6ec44da7b09882c6b220d355be003475eaf4aec6864adce14b",
       "abi": [
         {
           "type": "function",

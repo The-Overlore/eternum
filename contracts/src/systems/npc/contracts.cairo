@@ -82,8 +82,6 @@ mod npc_systems {
             full_name: felt252,
             signature: Span<felt252>
         ) -> u128 {
-            let player_address: starknet::ContractAddress = starknet::get_caller_address();
-
             assert_existance_and_ownership(world, realm_entity_id);
 
             let npc_config = get!(world, NPC_CONFIG_ID, (NpcConfig));
@@ -125,8 +123,10 @@ mod npc_systems {
 
             set_npc_to_free_slot(world, npcs, entity_id);
 
-            let ts: u128 = starknet::get_block_timestamp().into();
-            set!(world, (LastSpawned { realm_entity_id, last_spawned_ts: ts }));
+            set!(
+                world,
+                (LastSpawned { realm_entity_id, last_spawned_ts: starknet::get_block_timestamp() })
+            );
             emit!(world, NpcSpawned { realm_entity_id, entity_id });
 
             entity_id
