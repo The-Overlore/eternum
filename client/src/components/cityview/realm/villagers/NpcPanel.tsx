@@ -18,7 +18,6 @@ import {
 import { getRealm } from "../../../../utils/realms";
 import { packCharacteristics, keysSnakeToCamel } from "./utils";
 import { BigNumberish, shortString } from "starknet";
-import { getEntityIdFromKeys } from "@dojoengine/utils";
 
 type NpcPanelProps = {
   type?: "all" | "farmers" | "miners";
