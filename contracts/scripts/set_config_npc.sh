@@ -2,7 +2,7 @@
 
 source ./scripts/contracts.sh
 
-declare -a NPC_MODELS=("Npc" "NpcConfig" "LastSpawned")
+declare -a NPC_MODELS=("Npc" "Npcs" "NpcConfig" "LastSpawned" "Owner" "EntityOwner" "Position")
 
 NPC_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.name == "eternum::systems::npc::contracts::npc_systems" ).address')
 

@@ -3,8 +3,8 @@ use eternum::constants::ResourceTypes;
 use eternum::models::resources::Resource;
 use eternum::models::labor::Labor;
 use eternum::models::position::Position;
-use eternum::models::npc::{Npc, Characteristics, pack_characs};
-use eternum::systems::npc::utils::pedersen_hash_many;
+use eternum::models::npc::{Npc, Npcs, Characteristics};
+use eternum::systems::npc::utils::{pedersen_hash_many, pack_characs};
 
 use eternum::utils::testing::{spawn_eternum, deploy_system};
 use starknet::contract_address_const;
@@ -23,22 +23,19 @@ use eternum::systems::config::interface::{INpcConfigDispatcher, INpcConfigDispat
 
 use eternum::systems::npc::contracts::npc_systems;
 use eternum::systems::npc::interface::{INpcDispatcher, INpcDispatcherTrait,};
-
-
-const pub_key: felt252 = 0x141a26313bd3355fe4c4f3dda7e40dfb77ce54aea5f62578b4ec5aad8dd63b1;
-const spawn_delay: u128 = 100;
+use eternum::systems::npc::tests::npc_spawn_tests::{spawn_npc, PUB_KEY, SPAWN_DELAY};
 
 
 #[test]
 #[should_panic(expected: ('Realm does not belong to player', 'ENTRYPOINT_FAILED',))]
 #[available_gas(3000000000)]
-fn test_ownership() {
+fn test_spawn_ownership() {
     let world = spawn_eternum();
     let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
     let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
 
     // first argument is the spawn delay
-    npc_config_dispatcher.set_npc_config(world, spawn_delay, pub_key);
+    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
 
     // set realm entity
     let realm_systems_address = deploy_system(realm_systems::TEST_CLASS_HASH);
@@ -66,22 +63,14 @@ fn test_ownership() {
     let npc_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_address };
 
-    let characs = pack_characs(Characteristics { age: 30, role: 10, sex: 1, });
-    let r_sign = 0x6a43f62142ac80f794378d1298d429b77c068cba42f884b1856f2087cdaf0c6;
-    let s_sign = 0x1171a4553f2b9d6a053f4e60c35b5c329931c7b353324f03f7ec5055f48f1ec;
-
-    // naive call should work
-    //   
-    let npc_id = npc_dispatcher
-        .spawn_npc(world, realm_entity_id, characs, 'brave', 'John', array![r_sign, s_sign].span());
-
-    let npc = get!(world, (realm_entity_id, npc_id), (Npc));
-    assert(npc.entity_id == npc_id, 'should allow npc spawning');
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
     // call should not work
-    let npc_id = npc_dispatcher
-        .spawn_npc(world, realm_entity_id, characs, 'brave', 'John', array![r_sign, s_sign].span());
+
+    let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    assert(npcs.npc_0 == npc_0.entity_id, 'wrond index of npc in struct');
 }
 
 #[test]

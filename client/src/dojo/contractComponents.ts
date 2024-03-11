@@ -494,7 +494,6 @@ export function defineContractComponents(world: World) {
         world,
         {
           entity_id: RecsType.BigInt,
-          realm_entity_id: RecsType.BigInt,
           characteristics: RecsType.BigInt,
           character_trait: RecsType.BigInt,
           full_name: RecsType.BigInt,
@@ -502,7 +501,28 @@ export function defineContractComponents(world: World) {
         {
           metadata: {
             name: "Npc",
-            types: ["u128", "u128", "felt252", "felt252", "felt252"],
+            types: ["u128", "felt252", "felt252", "felt252"],
+            customTypes: [],
+          },
+        },
+      );
+    })(),
+    Npcs: (() => {
+      return defineComponent(
+        world,
+        {
+          realm_entity_id: RecsType.BigInt,
+          num_npcs: RecsType.BigInt,
+          npc_0: RecsType.BigInt,
+          npc_1: RecsType.BigInt,
+          npc_2: RecsType.BigInt,
+          npc_3: RecsType.BigInt,
+          npc_4: RecsType.BigInt,
+        },
+        {
+          metadata: {
+            name: "Npc",
+            types: ["u128", "u8", "u128", "u128", "u128", "u128", "u128"],
             customTypes: [],
           },
         },
@@ -523,7 +543,6 @@ export function defineContractComponents(world: World) {
         },
       );
     })(),
-
     LaborAuction: (() => {
       return defineComponent(
         world,
