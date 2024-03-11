@@ -8,9 +8,7 @@ struct LastSpawned {
 #[generate_trait]
 impl ShouldSpawnImpl of ShouldSpawn {
     fn can_spawn(self: LastSpawned, spawn_delay: u64) -> bool {
-        let current = starknet::get_block_timestamp().into();
-
-        if (current - self.last_spawned_ts < spawn_delay) {
+        if (starknet::get_block_timestamp() - self.last_spawned_ts < spawn_delay) {
             false
         } else {
             true
