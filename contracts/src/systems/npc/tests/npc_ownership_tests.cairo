@@ -60,14 +60,11 @@ fn test_spawn_ownership() {
     let npc_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_address };
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
     assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
-    // call should not work
-
-    let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
+    let (_npc_1, _npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
 }
 
 #[test]

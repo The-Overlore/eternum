@@ -39,7 +39,7 @@ fn test_set_new_pub_key_panic() {
 
 #[test]
 #[available_gas(3000000000)]
-#[should_panic(expected: ('Empty SPAWN_DELAY received', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('Empty spawn_delay received', 'ENTRYPOINT_FAILED'))]
 fn test_set_spawn_delay_panic() {
     let world = spawn_eternum();
     let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
@@ -50,7 +50,7 @@ fn test_set_spawn_delay_panic() {
 
 #[test]
 #[available_gas(3000000000)]
-#[should_panic(expected: ('Empty PUB_KEY received', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('Empty pub_key received', 'ENTRYPOINT_FAILED'))]
 fn test_set_0_pub_key_panic() {
     let world = spawn_eternum();
     let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
