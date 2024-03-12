@@ -1626,7 +1626,7 @@
     {
       "name": "eternum::systems::config::contracts::config_systems",
       "address": "0x7fff06bbcbe4f42f22c86b14e7a80604495c8b2034d14cbb10d32402c933ca8",
-      "class_hash": "0x1ad75a6f46587a9e28705547ab0c4ceafbcd3cf857ea071751fecfabb43125a",
+      "class_hash": "0xcfa15bebef8f4950e84daca476bbef55e0bb28627d885b7fe7a0f500e2986a",
       "abi": [
         {
           "type": "impl",
@@ -1747,7 +1747,7 @@
                 },
                 {
                   "name": "spawn_delay",
-                  "type": "core::integer::u128"
+                  "type": "core::integer::u64"
                 },
                 {
                   "name": "pub_key",
@@ -3118,7 +3118,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x44027fcf41ba10379f1e2dd2cfd9210f688d065dabdc971efe64fe9d3dd2d30",
+      "class_hash": "0x3d72fd32119151fd30af15e5cffed5f912349d03b7f21518b78524a7049ce83",
       "abi": [
         {
           "type": "impl",
@@ -3220,7 +3220,7 @@
                   "type": "core::integer::u128"
                 },
                 {
-                  "name": "npc_id",
+                  "name": "entity_id",
                   "type": "core::integer::u128"
                 },
                 {
@@ -3302,7 +3302,7 @@
               "kind": "key"
             },
             {
-              "name": "npc_id",
+              "name": "entity_id",
               "type": "core::integer::u128",
               "kind": "data"
             }
@@ -9089,7 +9089,7 @@
         },
         {
           "name": "spawn_delay",
-          "type": "u128",
+          "type": "u64",
           "key": false
         },
         {
@@ -9098,7 +9098,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x607b6e0bbe60731a9a7249d9f6b6093376642001d699f1308ec92c92479d04e",
+      "class_hash": "0x246fb8eaf33ecbe580bb3dadb56813a494429415aaf907f70a46e6ef35fbcbd",
       "abi": [
         {
           "type": "function",
@@ -11338,11 +11338,11 @@
         },
         {
           "name": "last_spawned_ts",
-          "type": "u128",
+          "type": "u64",
           "key": false
         }
       ],
-      "class_hash": "0x404785a047adb9d5f6c1824f37610e1beb50c1924126f59219861b70863711c",
+      "class_hash": "0x5c81803f83bad6ec44da7b09882c6b220d355be003475eaf4aec6864adce14b",
       "abi": [
         {
           "type": "function",
@@ -12601,11 +12601,6 @@
           "key": true
         },
         {
-          "name": "realm_entity_id",
-          "type": "u128",
-          "key": false
-        },
-        {
           "name": "characteristics",
           "type": "felt252",
           "key": false
@@ -12621,7 +12616,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x24da8ad2a9dc1e127b0a7ff06c7b95e3f86c99fa551f589703f2f39a949b035",
+      "class_hash": "0x58ae251af93d1178459397ce04298d86766c6fd70ad6a2954e9547ee30a4ccd",
       "abi": [
         {
           "type": "function",
@@ -12779,6 +12774,208 @@
         {
           "type": "event",
           "name": "eternum::models::npc::npc::Event",
+          "kind": "enum",
+          "variants": []
+        }
+      ]
+    },
+    {
+      "name": "eternum::models::npc::npcs",
+      "members": [
+        {
+          "name": "realm_entity_id",
+          "type": "u128",
+          "key": true
+        },
+        {
+          "name": "num_npcs",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "npc_0",
+          "type": "u128",
+          "key": false
+        },
+        {
+          "name": "npc_1",
+          "type": "u128",
+          "key": false
+        },
+        {
+          "name": "npc_2",
+          "type": "u128",
+          "key": false
+        },
+        {
+          "name": "npc_3",
+          "type": "u128",
+          "key": false
+        },
+        {
+          "name": "npc_4",
+          "type": "u128",
+          "key": false
+        }
+      ],
+      "class_hash": "0x2584d9d9748286f07f37917c5efa59d89c1ae44916f446b4f1a51b5712932b7",
+      "abi": [
+        {
+          "type": "function",
+          "name": "name",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "unpacked_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "packed_size",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "layout",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Span::<core::integer::u8>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Struct",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "dojo::database::introspect::Enum",
+          "members": [
+            {
+              "name": "name",
+              "type": "core::felt252"
+            },
+            {
+              "name": "attrs",
+              "type": "core::array::Span::<core::felt252>"
+            },
+            {
+              "name": "children",
+              "type": "core::array::Span::<(core::felt252, core::array::Span::<core::felt252>)>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "dojo::database::introspect::Ty",
+          "variants": [
+            {
+              "name": "Primitive",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Struct",
+              "type": "dojo::database::introspect::Struct"
+            },
+            {
+              "name": "Enum",
+              "type": "dojo::database::introspect::Enum"
+            },
+            {
+              "name": "Tuple",
+              "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "schema",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "dojo::database::introspect::Ty"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "event",
+          "name": "eternum::models::npc::npcs::Event",
           "kind": "enum",
           "variants": []
         }

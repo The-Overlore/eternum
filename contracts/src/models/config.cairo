@@ -198,7 +198,7 @@ struct LevelingConfig {
 struct NpcConfig {
     #[key]
     config_id: u128,
-    spawn_delay: u128,
+    spawn_delay: u64,
     pub_key: felt252
 }
 
