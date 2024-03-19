@@ -226,6 +226,11 @@ export interface SpawnNpcProps extends SystemSigner {
   signature: num.BigNumberish[];
 }
 
+export interface NpcTravelProps extends SystemSigner {
+  npc_entity_id: num.BigNumberish;
+  to_realm_entity_id: num.BigNumberish;
+}
+
 export interface CreateLaborBuildingProps extends SystemSigner {
   realm_entity_id: num.BigNumberish;
   building_type: num.BigNumberish;

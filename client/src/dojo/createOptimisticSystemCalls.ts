@@ -1,7 +1,7 @@
 import { uuid } from "@latticexyz/utils";
 import { ClientComponents } from "./createClientComponents";
 import { getEntityIdFromKeys } from "../utils/utils";
-import { Type, getComponentValue } from "@dojoengine/recs";
+import { Entity, Type, getComponentValue } from "@dojoengine/recs";
 import { LABOR_CONFIG, Resource } from "@bibliothecadao/eternum";
 import {
   CancelFungibleOrderProps,
@@ -12,6 +12,7 @@ import {
   PurchaseLaborProps,
   BuildLaborProps,
   SpawnNpcProps,
+  NpcTravelProps,
 } from "@bibliothecadao/eternum";
 
 export const HIGH_ENTITY_ID = 9999999999n;
@@ -288,7 +289,45 @@ export function createOptimisticSystemCalls({
 
   function optimisticSpawnNpc(systemCall: (args: SpawnNpcProps) => Promise<void>) {
     return async function (this: any, args: SpawnNpcProps) {
-      // TODO
+      const overrideId = uuid();
+      Npc.addOverride(overrideId, {
+        entity: overrideId as Entity,
+        value: {
+          entity_id: BigInt(args.full_name),
+          character_trait: BigInt(args.character_trait),
+          characteristics: BigInt(args.characteristics),
+          full_name: BigInt(args.full_name),
+        },
+      });
+      try {
+        await systemCall(args);
+      } finally {
+        Npc.removeOverride(overrideId);
+      }
+    };
+  }
+
+  function optimisticNpcTravel(systemCall: (args: NpcTravelProps) => Promise<void>) {
+    return async function (this: any, args: NpcTravelProps) {
+      const overrideId = uuid();
+      // compute new values
+      const npc = getComponentValue(Npc, getEntityIdFromKeys([BigInt(args.npc_entity_id)]));
+      console.log(npc);
+      Npc.addOverride(overrideId, {
+        entity: args.npc_entity_id.toString() as Entity,
+        value: {
+          entity_id: args.npc_entity_id as bigint,
+          character_trait: npc!.character_trait,
+          characteristics: npc!.characteristics,
+          current_realm_entity_id: BigInt(0),
+          full_name: npc!.full_name,
+        },
+      });
+      try {
+        await systemCall(args);
+      } finally {
+        Npc.removeOverride(overrideId);
+      }
     };
   }
 
@@ -405,5 +444,6 @@ export function createOptimisticSystemCalls({
     optimisticHarvestLabor,
     optimisticBuildRoad,
     optimisticSpawnNpc,
+    optimisticNpcTravel,
   };
 }

@@ -32,6 +32,7 @@ import {
   HarvestAllLaborProps,
   SwapBankAndTravelBackProps,
   SpawnNpcProps,
+  NpcTravelProps,
   MintResourcesProps,
   DisassembleCaravanAndReturnFreeUnitsProps,
   CreateLaborBuildingProps,
@@ -95,6 +96,18 @@ export class EternumProvider extends DojoProvider {
       contractAddress: getContractByName(this.manifest, "npc_systems"),
       entrypoint: "spawn_npc",
       calldata: [this.getWorldAddress(), realm_entity_id, characteristics, character_trait, full_name, signature],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async npc_travel(props: NpcTravelProps) {
+    const { npc_entity_id, to_realm_entity_id, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "npc_travel",
+      calldata: [this.getWorldAddress(), npc_entity_id, to_realm_entity_id],
     });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,

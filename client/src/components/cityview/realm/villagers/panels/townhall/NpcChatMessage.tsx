@@ -1,15 +1,15 @@
 import { useState, useEffect, RefObject } from "react";
-import { useNpcContext } from "./NpcContext";
-import { scrollToElement } from "./utils";
-import Avatar from "../../../../elements/Avatar";
-import { NpcPopup } from "./NpcPopup";
-import { Npc } from "./types";
+import { useNpcContext } from "../../NpcContext";
+import { scrollToElement } from "../../utils";
+import Avatar from "../../../../../../elements/Avatar";
+import { NpcPopup } from "../../NpcPopup";
+import { Npc } from "../../types";
 
 const INTERKEY_STROKEN_DURATION_MS = 35;
 const CHARACTER_NUMBER_PER_LINE = 64;
 
 export interface NpcChatMessageProps {
-  fullName: string;
+  npc: Npc;
   dialogueSegment: string;
   msgIndex: number;
   wasAlreadyViewed: boolean;
@@ -52,8 +52,8 @@ export function useTypingEffect(
 }
 
 export const NpcChatMessage = (props: NpcChatMessageProps) => {
-  const { msgIndex, fullName, dialogueSegment, bottomRef, wasAlreadyViewed } = props;
-  const { setLastMessageDisplayedIndex, npcs } = useNpcContext();
+  const { msgIndex, npc, dialogueSegment, bottomRef, wasAlreadyViewed } = props;
+  const { setLastMessageDisplayedIndex } = useNpcContext();
   const [typingCompleted, setTypingComplete] = useState(false);
   const [showNpcStats, setShowNpcStats] = useState(false);
 
@@ -79,7 +79,7 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
               style={{ userSelect: "text" }}
               className="relative text-white/50 text-[10px]"
             >
-              {fullName}
+              {npc.fullName}
             </div>
           </div>
           <div style={{ userSelect: "text" }} className="mt-1 text-xs text-white/70">
@@ -87,11 +87,7 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
           </div>
         </div>
       </div>
-      {showNpcStats && <NpcPopup onClose={() => setShowNpcStats(false)} npc={getNpcByName(fullName, npcs)} />}
+      {showNpcStats && <NpcPopup onClose={() => setShowNpcStats(false)} npc={npc} />}
     </div>
   );
-};
-
-const getNpcByName = (name: string, npcs: Npc[]): Npc | undefined => {
-  return npcs.find((npc: Npc) => npc.fullName === name);
 };

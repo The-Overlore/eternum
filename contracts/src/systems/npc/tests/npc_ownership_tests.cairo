@@ -5,7 +5,7 @@ use starknet::contract_address_const;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use eternum::{
-    models::{position::Position, npc::{Npc, Npcs, Characteristics}},
+    models::{position::Position, npc::{Npc, RealmRegistry, Characteristics}},
     systems::{
         npc::{
             utils::{pedersen_hash_many, pack_characs}, contracts::npc_systems,
@@ -60,11 +60,10 @@ fn test_spawn_ownership() {
     let npc_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_address };
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
+    let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
-    let (_npc_1, _npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let _npc = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
 }
 
 #[test]

@@ -1,11 +1,14 @@
 import { useEffect, useRef } from "react";
 import { NpcChatMessage } from "./NpcChatMessage";
-import { StorageTownhalls, StorageTownhall, NpcChatProps } from "./types";
-import { scrollToElement } from "./utils";
-import { useNpcContext } from "./NpcContext";
-import BlurryLoadingImage from "../../../../elements/BlurryLoadingImage";
+import { StorageTownhalls, StorageTownhall, Npc, NpcTownhallMessage } from "../../types";
+import { getResidentNpcs, scrollToElement } from "../../utils";
+import { useNpcContext } from "../../NpcContext";
+import BlurryLoadingImage from "../../../../../../elements/BlurryLoadingImage";
+import useRealmStore from "../../../../../../hooks/store/useRealmStore";
+import { useDojo } from "../../../../../../DojoContext";
+import { defaultNpc } from "../../defaults";
 
-const NpcChat = ({}: NpcChatProps) => {
+const NpcChat = ({}) => {
   const {
     setLastMessageDisplayedIndex,
     selectedTownhall,
@@ -13,6 +16,16 @@ const NpcChat = ({}: NpcChatProps) => {
     loadingTownhall,
     LOCAL_STORAGE_ID,
   } = useNpcContext();
+
+  const {
+    setup: {
+      components: { Npc, EntityOwner },
+    },
+  } = useDojo();
+  const { realmEntityId } = useRealmStore();
+
+  const residents = getResidentNpcs(realmEntityId, Npc, EntityOwner);
+  const npcs = residents.foreigners.concat(residents.natives);
 
   const topRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -67,7 +80,13 @@ const NpcChat = ({}: NpcChatProps) => {
                 </div>
               </div>
             ) : (
-              getDisplayableChatMessages(lastMessageDisplayedIndex, selectedTownhall!, bottomRef, LOCAL_STORAGE_ID)
+              getDisplayableChatMessages(
+                npcs,
+                lastMessageDisplayedIndex,
+                selectedTownhall!,
+                bottomRef,
+                LOCAL_STORAGE_ID,
+              )
             )}
             <span className="" ref={bottomRef}></span>;
           </>
@@ -100,6 +119,7 @@ const setStoredTownhallToViewedIfFullyDisplayed = (
 };
 
 const getDisplayableChatMessages = (
+  npcs: Npc[],
   lastMessageDisplayedIndex: number,
   selectedTownhall: number,
   bottomRef: React.RefObject<HTMLDivElement>,
@@ -113,7 +133,8 @@ const getDisplayableChatMessages = (
 
   const shouldBeUsingTypingEffect = storageTownhall.viewed == false;
 
-  return storageTownhall.dialogue.map((message: any, index: number) => {
+  return storageTownhall.dialogue.map((message: NpcTownhallMessage, index: number) => {
+    const { fullName, dialogueSegment } = message;
     if (shouldBeUsingTypingEffect && index > lastMessageDisplayedIndex) {
       return;
     }
@@ -123,7 +144,8 @@ const getDisplayableChatMessages = (
         msgIndex={index}
         bottomRef={bottomRef}
         wasAlreadyViewed={storageTownhall.viewed}
-        {...message}
+        dialogueSegment={dialogueSegment}
+        npc={getNpcByName(fullName, npcs)}
       />
     );
   });
@@ -132,6 +154,10 @@ const getDisplayableChatMessages = (
 const getNumberOfStoredTownhalls = (localStorageId: string) => {
   const storageTownhalls: StorageTownhalls = JSON.parse(localStorage.getItem(localStorageId) ?? "{}");
   return Object.keys(storageTownhalls).length;
+};
+
+const getNpcByName = (name: string, npcs: Npc[]): Npc => {
+  return npcs.find((npc: Npc) => npc.fullName === name) || defaultNpc;
 };
 
 export default NpcChat;

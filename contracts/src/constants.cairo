@@ -105,7 +105,7 @@ fn get_resource_probabilities() -> Span<(u8, u128)> {
 const FREE_TRANSPORT_ENTITY_TYPE: u128 = 256;
 const REALM_ENTITY_TYPE: u128 = 257;
 const SOLDIER_ENTITY_TYPE: u128 = 258;
-
+const NPC_ENTITY_TYPE: u128 = 259;
 
 // TODO: change to consts
 enum BuildingTypes {
