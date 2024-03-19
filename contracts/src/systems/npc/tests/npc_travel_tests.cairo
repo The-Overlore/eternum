@@ -85,7 +85,7 @@ fn test_npc_travel() {
     let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
     let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
-    npc_dispatcher.travel(world, npc.entity_id, to_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, to_realm_entity_id);
 
     let npc_position = get!(world, npc.entity_id, (Position));
     let npc_coord: Coord = npc_position.into();
@@ -105,7 +105,7 @@ fn test_npc_travel_twice() {
     let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
     let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
-    npc_dispatcher.travel(world, npc.entity_id, to_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, to_realm_entity_id);
 
     let npc_position = get!(world, npc.entity_id, (Position));
     let npc_coord: Coord = npc_position.into();
@@ -118,10 +118,10 @@ fn test_npc_travel_twice() {
     assert(source_realm_registry.num_resident_npcs == 0, 'invalid residents source');
     assert(dest_realm_registry.num_resident_npcs == 0, 'invalid residents dest');
 
-    // 2nd travel
+    // 2nd npc_travel
     let npc_arrival_time = get!(world, npc.entity_id, (ArrivalTime)).arrives_at;
     starknet::testing::set_block_timestamp(npc_arrival_time);
-    npc_dispatcher.travel(world, npc.entity_id, from_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, from_realm_entity_id);
 
     let npc_position = get!(world, npc.entity_id, (Position));
     let npc_coord: Coord = npc_position.into();
@@ -142,7 +142,7 @@ fn test_npc_travel_to_invalid_realm() {
     let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
 
     let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    npc_dispatcher.travel(world, npc.entity_id, 1000);
+    npc_dispatcher.npc_travel(world, npc.entity_id, 1000);
 }
 
 #[test]
@@ -152,8 +152,8 @@ fn test_npc_travel_while_traveling() {
     let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
 
     let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    npc_dispatcher.travel(world, npc.entity_id, to_realm_entity_id);
-    npc_dispatcher.travel(world, npc.entity_id, to_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, to_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, to_realm_entity_id);
 }
 
 #[test]
@@ -163,5 +163,5 @@ fn test_npc_travel_to_current_realm() {
     let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
 
     let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    npc_dispatcher.travel(world, npc.entity_id, from_realm_entity_id);
+    npc_dispatcher.npc_travel(world, npc.entity_id, from_realm_entity_id);
 }
