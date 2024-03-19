@@ -1,7 +1,7 @@
 import { uuid } from "@latticexyz/utils";
 import { ClientComponents } from "./createClientComponents";
 import { getEntityIdFromKeys } from "../utils/utils";
-import { Entity, Type, getComponentValue } from "@dojoengine/recs";
+import { Type, getComponentValue } from "@dojoengine/recs";
 import { LABOR_CONFIG, Resource } from "@bibliothecadao/eternum";
 import {
   CancelFungibleOrderProps,
