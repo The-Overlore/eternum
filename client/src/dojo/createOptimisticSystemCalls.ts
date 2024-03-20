@@ -11,7 +11,6 @@ import {
   HarvestLaborProps,
   PurchaseLaborProps,
   BuildLaborProps,
-  SpawnNpcProps,
 } from "@bibliothecadao/eternum";
 
 export const HIGH_ENTITY_ID = 9999999999n;
@@ -26,7 +25,6 @@ export function createOptimisticSystemCalls({
   DetachedResource,
   ResourceChest,
   Inventory,
-  Npc,
 }: ClientComponents) {
   function optimisticCreateOrder(systemCall: (args: any) => Promise<any>) {
     return async function (this: any, args: CreateOrderProps): Promise<void | number> {
@@ -286,12 +284,6 @@ export function createOptimisticSystemCalls({
     };
   }
 
-  function optimisticSpawnNpc(systemCall: (args: SpawnNpcProps) => Promise<void>) {
-    return async function (this: any, args: SpawnNpcProps) {
-      // TODO
-    };
-  }
-
   function optimisticHarvestLabor(
     ts: number,
     levelBonus: number,
@@ -404,6 +396,5 @@ export function createOptimisticSystemCalls({
     optimisticBuildLabor,
     optimisticHarvestLabor,
     optimisticBuildRoad,
-    optimisticSpawnNpc,
   };
 }

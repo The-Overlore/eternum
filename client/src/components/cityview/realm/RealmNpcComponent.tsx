@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Tabs } from "../../../elements/tab";
-import { NpcPanel } from "./villagers/NpcPanel";
-import { NpcListPanel } from "./villagers/NpcListPanel";
+import { TownhallPanel } from "./villagers/panels/townhall/TownhallPanel";
+import { ResidentsPanel } from "./villagers/panels/residents/ResidentsPanel";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
 import { NpcProvider } from "./villagers/NpcContext";
+import { TravelersPanel } from "./villagers/panels/travelers/TravelersPanel";
 
 type RealmVillagersComponentProps = {};
 
@@ -41,23 +42,75 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
     () => [
       {
         key: "townhall",
-        label: <div>Townhall</div>,
-        component: <NpcPanel />,
-      },
-      {
-        key: "npcs",
         label: (
           <div
             onMouseEnter={() =>
-              setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Tooltip</p> })
+              setTooltip({ position: "bottom", content: <p className="whitespace-nowrap">Talk with your villagers</p> })
             }
             onMouseLeave={() => setTooltip(null)}
             className="flex relative group flex-col items-center"
           >
-            Villagers
+            Townhall
           </div>
         ),
-        component: <NpcListPanel />,
+
+        component: <TownhallPanel />,
+      },
+      {
+        key: "residents",
+        label: (
+          <div
+            onMouseEnter={() =>
+              setTooltip({
+                position: "bottom",
+                content: <p className="whitespace-nowrap">Show the resident villagers of your Realm</p>,
+              })
+            }
+            onMouseLeave={() => setTooltip(null)}
+            className="flex relative group flex-col items-center"
+          >
+            Residents
+          </div>
+        ),
+        component: <ResidentsPanel />,
+      },
+      {
+        key: "travelers",
+        label: (
+          <div
+            onMouseEnter={() =>
+              setTooltip({
+                position: "bottom",
+                content: <p className="whitespace-nowrap">Show your traveling villagers</p>,
+              })
+            }
+            onMouseLeave={() => setTooltip(null)}
+            className="flex relative group flex-col items-center"
+          >
+            Travelers
+          </div>
+        ),
+        component: <TravelersPanel />,
+      },
+      {
+        key: "at_gates",
+        label: (
+          <div
+            onMouseEnter={() =>
+              setTooltip({
+                position: "bottom",
+                content: (
+                  <p className="whitespace-nowrap">Show the villagers at your gates asking to come in</p>
+                ),
+              })
+            }
+            onMouseLeave={() => setTooltip(null)}
+            className="flex relative group flex-col items-center"
+          >
+            At your gates
+          </div>
+        ),
+        component: <ResidentsPanel />,
       },
     ],
     [selectedTab],

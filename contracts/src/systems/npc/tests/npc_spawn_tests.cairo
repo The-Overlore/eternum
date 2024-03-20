@@ -4,7 +4,7 @@ use core::option::OptionTrait;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use eternum::{
-    models::{position::Position, npc::{Npc, Npcs, Characteristics}},
+    models::{position::{Position, Coord, PositionImpl, PositionIntoCoord,}, npc::{Npc, RealmRegistry, Characteristics}},
     systems::{
         npc::{
             utils::{pack_characs}, contracts::{npc_systems},
@@ -60,8 +60,8 @@ fn test_spawn_single() {
             Position { x: 1, y: 1, entity_id: 1_u128 }, // position  
         // x needs to be > 470200 to get zone
         );
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
+    let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    
 }
 
 #[test]
@@ -100,10 +100,9 @@ fn test_spawn_too_early() {
         // x needs to be > 470200 to get zone
         );
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
+    let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 10, 1);
+    let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, 10, 1);
 }
 
 #[test]
@@ -141,20 +140,15 @@ fn test_spawn_multiple() {
         // x needs to be > 470200 to get zone
         );
 
-    let (npc_0, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    assert(npcs.npc_0 == npc_0.entity_id, 'wrong index of npc in struct');
+    let npc_0 = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
-    let (npc_1, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
-    assert(npcs.npc_1 == npc_1.entity_id, 'wrong index of npc in struct');
+    let npc_1 = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
 
-    let (npc_2, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
-    assert(npcs.npc_2 == npc_2.entity_id, 'wrong index of npc in struct');
+    let npc_2 = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
 
-    let (npc_3, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
-    assert(npcs.npc_3 == npc_3.entity_id, 'wrong index of npc in struct');
+    let npc_3 = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
 
-    let (npc_4, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
-    assert(npcs.npc_4 == npc_4.entity_id, 'wrong index of npc in struct');
+    let npc_4 = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
 
     assert(npc_0.entity_id != npc_1.entity_id, 'same entity_id 0 1');
     assert(npc_0.entity_id != npc_2.entity_id, 'same entity_id 0 2');
@@ -171,7 +165,7 @@ fn test_spawn_multiple() {
 
 #[test]
 #[available_gas(3000000000)]
-#[should_panic(expected: ('max num npcs reached', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('max num npcs spawned', 'ENTRYPOINT_FAILED'))]
 fn test_spawn_more_than_five() {
     let world = spawn_eternum();
 
@@ -215,7 +209,7 @@ fn test_spawn_more_than_five() {
             break;
         }
 
-        let (npc, npcs) = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, i);
+        let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, 100, i);
         i += 1;
     }
 }
@@ -273,8 +267,8 @@ fn spawn_npc(
     realm_entity_id: u128,
     npc_dispatcher: INpcDispatcher,
     time_increment: u64,
-    index: u8
-) -> (Npc, Npcs) {
+    current_num_of_npcs: u8
+) -> Npc {
     let current_time = starknet::get_block_timestamp();
     starknet::testing::set_block_timestamp(current_time + time_increment);
 
@@ -288,12 +282,22 @@ fn spawn_npc(
     assert(entity_id != 0, 'entity id is zero');
 
     let npc = get!(world, entity_id, (Npc));
-    let npcs = get!(world, realm_entity_id, (Npcs));
 
     assert(npc.entity_id != 0, 'npc.entity_id is zero');
 
-    assert(npcs.num_npcs == index + 1, 'wrong number of npcs');
+    let realm_registry = get!(world, realm_entity_id, (RealmRegistry));
+    assert(
+        realm_registry.num_resident_npcs == current_num_of_npcs + 1, 'wrong number of residents'
+    );
+    assert(realm_registry.num_native_npcs == current_num_of_npcs + 1, 'wrong number of natives');
 
-    (npc, npcs)
+    let npc_position = get!(world, npc.entity_id, (Position));
+    let npc_coords: Coord = npc_position.into();
+    let realm_position = get!(world, realm_entity_id, (Position));
+
+    assert(npc_coords == realm_position.into(), 'npc at wrong position');
+
+
+    npc
 }
 
