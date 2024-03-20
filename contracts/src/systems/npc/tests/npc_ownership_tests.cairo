@@ -17,7 +17,8 @@ use eternum::{
             interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,}
         },
         config::{
-            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait}
+            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait},
+            tests::npc_config_tests::{MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS}
         }
     },
     utils::testing::{spawn_eternum, deploy_system}
@@ -32,7 +33,8 @@ fn test_spawn_ownership() {
     let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
 
     // first argument is the spawn delay
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // set realm entity
     let realm_systems_address = deploy_system(realm_systems::TEST_CLASS_HASH);

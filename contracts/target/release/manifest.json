@@ -1626,7 +1626,7 @@
     {
       "name": "eternum::systems::config::contracts::config_systems",
       "address": "0x7fff06bbcbe4f42f22c86b14e7a80604495c8b2034d14cbb10d32402c933ca8",
-      "class_hash": "0xcfa15bebef8f4950e84daca476bbef55e0bb28627d885b7fe7a0f500e2986a",
+      "class_hash": "0x51bc941a459ebd8a0fac0d53cfdf16aedafb8770e6165b0cc8bc61bdaf54b6d",
       "abi": [
         {
           "type": "impl",
@@ -1752,6 +1752,14 @@
                 {
                   "name": "pub_key",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "max_num_resident_npcs",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "max_num_native_npcs",
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [],
@@ -3118,7 +3126,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x3446c053e2f1d73be23da381264bb254610ea4374dce9f9a4cb9c8772d6cd8b",
+      "class_hash": "0x3e1fb19f990a43116cf2c13c55c848faacaaa27ec3719fd98224d422f185243",
       "abi": [
         {
           "type": "impl",
@@ -3261,6 +3269,10 @@
                 },
                 {
                   "name": "npc_entity_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "into_realm_entity_id",
                   "type": "core::integer::u128"
                 }
               ],
@@ -9148,9 +9160,19 @@
           "name": "pub_key",
           "type": "felt252",
           "key": false
+        },
+        {
+          "name": "max_num_native_npcs",
+          "type": "u8",
+          "key": false
+        },
+        {
+          "name": "max_num_resident_npcs",
+          "type": "u8",
+          "key": false
         }
       ],
-      "class_hash": "0x246fb8eaf33ecbe580bb3dadb56813a494429415aaf907f70a46e6ef35fbcbd",
+      "class_hash": "0x6f8d64094c9c0f17862aad9e6cf0b27b9674914864c0b926a69492c4181d385",
       "abi": [
         {
           "type": "function",

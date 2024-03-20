@@ -199,7 +199,9 @@ struct NpcConfig {
     #[key]
     config_id: u128,
     spawn_delay: u64,
-    pub_key: felt252
+    pub_key: felt252,
+    max_num_native_npcs: u8,
+    max_num_resident_npcs: u8,
 }
 
 

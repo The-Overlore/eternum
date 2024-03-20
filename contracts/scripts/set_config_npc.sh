@@ -9,7 +9,7 @@ NPC_SYSTEMS=$(cat ./target/dev/manifest.json | jq -r '.contracts[] | select(.nam
 LORE_MACHINE_PUB_KEY=0x175436af24aa0b0c720ebd341dd6c396fa03a02dd8379041191c773f5460e0b
 
 commands=(
-	"sozo execute ${CONFIG_SYSTEMS} set_npc_config --account-address ${DOJO_ACCOUNT_ADDRESS} --calldata ${SOZO_WORLD},100,${LORE_MACHINE_PUB_KEY}"
+	"sozo execute ${CONFIG_SYSTEMS} set_npc_config --account-address ${DOJO_ACCOUNT_ADDRESS} --calldata ${SOZO_WORLD},100,${LORE_MACHINE_PUB_KEY},5,5"
 	# NPC speed
 	# NPC_ENTITY_TYPE = 259
 	# 800 sec per km = 4.5 km/h

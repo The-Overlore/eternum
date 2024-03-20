@@ -4,7 +4,10 @@ use core::option::OptionTrait;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use eternum::{
-    models::{position::{Position, Coord, PositionImpl, PositionIntoCoord,}, npc::{Npc, RealmRegistry, Characteristics}},
+    models::{
+        position::{Position, Coord, PositionImpl, PositionIntoCoord,},
+        npc::{Npc, RealmRegistry, Characteristics}
+    },
     systems::{
         npc::{
             utils::{pack_characs}, contracts::{npc_systems},
@@ -15,7 +18,8 @@ use eternum::{
             interface::{IRealmSystemsDispatcher, IRealmSystemsDispatcherTrait,}
         },
         config::{
-            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait}
+            contracts::config_systems, interface::{INpcConfigDispatcher, INpcConfigDispatcherTrait},
+            tests::npc_config_tests::{MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS}
         }
     },
     utils::testing::{spawn_eternum, deploy_system},
@@ -42,7 +46,8 @@ fn test_spawn_single() {
     let npc_systems_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_systems_address };
 
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // create realm
     let realm_entity_id = realm_systems_dispatcher
@@ -61,7 +66,6 @@ fn test_spawn_single() {
         // x needs to be > 470200 to get zone
         );
     let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    
 }
 
 #[test]
@@ -81,7 +85,8 @@ fn test_spawn_too_early() {
     let npc_systems_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_systems_address };
 
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // create realm
     let realm_entity_id = realm_systems_dispatcher
@@ -121,7 +126,8 @@ fn test_spawn_multiple() {
     let npc_systems_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_systems_address };
 
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // create realm
     let realm_entity_id = realm_systems_dispatcher
@@ -180,7 +186,8 @@ fn test_spawn_more_than_five() {
     let npc_systems_address = deploy_system(npc_systems::TEST_CLASS_HASH);
     let npc_dispatcher = INpcDispatcher { contract_address: npc_systems_address };
 
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // create realm
     let realm_entity_id = realm_systems_dispatcher
@@ -224,7 +231,8 @@ fn test_invalid_trait() {
     let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
 
     // first argument is the spawn delay
-    npc_config_dispatcher.set_npc_config(world, SPAWN_DELAY, PUB_KEY);
+    npc_config_dispatcher
+        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
 
     // set realm entity
     let realm_systems_address = deploy_system(realm_systems::TEST_CLASS_HASH);
@@ -296,7 +304,6 @@ fn spawn_npc(
     let realm_position = get!(world, realm_entity_id, (Position));
 
     assert(npc_coords == realm_position.into(), 'npc at wrong position');
-
 
     npc
 }
