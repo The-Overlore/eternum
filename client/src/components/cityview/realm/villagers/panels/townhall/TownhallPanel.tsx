@@ -15,12 +15,6 @@ type TownhallPanelProps = {
 };
 
 export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
-  const {
-    setup: {
-      components: { Npc: NpcComponent, EntityOwner },
-    },
-  } = useDojo();
-
   const { realmId, realmEntityId } = useRealmStore();
 
   const realm = useMemo(() => {
@@ -49,9 +43,6 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
     setSelectedTownhall(newKey);
   };
 
-  const residents = getResidentNpcs(realmEntityId, NpcComponent, EntityOwner);
-  const npcs = residents.foreigners.concat(residents.natives);
-
   useEffect(() => {
     if (lastWsMsg === null || lastWsMsg === undefined || Object.is(lastWsMsg, {})) {
       return;
@@ -71,19 +62,11 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
   };
 
   const gatherVillagers = () => {
-    const npcsToSend = npcs.map((npc): any => {
-      return {
-        characteristics: npc.characteristics,
-        character_trait: npc.characterTrait,
-        full_name: npc.fullName,
-      };
-    });
     sendWsMsg({
       msg_type: WsMsgType.TOWNHALL,
       data: {
         realm_id: realmId!.toString(),
         order_id: realm!.order,
-        npcs: npcsToSend,
       },
     });
     setLoadingTownhall(true);
