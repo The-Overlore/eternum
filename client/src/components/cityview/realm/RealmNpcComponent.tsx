@@ -7,6 +7,7 @@ import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
 import { NpcProvider } from "./villagers/NpcContext";
 import { TravelersPanel } from "./villagers/panels/travelers/TravelersPanel";
+import { AtGatesPanel } from "./villagers/panels/atGates/AtGatesPanel";
 
 type RealmVillagersComponentProps = {};
 
@@ -110,7 +111,7 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
             At your gates
           </div>
         ),
-        component: <ResidentsPanel />,
+        component: <AtGatesPanel />,
       },
     ],
     [selectedTab],

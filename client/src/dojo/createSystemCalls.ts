@@ -37,6 +37,7 @@ import {
   TransferItemsFromMultipleProps,
   SpawnNpcProps,
   NpcTravelProps,
+  WelcomeNpcProps,
   CreateLaborBuildingProps,
   DestroyLaborBuildingProps,
 } from "@bibliothecadao/eternum";
@@ -64,6 +65,10 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
 
   const npc_travel = async (props: NpcTravelProps) => {
     setComponentsFromEvents(contractComponents, getEvents(await provider.npc_travel(props)));
+  };
+
+  const welcome_npc = async (props: WelcomeNpcProps) => {
+    setComponentsFromEvents(contractComponents, getEvents(await provider.welcome_npc(props)));
   };
 
   const harvest_labor = async (props: HarvestLaborProps) => {
@@ -229,6 +234,7 @@ export function createSystemCalls({ provider, contractComponents }: SetupNetwork
     build_labor,
     spawn_npc,
     npc_travel,
+	welcome_npc,
     purchase_and_build_labor,
     harvest_labor,
     harvest_all_labor,
