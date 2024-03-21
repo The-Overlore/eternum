@@ -14,7 +14,7 @@ export const Resident = ({ npc, native }: NpcComponentProps) => {
   const onClose = (): void => {
     setShowTravel(false);
   };
-  console.log(native);
+
   const extraButtons: any = [
     native ? (
       <Button

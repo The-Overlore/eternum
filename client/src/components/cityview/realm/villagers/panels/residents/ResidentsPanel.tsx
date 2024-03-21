@@ -29,7 +29,6 @@ export const ResidentsPanel = () => {
   const { sendWsMsg, lastWsMsg } = useNpcContext();
 
   const residents = getResidentNpcs(realmEntityId, NpcComponent, EntityOwner);
-  console.log(residents);
 
   const sortingParams = useMemo(() => {
     return [
