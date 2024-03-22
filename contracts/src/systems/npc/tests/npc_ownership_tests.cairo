@@ -10,7 +10,7 @@ use eternum::{
         npc::{
             utils::{pedersen_hash_many, pack_characs}, contracts::npc_systems,
             interface::{INpcDispatcher, INpcDispatcherTrait,},
-            tests::npc_spawn_tests::{spawn_npc, PUB_KEY, SPAWN_DELAY}
+            tests::{npc_spawn_tests::{PUB_KEY, SPAWN_DELAY}, utils::{setup, spawn_npc}},
         },
         realm::{
             contracts::realm_systems,
@@ -28,44 +28,12 @@ use eternum::{
 #[should_panic(expected: ('Realm does not belong to player', 'ENTRYPOINT_FAILED',))]
 #[available_gas(3000000000)]
 fn test_spawn_ownership() {
-    let world = spawn_eternum();
-    let config_systems_address = deploy_system(config_systems::TEST_CLASS_HASH);
-    let npc_config_dispatcher = INpcConfigDispatcher { contract_address: config_systems_address };
+    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
 
-    // first argument is the spawn delay
-    npc_config_dispatcher
-        .set_npc_config(world, SPAWN_DELAY, PUB_KEY, MAX_NUM_RESIDENT_NPCS, MAX_NUM_NATIVE_NPCS);
-
-    // set realm entity
-    let realm_systems_address = deploy_system(realm_systems::TEST_CLASS_HASH);
-    let realm_systems_dispatcher = IRealmSystemsDispatcher {
-        contract_address: realm_systems_address
-    };
-
-    // create realm
-    let realm_entity_id = realm_systems_dispatcher
-        .create(
-            world,
-            1, // realm id
-            0x209, // resource_types_packed // 2,9 // stone and gold
-            2, // resource_types_count
-            5, // cities
-            5, // harbors
-            5, // rivers
-            5, // regions
-            1, // wonder
-            1, // order
-            Position { x: 1, y: 1, entity_id: 1_u128 }, // position  
-        // x needs to be > 470200 to get zone
-        );
-
-    let npc_address = deploy_system(npc_systems::TEST_CLASS_HASH);
-    let npc_dispatcher = INpcDispatcher { contract_address: npc_address };
-
-    let npc = spawn_npc(world, realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
-    let _npc = spawn_npc(world, realm_entity_id, npc_dispatcher, 0, 0);
+    let _npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, 0, 0);
 }
 
 #[test]

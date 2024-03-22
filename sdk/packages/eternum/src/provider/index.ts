@@ -34,6 +34,7 @@ import {
   SpawnNpcProps,
   NpcTravelProps,
   WelcomeNpcProps,
+  KickOutNpcProps,
   MintResourcesProps,
   DisassembleCaravanAndReturnFreeUnitsProps,
   CreateLaborBuildingProps,
@@ -121,6 +122,18 @@ export class EternumProvider extends DojoProvider {
       contractAddress: getContractByName(this.manifest, "npc_systems"),
       entrypoint: "welcome_npc",
       calldata: [this.getWorldAddress(), npc_entity_id, into_realm_entity_id],
+    });
+    return await this.provider.waitForTransaction(tx.transaction_hash, {
+      retryInterval: 500,
+    });
+  }
+
+  public async kick_out_npc(props: KickOutNpcProps) {
+    const { npc_entity_id, signer } = props;
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "kick_out_npc",
+      calldata: [this.getWorldAddress(), npc_entity_id],
     });
     return await this.provider.waitForTransaction(tx.transaction_hash, {
       retryInterval: 500,
