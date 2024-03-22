@@ -69,6 +69,7 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
       msg_type: WsMsgType.TOWNHALL,
       data: {
         realm_id: realmId!.toString(),
+        realm_entity_id: realmEntityId!.toString(),
         order_id: realm!.order,
         user_message: userMessage,
       },
