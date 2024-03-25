@@ -3126,7 +3126,7 @@
     {
       "name": "eternum::systems::npc::contracts::npc_systems",
       "address": "0x2edc6b1b51c5ca1b114708fff13534839f9e526175fd6159795df7210685cf4",
-      "class_hash": "0x3e1fb19f990a43116cf2c13c55c848faacaaa27ec3719fd98224d422f185243",
+      "class_hash": "0x4b7f0cd6fe85d3b6cdf61c67db054929d168fe2b518f8df2e834175fe1874e3",
       "abi": [
         {
           "type": "impl",

@@ -236,6 +236,10 @@ export interface WelcomeNpcProps extends SystemSigner {
   into_realm_entity_id: num.BigNumberish;
 }
 
+export interface KickOutNpcProps extends SystemSigner {
+  npc_entity_id: num.BigNumberish;
+}
+
 export interface CreateLaborBuildingProps extends SystemSigner {
   realm_entity_id: num.BigNumberish;
   building_type: num.BigNumberish;
