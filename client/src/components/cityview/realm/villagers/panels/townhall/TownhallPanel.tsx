@@ -9,7 +9,7 @@ import { StorageTownhalls, WsMsgType, TownhallResponse, StorageTownhall, WsRespo
 import { getRealm } from "../../../../../../utils/realms";
 import { keysSnakeToCamel } from "../../utils";
 import TextInput from "../../../../../../elements/TextInput";
-import { USER_MESSAGE_LENGTH } from "../../constants";
+import { MAX_TOWNHALL_INPUT_LENGTH } from "../../constants";
 
 type TownhallPanelProps = {
   type?: "all" | "farmers" | "miners";
@@ -17,7 +17,7 @@ type TownhallPanelProps = {
 
 export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
   const { realmId, realmEntityId } = useRealmStore();
-  const [userMessage, setUserMessage] = useState('');
+  const [townhallInput, setTownhallInput] = useState('');
 
 
   const realm = useMemo(() => {
@@ -71,7 +71,7 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
         realm_id: realmId!.toString(),
         realm_entity_id: realmEntityId!.toString(),
         order_id: realm!.order,
-        user_message: userMessage,
+        townhall_input: townhallInput,
       },
     });
     setLoadingTownhall(true);
@@ -87,9 +87,8 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
   }, [realmId]);
 
   const handleUserMessageChange = (inputValue: string) => {
-    const maxLength = USER_MESSAGE_LENGTH;
-    if (inputValue.length <= maxLength) {
-      setUserMessage(inputValue);
+    if (inputValue.length <= MAX_TOWNHALL_INPUT_LENGTH) {
+      setTownhallInput(inputValue);
     }
   };
 
@@ -109,7 +108,7 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
       <NpcChat />
 
       <div className="flex my-2">
-        <TextInput placeholder="Write something..." value={userMessage} onChange={handleUserMessageChange} />
+        <TextInput placeholder="Write something..." value={townhallInput} onChange={handleUserMessageChange} />
         <Button
             className="mx-2 w-32 bottom-2 !rounded-full"
             onClick={gatherVillagers}
