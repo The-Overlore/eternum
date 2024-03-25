@@ -10,7 +10,7 @@ use eternum::{
         npc::{
             utils::{pedersen_hash_many, pack_characs}, contracts::npc_systems,
             interface::{INpcDispatcher, INpcDispatcherTrait,},
-            tests::{npc_spawn_tests::{PUB_KEY, SPAWN_DELAY}, utils::{setup, spawn_npc}},
+            tests::{npc_spawn_tests::{PUB_KEY, SPAWN_DELAY}, utils::{setup, spawn_npc_util}},
         },
         realm::{
             contracts::realm_systems,
@@ -28,12 +28,12 @@ use eternum::{
 #[should_panic(expected: ('Realm does not belong to player', 'ENTRYPOINT_FAILED',))]
 #[available_gas(3000000000)]
 fn test_spawn_ownership() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
 
-    let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
     starknet::testing::set_contract_address(contract_address_const::<'entity'>());
-    let _npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, 0, 0);
+    let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
 }
 
 #[test]

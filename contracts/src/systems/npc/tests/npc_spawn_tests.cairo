@@ -11,7 +11,7 @@ use eternum::{
     systems::{
         npc::{
             utils::{pack_characs}, contracts::{npc_systems},
-            interface::{INpcDispatcher, INpcDispatcherTrait}, tests::{utils::{spawn_npc, setup}}
+            interface::{INpcDispatcher, INpcDispatcherTrait}, tests::{utils::{spawn_npc_util, setup}}
         },
         realm::{
             contracts::realm_systems,
@@ -33,33 +33,33 @@ const SPAWN_DELAY: u64 = 100;
 #[test]
 #[available_gas(3000000000)]
 fn test_spawn_single() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
-    let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
+    let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 }
 
 #[test]
 #[available_gas(3000000000)]
 #[should_panic(expected: ('too early to spawn', 'ENTRYPOINT_FAILED'))]
 fn test_spawn_too_early() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
-    let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
-    let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, 10, 1);
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
+    let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, 10, 1);
 }
 
 #[test]
 #[available_gas(3000000000)]
 fn test_spawn_multiple() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
 
-    let npc_0 = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
+    let npc_0 = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 0);
 
-    let npc_1 = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
+    let npc_1 = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 1);
 
-    let npc_2 = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
+    let npc_2 = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 2);
 
-    let npc_3 = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
+    let npc_3 = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 3);
 
-    let npc_4 = spawn_npc(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
+    let npc_4 = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, 4);
 
     assert(npc_0.entity_id != npc_1.entity_id, 'same entity_id 0 1');
     assert(npc_0.entity_id != npc_2.entity_id, 'same entity_id 0 2');
@@ -78,7 +78,7 @@ fn test_spawn_multiple() {
 #[available_gas(3000000000)]
 #[should_panic(expected: ('max num npcs spawned', 'ENTRYPOINT_FAILED'))]
 fn test_spawn_more_than_five() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
 
     let mut i = 0;
     loop {
@@ -86,7 +86,7 @@ fn test_spawn_more_than_five() {
             break;
         }
 
-        let npc = spawn_npc(world, from_realm_entity_id, npc_dispatcher, 100, i);
+        let _npc = spawn_npc_util(world, from_realm_entity_id, npc_dispatcher, SPAWN_DELAY, i);
         i += 1;
     }
 }
@@ -96,7 +96,7 @@ fn test_spawn_more_than_five() {
 #[available_gas(3000000000)]
 #[should_panic(expected: ('Invalid signature', 'ENTRYPOINT_FAILED'))]
 fn test_invalid_trait() {
-    let (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id) = setup();
+    let (world, npc_dispatcher, from_realm_entity_id, _to_realm_entity_id) = setup();
 
     let characs = pack_characs(Characteristics { age: 30, role: 10, sex: 1, });
     let r_sign = 0x6a43f62142ac80f794378d1298d429b77c068cba42f884b1856f2087cdaf0c6;

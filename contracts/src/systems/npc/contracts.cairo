@@ -317,7 +317,7 @@ mod npc_systems {
             let npc = get!(world, npc_entity_id, (Npc));
             assert(npc.full_name != 0, 'invalid npc_entity_id');
 
-            assert(npc.current_realm_entity_id != 0, 'npc wasnt welcomed any realm');
+            assert(npc.current_realm_entity_id != 0, 'npc wasnt welcomed in any realm');
             assert_realm_existance_and_ownership(world, npc.current_realm_entity_id);
 
             let npc_arrival = get!(world, npc_entity_id, (ArrivalTime));

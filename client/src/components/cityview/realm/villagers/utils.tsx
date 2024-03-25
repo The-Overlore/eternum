@@ -54,7 +54,7 @@ export const getAtGatesNpcs = (
     NpcComponent,
   );
 
-  const natives: AtGates = getNpcsOnlyIfArrivedAtGates(potentialNatives, nextBlockTimestamp, ArrivalTime);
+  const natives: AtGates = getNpcsOnlyIfArrivedAtGates(potentialNatives, nextBlockTimestamp, true, ArrivalTime);
 
   const potentialForeigners = getNpcsFromQuery(
     [
@@ -65,7 +65,7 @@ export const getAtGatesNpcs = (
     ],
     NpcComponent,
   );
-  const foreigners: AtGates = getNpcsOnlyIfArrivedAtGates(potentialForeigners, nextBlockTimestamp, ArrivalTime);
+  const foreigners: AtGates = getNpcsOnlyIfArrivedAtGates(potentialForeigners, nextBlockTimestamp, false, ArrivalTime);
 
   return natives.concat(foreigners).sort((a, b) => Number(b!.arrival_time - a!.arrival_time));
 };
@@ -82,11 +82,16 @@ export const alreadyArrivedAtGates = (
   }
 };
 
-const getNpcsOnlyIfArrivedAtGates = (tempNpcs: Npc[], nextBlockTimestamp: number, ArrivalTime: any): AtGates => {
+const getNpcsOnlyIfArrivedAtGates = (
+  tempNpcs: Npc[],
+  nextBlockTimestamp: number,
+  native: boolean,
+  ArrivalTime: any,
+): AtGates => {
   const npcs: AtGates = tempNpcs.reduce((acc: AtGates, npc: Npc) => {
     const npcWithArrivalTimeAlreadyAtGate = alreadyArrivedAtGates(npc, nextBlockTimestamp, ArrivalTime);
     if (npcWithArrivalTimeAlreadyAtGate !== undefined) {
-      acc.push({ ...npcWithArrivalTimeAlreadyAtGate, native: false });
+      acc.push({ ...npcWithArrivalTimeAlreadyAtGate, native });
     }
     return acc;
   }, []);
@@ -127,7 +132,7 @@ const getNpcFromEntityId = (npcEntityId: Entity, NpcComponent: any): Npc => {
   };
 };
 
-export const useArrivalTimeByEntityId = (entityId: BigNumberish, ArrivalTime: any): any => {
+export const useArrivalTimeByEntityId = (entityId: BigNumberish, ArrivalTime: any): number => {
   const npcArrivalTimeEntityId = useEntityQuery([HasValue(ArrivalTime, { entity_id: BigInt(entityId) })]);
   const npcArrivalTime = getComponentValue(ArrivalTime, npcArrivalTimeEntityId.values().next().value);
   return npcArrivalTime!.arrives_at;

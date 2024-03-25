@@ -77,7 +77,7 @@ fn setup() -> (IWorldDispatcher, INpcDispatcher, u128, u128) {
     (world, npc_dispatcher, from_realm_entity_id, to_realm_entity_id)
 }
 
-fn spawn_npc(
+fn spawn_npc_util(
     world: IWorldDispatcher,
     realm_entity_id: u128,
     npc_dispatcher: INpcDispatcher,
