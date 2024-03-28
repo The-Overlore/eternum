@@ -5,7 +5,6 @@ import { ResidentsPanel } from "./villagers/panels/residents/ResidentsPanel";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
-import { NpcProvider } from "./villagers/NpcContext";
 import { TravelersPanel } from "./villagers/panels/travelers/TravelersPanel";
 import { AtGatesPanel } from "./villagers/panels/atGates/AtGatesPanel";
 
@@ -100,9 +99,7 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
             onMouseEnter={() =>
               setTooltip({
                 position: "bottom",
-                content: (
-                  <p className="whitespace-nowrap">Show the villagers at your gates asking to come in</p>
-                ),
+                content: <p className="whitespace-nowrap">Show the villagers at your gates asking to come in</p>,
               })
             }
             onMouseLeave={() => setTooltip(null)}
@@ -118,25 +115,23 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
   );
 
   return (
-    <NpcProvider>
-      <Tabs
-        selectedIndex={selectedTab}
-        onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
-        variant="default"
-        className="h-full"
-      >
-        <Tabs.List>
-          {tabs.map((tab, index) => (
-            <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
-          ))}
-        </Tabs.List>
-        <Tabs.Panels className="overflow-hidden">
-          {tabs.map((tab, index) => (
-            <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
-          ))}
-        </Tabs.Panels>
-      </Tabs>
-    </NpcProvider>
+    <Tabs
+      selectedIndex={selectedTab}
+      onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
+      variant="default"
+      className="h-full"
+    >
+      <Tabs.List>
+        {tabs.map((tab, index) => (
+          <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
+        ))}
+      </Tabs.List>
+      <Tabs.Panels className="overflow-hidden">
+        {tabs.map((tab, index) => (
+          <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
+        ))}
+      </Tabs.Panels>
+    </Tabs>
   );
 };
 
