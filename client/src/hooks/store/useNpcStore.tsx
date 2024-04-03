@@ -14,7 +14,7 @@ const callLoreMachineJsonRpcMethod = async (method: string, params: any) => {
     }),
   });
   const responseJson = await response.json();
-  if ("error" in responseJson) throw new Error(JSON.stringify(responseJson.error));
+  if ("error" in responseJson) throw responseJson.error;
   else return JSON.parse(responseJson.result);
 };
 
