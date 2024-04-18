@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Npc } from "../../components/cityview/realm/villagers/types";
 
 const callLoreMachineJsonRpcMethod = async (method: string, params: any) => {
   const response = await fetch(import.meta.env.VITE_OVERLORE_RPC_URL, {
@@ -26,6 +27,10 @@ interface NpcState {
   setSelectedTownhall: (newIndex: number | null) => void;
   lastMessageDisplayedIndex: number;
   setLastMessageDisplayedIndex: (newIndex: number) => void;
+  showNpcPopup: boolean;
+  setShowNpcPopup: (val: boolean) => void;
+  selectedNpc: Npc | null;
+  setSelectedNpc: (val: Npc) => void;
 }
 
 const useNpcStore = create<NpcState>((set) => ({
@@ -38,6 +43,10 @@ const useNpcStore = create<NpcState>((set) => ({
   setSelectedTownhall: (val: number | null) => set({ selectedTownhall: val }),
   lastMessageDisplayedIndex: 0,
   setLastMessageDisplayedIndex: (val: number) => set({ lastMessageDisplayedIndex: val }),
+  showNpcPopup: false,
+  setShowNpcPopup: (val: boolean) => set({ showNpcPopup: val }),
+  selectedNpc: null,
+  setSelectedNpc: (val: Npc) => set({ selectedNpc: val }),
 }));
 
 export default useNpcStore;

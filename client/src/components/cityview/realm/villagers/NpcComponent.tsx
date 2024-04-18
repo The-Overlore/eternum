@@ -1,40 +1,71 @@
-import Avatar from "../../../../elements/Avatar";
-import { Npc } from "./types";
+import useNpcStore from "../../../../hooks/store/useNpcStore";
 import Button from "../../../../elements/Button";
+import { Npc } from "./types";
+import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
+import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg";
+import { ReactComponent as Info } from "../../../../assets/icons/npc/info.svg";
 
 type NpcComponentProps = {
   npc: Npc;
   extraButtons: (typeof Button)[];
+  getDisplayedInfo: JSX.Element;
 };
 
-export const NpcComponent = ({ npc, extraButtons }: NpcComponentProps) => {
+export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo }: NpcComponentProps) => {
+  const { showNpcPopup, setShowNpcPopup, selectedNpc, setSelectedNpc } = useNpcStore();
+
+  const toggleDetailsPanel = () => {
+    if (selectedNpc?.entityId != npc.entityId) {
+      setSelectedNpc(npc!);
+      if (!showNpcPopup) {
+        setShowNpcPopup(true);
+      }
+    } else {
+      setShowNpcPopup(!showNpcPopup);
+    }
+  };
+
+  const getProfilePic = () => {
+    // Return profile img path
+    return ""
+  }
+
   return (
     <>
-      <div className="relative flex flex-col border rounded-md border-gray-gold text-xxs text-gray-gold">
-        <div className="flex items-stretch content-around flex-row p-2">
-          <div className="flex flex-col mr-5 p-2">
-            <Avatar src="/images/npc/default-npc.svg" className="m-auto p-1 w-9 h-9 mr-5" />
+      <div className="flex flex-col p-2 border rounded-md border-gray-gold text-xxs text-light-pink">
+        <div className="flex items-center">
+          <div className="p-1 -mt-2 -ml-2 italic border border-t-0 border-l-0 rounded-br-md border-gray-gold">
+            {npc.characteristics.role}
           </div>
-          <div className="flex flex-col text-gold text-xxs w-1/2">
-            <p>
-              <span>Name: </span> <span className="text-white">{npc.fullName}</span>
-            </p>
-            <p>
-              <span>Age: </span> <span className="text-white">{npc.characteristics.age}</span>
-            </p>
-            <p>
-              <span>Sex: </span> <span className="text-white">{npc.characteristics.sex}</span>
-            </p>
-            <p>
-              <span>Role: </span> <span className="text-white">{npc.characteristics.role}</span>
-            </p>
-          </div>
-          <div className="flex flex-col justify-between text-right">
-            <div className="text-white/70">
-              <p>Character Trait: {npc.characterTrait}</p>
+
+          <>{getDisplayedInfo}</>
+        </div>
+
+        <div className="flex w-full mt-2">
+          <img src={getProfilePic()} className="h-12 w-10 border border-gold" />
+
+          <div className="flex flex-col mt-auto ml-2">
+            <div className="flex flex-row items-center">
+              <p className="text-gold font-semibold text-xs"> {npc.fullName}</p>
+              <button className="cursor-pointer" onClick={toggleDetailsPanel}>
+                <Info className="ml-1.5 rounded-sm  p-0.5 bg-gold" />
+              </button>
             </div>
-            {extraButtons.map((button) => button as any)}
+
+            <div className="flex flex-row items-center">
+              {npc.characteristics.sex == "male" ? (
+                <Mars className="fill-cyan-500 h-4" />
+              ) : (
+                <Venus className="fill-pink-500 h-4" />
+              )}
+              <p className="capitalize ml-1"> {npc.characteristics.sex},</p>
+              <p className="ml-1">{npc.characteristics.age} y.o.</p>
+              <p className="ml-1 text-xl relative bottom-1.5">.</p>
+              <p className="ml-1 capitalize mr-auto">{npc.characterTrait}</p>
+            </div>
           </div>
+
+          <div className="ml-auto mt-auto p-2">{extraButtons.map((button) => button as any)}</div>
         </div>
       </div>
     </>

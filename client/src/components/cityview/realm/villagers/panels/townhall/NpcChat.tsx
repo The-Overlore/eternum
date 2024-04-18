@@ -127,6 +127,7 @@ const getDisplayableChatMessages = (
   bottomRef: React.RefObject<HTMLDivElement>,
   localStorageId: string,
 ) => {
+  console.log("fn called")
   const storageTownhall: StorageTownhall = getTownhallFromStorage(selectedTownhall ?? 0, localStorageId);
 
   if (!storageTownhall) {

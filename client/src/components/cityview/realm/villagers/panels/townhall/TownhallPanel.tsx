@@ -10,6 +10,7 @@ import { keysSnakeToCamel } from "../../utils";
 import TextInput from "../../../../../../elements/TextInput";
 import { MAX_TOWNHALL_INPUT_LENGTH } from "../../constants";
 import useNpcStore from "../../../../../../hooks/store/useNpcStore";
+import { ReactComponent as Bell } from "../../../../../../assets/icons/npc/bell.svg";
 
 type TownhallPanelProps = {
   type?: "all" | "farmers" | "miners";
@@ -99,14 +100,14 @@ export const TownhallPanel = ({ type = "all" }: TownhallPanelProps) => {
       </div>
       <NpcChat />
 
-      <div className="flex my-2">
-        <TextInput placeholder="Write something..." value={townhallInput} onChange={handleUserMessageChange} />
+      <div className="flex my-2 items-center">
+        <TextInput className="mx-2 border border-gold !text-white/70" placeholder="Write something..." value={townhallInput} onChange={handleUserMessageChange} />
         <Button
-          className="mx-2 w-32 bottom-2 !rounded-full"
+          className=""
           onClick={gatherVillagers}
-          variant={isTownHallLoading ? "default" : "primary"}
+          // variant={isTownHallLoading ? "default" : "primary"}
         >
-          Ring the town bell
+          <Bell className="h-5 fill-gold"/>
         </Button>
       </div>
     </div>

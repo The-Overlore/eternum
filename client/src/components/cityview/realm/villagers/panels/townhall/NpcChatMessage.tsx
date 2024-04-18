@@ -1,6 +1,7 @@
 import { useState, useEffect, RefObject } from "react";
 import { scrollToElement } from "../../utils";
-import Avatar from "../../../../../../elements/Avatar";
+// import Avatar from "../../../../../../elements/Avatar";
+import { ReactComponent as Info } from "../../../../../../assets/icons/npc/info.svg";
 import { NpcPopup } from "../../NpcPopup";
 import { Npc } from "../../types";
 import useNpcStore from "../../../../../../hooks/store/useNpcStore";
@@ -36,7 +37,7 @@ export function useTypingEffect(
       setDisplayedText((prev) => {
         if (prev.length < textToType.length) {
           if (prev.length % CHARACTER_NUMBER_PER_LINE == 0) {
-            scrollToElement(bottomRef!);
+            // scrollToElement(bottomRef!);
           }
           return textToType.slice(0, prev.length + 1);
         }
@@ -71,15 +72,13 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
       <div className="flex items-center">
         <div className="flex flex-col w-full">
           <div className="flex flex-row items-end h-5">
-            <div onClick={() => setShowNpcStats(true)}>
-              <Avatar src="/images/npc/default-npc.svg" className="p-1 w-4 h-4 mr-1" />
-            </div>
             <div
               onClick={() => setShowNpcStats(true)}
               style={{ userSelect: "text" }}
-              className="relative text-white/50 text-[10px]"
+              className="flex relative text-gold text-[10px]"
             >
               {npc.fullName}
+              <Info className="ml-1.5 rounded-sm  p-0.5 bg-gold" />
             </div>
           </div>
           <div style={{ userSelect: "text" }} className="mt-1 text-xs text-white/70">
