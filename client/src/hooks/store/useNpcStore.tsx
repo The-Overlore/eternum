@@ -21,32 +21,36 @@ const callLoreMachineJsonRpcMethod = async (method: string, params: any) => {
 
 interface NpcState {
   loreMachineJsonRpcCall: (method: string, params: any) => Promise<any>;
-  isTownHallLoading: boolean;
-  setIsTownHallLoading: (val: boolean) => void;
-  selectedTownhall: number | null;
-  setSelectedTownhall: (newIndex: number | null) => void;
+  isDiscussionLoading: boolean;
+  setIsDiscussionLoading: (val: boolean) => void;
+  selectedDiscussion: number | null;
+  setSelectedDiscussion: (newIndex: number | null) => void;
   lastMessageDisplayedIndex: number;
   setLastMessageDisplayedIndex: (newIndex: number) => void;
   showNpcPopup: boolean;
   setShowNpcPopup: (val: boolean) => void;
   selectedNpc: Npc | null;
   setSelectedNpc: (val: Npc) => void;
+  initializedRealms: bigint[];
+  setInitialisedRealms: (val: bigint[]) => void;
 }
 
 const useNpcStore = create<NpcState>((set) => ({
   loreMachineJsonRpcCall: async (method: string, params: any): Promise<any> => {
     return await callLoreMachineJsonRpcMethod(method, params);
   },
-  isTownHallLoading: false,
-  setIsTownHallLoading: (val: boolean) => set({ isTownHallLoading: val }),
-  selectedTownhall: null,
-  setSelectedTownhall: (val: number | null) => set({ selectedTownhall: val }),
+  isDiscussionLoading: false,
+  setIsDiscussionLoading: (val: boolean) => set({ isDiscussionLoading: val }),
+  selectedDiscussion: null,
+  setSelectedDiscussion: (val: number | null) => set({ selectedDiscussion: val }),
   lastMessageDisplayedIndex: 0,
   setLastMessageDisplayedIndex: (val: number) => set({ lastMessageDisplayedIndex: val }),
   showNpcPopup: false,
   setShowNpcPopup: (val: boolean) => set({ showNpcPopup: val }),
   selectedNpc: null,
   setSelectedNpc: (val: Npc) => set({ selectedNpc: val }),
+  initializedRealms: [],
+  setInitialisedRealms: (val: bigint[]) => set({ initializedRealms: val }),
 }));
 
 export default useNpcStore;

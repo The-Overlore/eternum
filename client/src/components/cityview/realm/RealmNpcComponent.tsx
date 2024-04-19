@@ -1,26 +1,67 @@
 import { useEffect, useMemo, useState } from "react";
 import { Tabs } from "../../../elements/tab";
-import { TownhallPanel } from "./villagers/panels/townhall/TownhallPanel";
+import {
+  addDiscussionToStorage,
+  getMostRecentStorageDiscussionKey,
+  DiscussionPanel,
+} from "./villagers/panels/discussion/DiscussionPanel";
 import { VillagersPanel } from "./villagers/panels/villagers/VillagersPanel";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
+import useNpcStore from "../../../hooks/store/useNpcStore";
+import { keysSnakeToCamel } from "./villagers/utils";
 
 type RealmVillagersComponentProps = {};
 
 export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const { realmEntityId } = useRealmStore();
+  const { loreMachineJsonRpcCall, initializedRealms, setInitialisedRealms, setSelectedDiscussion } = useNpcStore();
+
+  const { realmEntityId, realmId } = useRealmStore();
 
   const moveCameraToLaborView = useUIStore((state) => state.moveCameraToLaborView);
   const moveCameraToFoodView = useUIStore((state) => state.moveCameraToFoodView);
   const setTooltip = useUIStore((state) => state.setTooltip);
 
+  const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
+
   // @ts-ignore
   const [location, setLocation] = useLocation();
   // @ts-ignore
   const [match, params]: any = useRoute("/realm/:id/:tab");
+
+  const initializeRealm = async () => {
+    const mostRecentTs: number = 1 + getMostRecentStorageDiscussionKey(LOCAL_STORAGE_ID);
+
+    const response = await loreMachineJsonRpcCall("getDiscussions", {
+      start_time: mostRecentTs,
+      realm_id: Number(realmId),
+    });
+
+    let firstTs = 0;
+    response.discussions.forEach((discussion: any) => {
+      const discussionCamel = keysSnakeToCamel(discussion);
+      const ts = addDiscussionToStorage(discussionCamel, LOCAL_STORAGE_ID);
+      if (firstTs === 0) {
+        firstTs = ts;
+      }
+    });
+
+    if (firstTs !== 0) {
+      setSelectedDiscussion(firstTs);
+    }
+
+    setInitialisedRealms([...initializedRealms, realmId!]);
+  };
+
+  useEffect(() => {
+    if (initializedRealms.includes(realmId!)) {
+      return;
+    }
+    initializeRealm();
+  }, [realmId]);
 
   useEffect(() => {
     let _tab: string = "";
@@ -53,7 +94,7 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
           </div>
         ),
 
-        component: <TownhallPanel />,
+        component: <DiscussionPanel />,
       },
       {
         key: "villagers",

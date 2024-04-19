@@ -2,13 +2,27 @@ import { SecondaryPopup } from "../../../../elements/SecondaryPopup";
 import useNpcStore from "../../../../hooks/store/useNpcStore";
 import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
 import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg";
+import { useEffect, useState } from "react";
 
 type NpcPopupProps = {
   onClose: () => void;
 };
 
 export const NpcPopup = ({ onClose }: NpcPopupProps) => {
-  const { selectedNpc } = useNpcStore();
+  const [backstory, setBackstory] = useState<string>("");
+  const { selectedNpc, loreMachineJsonRpcCall } = useNpcStore();
+
+  const getBackstory = async () => {
+    const response = await loreMachineJsonRpcCall("getNpcsBackstory", {
+      npc_entity_ids: [Number(selectedNpc?.entityId)],
+    });
+    const backstory = response.backstories_with_entity_ids[0].backstory;
+    setBackstory(backstory);
+  };
+
+  useEffect(() => {
+    getBackstory();
+  }, [selectedNpc]);
 
   return (
     <SecondaryPopup>
@@ -19,7 +33,6 @@ export const NpcPopup = ({ onClose }: NpcPopupProps) => {
       </SecondaryPopup.Head>
 
       <SecondaryPopup.Body width={"400px"} height={"175px"}>
-
         <div className="flex flex-row h-full w-full p-2 text-xxs text-light-pink">
           <img src={`/images/npc/Female_farmer_copy.png`} className="mr-2 h-full border border-gold" />
           <div className="flex flex-col w-full">
@@ -28,7 +41,6 @@ export const NpcPopup = ({ onClose }: NpcPopupProps) => {
                 <p className="text-gold font-semibold text-xs"> {selectedNpc!.fullName}</p>
                 <div className="p-1 text-xxs ml-auto mb-auto italic border rounded-br-md rounded-tl-md border-gray-gold">
                   {selectedNpc!.characteristics.role}
-                  
                 </div>
               </div>
               <div className="flex flex-row items-center">
@@ -43,12 +55,9 @@ export const NpcPopup = ({ onClose }: NpcPopupProps) => {
                 <p className="ml-1 capitalize">{selectedNpc!.characterTrait}</p>
               </div>
             </div>
-            <div className="h-full mt-2 p-2 rounded-md bg-dark overflow-y-auto">
-              {/* Get background where npc_entity_id === {selectedNpc!.entityId.toString()} */}
-              {}
-            </div>
-          </div>  
-        </div> 
+            <div className="h-full mt-2 p-2 rounded-md bg-dark overflow-y-auto text-center">{backstory}</div>
+          </div>
+        </div>
       </SecondaryPopup.Body>
     </SecondaryPopup>
   );

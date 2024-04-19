@@ -18,7 +18,6 @@ export interface NpcChatMessageProps {
 }
 
 export function useTypingEffect(
-  bottomRef: RefObject<HTMLDivElement>,
   textToType: string,
   setTypingCompleted: (state: boolean) => void,
   wasAlreadyViewed: boolean,
@@ -36,9 +35,6 @@ export function useTypingEffect(
     const intervalId = setInterval(() => {
       setDisplayedText((prev) => {
         if (prev.length < textToType.length) {
-          if (prev.length % CHARACTER_NUMBER_PER_LINE == 0) {
-            // scrollToElement(bottomRef!);
-          }
           return textToType.slice(0, prev.length + 1);
         }
         clearInterval(intervalId);
@@ -53,12 +49,17 @@ export function useTypingEffect(
 }
 
 export const NpcChatMessage = (props: NpcChatMessageProps) => {
-  const { msgIndex, npc, dialogueSegment, bottomRef, wasAlreadyViewed } = props;
-  const { setLastMessageDisplayedIndex } = useNpcStore();
+  const { msgIndex, npc, dialogueSegment, wasAlreadyViewed } = props;
+  const { setLastMessageDisplayedIndex, setSelectedNpc } = useNpcStore();
   const [typingCompleted, setTypingComplete] = useState(false);
   const [showNpcStats, setShowNpcStats] = useState(false);
 
-  const displayedDialogSegment = useTypingEffect(bottomRef, dialogueSegment, setTypingComplete, wasAlreadyViewed);
+  const showNpcPopup = () => {
+    setSelectedNpc(npc);
+    setShowNpcStats(true);
+  };
+
+  const displayedDialogSegment = useTypingEffect(dialogueSegment, setTypingComplete, wasAlreadyViewed);
 
   useEffect(() => {
     if (typingCompleted) {
@@ -72,11 +73,7 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
       <div className="flex items-center">
         <div className="flex flex-col w-full">
           <div className="flex flex-row items-end h-5">
-            <div
-              onClick={() => setShowNpcStats(true)}
-              style={{ userSelect: "text" }}
-              className="flex relative text-gold text-[10px]"
-            >
+            <div onClick={showNpcPopup} style={{ userSelect: "text" }} className="flex relative text-gold text-[10px]">
               {npc.fullName}
               <Info className="ml-1.5 rounded-sm  p-0.5 bg-gold" />
             </div>
@@ -86,7 +83,7 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
           </div>
         </div>
       </div>
-      {showNpcStats && <NpcPopup onClose={() => setShowNpcStats(false)} npc={npc} />}
+      {showNpcStats && <NpcPopup onClose={() => setShowNpcStats(false)} />}
     </div>
   );
 };
