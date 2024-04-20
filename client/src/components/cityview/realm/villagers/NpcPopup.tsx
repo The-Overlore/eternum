@@ -3,14 +3,16 @@ import useNpcStore from "../../../../hooks/store/useNpcStore";
 import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
 import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg";
 import { useEffect, useState } from "react";
+import { Npc } from "./types";
 
 type NpcPopupProps = {
+  selectedNpc: Npc;
   onClose: () => void;
 };
 
-export const NpcPopup = ({ onClose }: NpcPopupProps) => {
+export const NpcPopup = ({ selectedNpc, onClose }: NpcPopupProps) => {
   const [backstory, setBackstory] = useState<string>("");
-  const { selectedNpc, loreMachineJsonRpcCall } = useNpcStore();
+  const { loreMachineJsonRpcCall } = useNpcStore();
 
   const getBackstory = async () => {
     const response = await loreMachineJsonRpcCall("getNpcsBackstory", {

@@ -1,13 +1,10 @@
 import { useState, useEffect, RefObject } from "react";
-import { scrollToElement } from "../../utils";
 // import Avatar from "../../../../../../elements/Avatar";
 import { ReactComponent as Info } from "../../../../../../assets/icons/npc/info.svg";
-import { NpcPopup } from "../../NpcPopup";
 import { Npc } from "../../types";
-import useNpcStore from "../../../../../../hooks/store/useNpcStore";
+import { useDiscussion } from "./DiscussionContext";
 
 const INTERKEY_STROKEN_DURATION_MS = 35;
-const CHARACTER_NUMBER_PER_LINE = 64;
 
 export interface NpcChatMessageProps {
   npc: Npc;
@@ -15,6 +12,7 @@ export interface NpcChatMessageProps {
   msgIndex: number;
   wasAlreadyViewed: boolean;
   bottomRef: RefObject<HTMLDivElement>;
+  setSelectedNpc: (state: Npc) => void;
 }
 
 export function useTypingEffect(
@@ -49,14 +47,12 @@ export function useTypingEffect(
 }
 
 export const NpcChatMessage = (props: NpcChatMessageProps) => {
-  const { msgIndex, npc, dialogueSegment, wasAlreadyViewed } = props;
-  const { setLastMessageDisplayedIndex, setSelectedNpc } = useNpcStore();
+  const { msgIndex, setSelectedNpc, npc, dialogueSegment, wasAlreadyViewed } = props;
+  const { setLastMessageDisplayedIndex } = useDiscussion();
   const [typingCompleted, setTypingComplete] = useState(false);
-  const [showNpcStats, setShowNpcStats] = useState(false);
 
   const showNpcPopup = () => {
     setSelectedNpc(npc);
-    setShowNpcStats(true);
   };
 
   const displayedDialogSegment = useTypingEffect(dialogueSegment, setTypingComplete, wasAlreadyViewed);
@@ -83,7 +79,6 @@ export const NpcChatMessage = (props: NpcChatMessageProps) => {
           </div>
         </div>
       </div>
-      {showNpcStats && <NpcPopup onClose={() => setShowNpcStats(false)} />}
     </div>
   );
 };

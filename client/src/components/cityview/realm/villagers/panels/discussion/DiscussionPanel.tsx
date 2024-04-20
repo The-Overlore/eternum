@@ -11,6 +11,7 @@ import TextInput from "../../../../../../elements/TextInput";
 import { MAX_DISCUSSION_INPUT_LENGTH } from "../../constants";
 import useNpcStore from "../../../../../../hooks/store/useNpcStore";
 import { ReactComponent as Bell } from "../../../../../../assets/icons/npc/bell.svg";
+import { useDiscussion } from "./DiscussionContext";
 
 type DiscussionPanelProps = {
   type?: "all" | "farmers" | "miners";
@@ -20,20 +21,15 @@ export const DiscussionPanel = ({ type = "all" }: DiscussionPanelProps) => {
   const { realmId, realmEntityId } = useRealmStore();
   const [DiscussionInput, setDiscussionInput] = useState("");
 
+  const { selectedDiscussion, setSelectedDiscussion, setLastMessageDisplayedIndex } = useDiscussion();
+
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
 
   const realm = useMemo(() => {
     return realmEntityId ? getRealm(realmId!) : undefined;
   }, [realmEntityId]);
 
-  const {
-    loreMachineJsonRpcCall,
-    isDiscussionLoading,
-    setIsDiscussionLoading,
-    selectedDiscussion,
-    setSelectedDiscussion,
-    setLastMessageDisplayedIndex,
-  } = useNpcStore();
+  const { loreMachineJsonRpcCall, setIsDiscussionLoading } = useNpcStore();
 
   const setSelectedDiscussionFromDirection = (direction: number) => {
     const newTimeStamp = getNewDiscussionTimeStampFromDirection(selectedDiscussion, direction, LOCAL_STORAGE_ID);

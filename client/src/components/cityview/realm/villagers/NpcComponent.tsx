@@ -1,4 +1,3 @@
-import useNpcStore from "../../../../hooks/store/useNpcStore";
 import Button from "../../../../elements/Button";
 import { Npc } from "./types";
 import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
@@ -9,26 +8,14 @@ type NpcComponentProps = {
   npc: Npc;
   extraButtons: (typeof Button)[];
   getDisplayedInfo: JSX.Element;
+  setSelectedNpc: (state: Npc) => void;
 };
 
-export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo }: NpcComponentProps) => {
-  const { showNpcPopup, setShowNpcPopup, selectedNpc, setSelectedNpc } = useNpcStore();
-
-  const toggleDetailsPanel = () => {
-    if (selectedNpc?.entityId != npc.entityId) {
-      setSelectedNpc(npc!);
-      if (!showNpcPopup) {
-        setShowNpcPopup(true);
-      }
-    } else {
-      setShowNpcPopup(!showNpcPopup);
-    }
-  };
-
+export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo, setSelectedNpc }: NpcComponentProps) => {
   const getProfilePic = () => {
     // Return profile img path
-    return ""
-  }
+    return "";
+  };
 
   return (
     <>
@@ -47,7 +34,7 @@ export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo }: NpcCompone
           <div className="flex flex-col mt-auto ml-2">
             <div className="flex flex-row items-center">
               <p className="text-gold font-semibold text-xs"> {npc.fullName}</p>
-              <button className="cursor-pointer" onClick={toggleDetailsPanel}>
+              <button className="cursor-pointer" onClick={() => setSelectedNpc(npc)}>
                 <Info className="ml-1.5 rounded-sm  p-0.5 bg-gold" />
               </button>
             </div>

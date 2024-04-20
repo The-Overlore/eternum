@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NpcChatMessage } from "./NpcChatMessage";
 import { StorageDiscussions, StorageDiscussion, Npc, DiscussionSegment } from "../../types";
 import { useResidentsNpcs, scrollToElement } from "../../utils";
@@ -9,8 +9,12 @@ import { defaultNpc } from "../../defaults";
 import useNpcStore from "../../../../../../hooks/store/useNpcStore";
 import { getComponentValue } from "@dojoengine/recs";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
+import { NpcPopup } from "../../NpcPopup";
+import { useDiscussion } from "./DiscussionContext";
 
 const NpcChat = ({}) => {
+  const [selectedNpc, setSelectedNpc] = useState<Npc | undefined>(undefined);
+
   const {
     setup: {
       components: { Npc, EntityOwner },
@@ -20,8 +24,9 @@ const NpcChat = ({}) => {
   const { realmEntityId, realmId } = useRealmStore();
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
 
-  const { setLastMessageDisplayedIndex, selectedDiscussion, lastMessageDisplayedIndex, isDiscussionLoading } =
-    useNpcStore();
+  const { setLastMessageDisplayedIndex, selectedDiscussion, lastMessageDisplayedIndex } = useDiscussion();
+
+  const { isDiscussionLoading } = useNpcStore();
 
   const residents = useResidentsNpcs(realmEntityId, Npc, EntityOwner);
   const npcs = residents.foreigners.concat(residents.natives);
@@ -91,12 +96,14 @@ const NpcChat = ({}) => {
                 bottomRef,
                 LOCAL_STORAGE_ID,
                 Npc,
+                setSelectedNpc,
               )
             )}
             <span className="" ref={bottomRef}></span>;
           </>
         )}
       </div>
+      {selectedNpc && <NpcPopup selectedNpc={selectedNpc} onClose={() => setSelectedNpc(undefined)} />}
     </div>
   );
 };
@@ -129,6 +136,7 @@ const getDisplayableChatMessages = (
   bottomRef: React.RefObject<HTMLDivElement>,
   localStorageId: string,
   NpcComponent: any,
+  setSelectedNpc: (state: Npc) => void,
 ) => {
   const storageDiscussion: StorageDiscussion = getDiscussionFromStorage(selectedDiscussion ?? 0, localStorageId);
 
@@ -151,6 +159,7 @@ const getDisplayableChatMessages = (
         wasAlreadyViewed={storageDiscussion.viewed}
         dialogueSegment={segment}
         npc={getNpcFromRealmNpcsOrEntityId(NpcComponent, BigInt(npcEntityId), npcs)}
+        setSelectedNpc={setSelectedNpc}
       />
     );
   });

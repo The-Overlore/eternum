@@ -11,13 +11,17 @@ import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
 import useNpcStore from "../../../hooks/store/useNpcStore";
 import { keysSnakeToCamel } from "./villagers/utils";
+import { DiscussionProvider } from "./villagers/panels/discussion/DiscussionContext";
 
 type RealmVillagersComponentProps = {};
 
 export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
+  const [selectedDiscussion, setSelectedDiscussion] = useState<number | null>(null);
+  const [lastMessageDisplayedIndex, setLastMessageDisplayedIndex] = useState<number>(0);
+
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const { loreMachineJsonRpcCall, initializedRealms, setInitialisedRealms, setSelectedDiscussion } = useNpcStore();
+  const { loreMachineJsonRpcCall, initializedRealms, setInitialisedRealms } = useNpcStore();
 
   const { realmEntityId, realmId } = useRealmStore();
 
@@ -121,23 +125,30 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
   );
 
   return (
-    <Tabs
-      selectedIndex={selectedTab}
-      onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
-      variant="default"
-      className="h-full"
+    <DiscussionProvider
+      selectedDiscussion={selectedDiscussion}
+      setSelectedDiscussion={setSelectedDiscussion}
+      lastMessageDisplayedIndex={lastMessageDisplayedIndex}
+      setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
     >
-      <Tabs.List>
-        {tabs.map((tab, index) => (
-          <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
-        ))}
-      </Tabs.List>
-      <Tabs.Panels className="overflow-hidden">
-        {tabs.map((tab, index) => (
-          <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
-        ))}
-      </Tabs.Panels>
-    </Tabs>
+      <Tabs
+        selectedIndex={selectedTab}
+        onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
+        variant="default"
+        className="h-full"
+      >
+        <Tabs.List>
+          {tabs.map((tab, index) => (
+            <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
+          ))}
+        </Tabs.List>
+        <Tabs.Panels className="overflow-hidden">
+          {tabs.map((tab, index) => (
+            <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
+          ))}
+        </Tabs.Panels>
+      </Tabs>
+    </DiscussionProvider>
   );
 };
 

@@ -23,8 +23,11 @@ import useNpcStore from "../../../../../../hooks/store/useNpcStore";
 import { ReactComponent as Plus } from "../../../../../../assets/icons/npc/plus.svg";
 import { NpcSortButton } from "../../NpcSortButton";
 import { NpcPopup } from "../../NpcPopup";
+import { Npc } from "../../types";
 
 export const VillagersPanel = () => {
+  const [selectedNpc, setSelectedNpc] = useState<Npc | undefined>(undefined);
+
   const {
     setup: {
       components: { LastSpawned, NpcConfig, RealmRegistry, Npc: NpcComponent, EntityOwner, ArrivalTime, Position },
@@ -35,7 +38,7 @@ export const VillagersPanel = () => {
 
   const { realmId, realmEntityId } = useRealmStore();
   const { nextBlockTimestamp } = useBlockchainStore();
-  const { loreMachineJsonRpcCall, showNpcPopup, setShowNpcPopup } = useNpcStore();
+  const { loreMachineJsonRpcCall } = useNpcStore();
 
   const travelers = getTravelersNpcs(realmId!, realmEntityId, NpcComponent, EntityOwner, Position);
   const residents = useResidentsNpcs(realmEntityId, NpcComponent, EntityOwner);
@@ -128,12 +131,12 @@ export const VillagersPanel = () => {
   };
 
   const onClose = (): void => {
-    setShowNpcPopup(false);
+    setSelectedNpc(undefined);
   };
 
   return (
     <div className="flex flex-col">
-      {showNpcPopup && <NpcPopup onClose={onClose} />}
+      {selectedNpc && <NpcPopup selectedNpc={selectedNpc} onClose={onClose} />}
 
       <SortPanel className="flex justify-between px-3 py-2">
         {sortingParams.map(({ label, sortKey, className }) => (
@@ -178,14 +181,14 @@ export const VillagersPanel = () => {
 
           {residents.natives.map((npc) => (
             <div className="flex flex-col p-2" key={npc.entityId}>
-              <Resident npc={npc} native={true} />
+              <Resident npc={npc} setSelectedNpc={setSelectedNpc} native={true} />
             </div>
           ))}
 
           {residents.foreigners &&
             residents.foreigners.map((npc) => (
               <div className="flex flex-col p-2" key={npc.entityId}>
-                <Resident npc={npc} native={false} />
+                <Resident npc={npc} setSelectedNpc={setSelectedNpc} native={false} />
               </div>
             ))}
         </>
@@ -197,7 +200,7 @@ export const VillagersPanel = () => {
           {getHeadline(travelers.length, "Travelers")}
           {travelers.map((npc) => (
             <div className="flex flex-col p-2" key={npc.entityId}>
-              <Traveler npc={npc} />
+              <Traveler npc={npc} setSelectedNpc={setSelectedNpc} />
             </div>
           ))}
         </>
@@ -209,7 +212,7 @@ export const VillagersPanel = () => {
           {getHeadline(atGates.length, "At Your Gates")}
           {atGates.map((atGates) => (
             <div className="flex flex-col p-2" key={atGates.npc.entityId}>
-              <AtGatesNpc npc={atGates.npc} />
+              <AtGatesNpc npc={atGates.npc} setSelectedNpc={setSelectedNpc} />
             </div>
           ))}
         </>
