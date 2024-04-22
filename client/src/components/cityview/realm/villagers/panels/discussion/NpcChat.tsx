@@ -1,14 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NpcChatMessage } from "./NpcChatMessage";
-import { StorageTownhalls, StorageTownhall, Npc, NpcTownhallMessage } from "../../types";
+import { StorageDiscussions, StorageDiscussion, Npc, DiscussionSegment } from "../../types";
 import { useResidentsNpcs, scrollToElement } from "../../utils";
 import BlurryLoadingImage from "../../../../../../elements/BlurryLoadingImage";
 import useRealmStore from "../../../../../../hooks/store/useRealmStore";
 import { useDojo } from "../../../../../../DojoContext";
 import { defaultNpc } from "../../defaults";
 import useNpcStore from "../../../../../../hooks/store/useNpcStore";
+import { getComponentValue } from "@dojoengine/recs";
+import { getEntityIdFromKeys } from "@dojoengine/utils";
+import { NpcPopup } from "../../NpcPopup";
+import { useDiscussion } from "./DiscussionContext";
 
 const NpcChat = ({}) => {
+  const [selectedNpc, setSelectedNpc] = useState<Npc | undefined>(undefined);
+
   const {
     setup: {
       components: { Npc, EntityOwner },
@@ -18,8 +24,9 @@ const NpcChat = ({}) => {
   const { realmEntityId, realmId } = useRealmStore();
   const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
 
-  const { setLastMessageDisplayedIndex, selectedTownhall, lastMessageDisplayedIndex, isTownHallLoading } =
-    useNpcStore();
+  const { setLastMessageDisplayedIndex, selectedDiscussion, lastMessageDisplayedIndex } = useDiscussion();
+
+  const { isDiscussionLoading } = useNpcStore();
 
   const residents = useResidentsNpcs(realmEntityId, Npc, EntityOwner);
   const npcs = residents.foreigners.concat(residents.natives);
@@ -28,13 +35,13 @@ const NpcChat = ({}) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (selectedTownhall === null || localStorage.getItem(LOCAL_STORAGE_ID) == null) {
-      console.log(selectedTownhall);
+    if (selectedDiscussion === null || localStorage.getItem(LOCAL_STORAGE_ID) == null) {
+      console.log(selectedDiscussion);
       return;
     }
     setLastMessageDisplayedIndex(0);
     scrollToElement(topRef);
-  }, [selectedTownhall]);
+  }, [selectedDiscussion]);
 
   useEffect(() => {
     if (localStorage.getItem(LOCAL_STORAGE_ID) == null) {
@@ -45,10 +52,10 @@ const NpcChat = ({}) => {
       scrollToElement(bottomRef);
     }
 
-    if (selectedTownhall === null) {
+    if (selectedDiscussion === null) {
       return;
     }
-    setStoredTownhallToViewedIfFullyDisplayed(selectedTownhall, lastMessageDisplayedIndex, LOCAL_STORAGE_ID);
+    setStoredDiscussionToViewedIfFullyDisplayed(selectedDiscussion, lastMessageDisplayedIndex, LOCAL_STORAGE_ID);
   }, [lastMessageDisplayedIndex]);
 
   useEffect(() => {}, []);
@@ -58,7 +65,7 @@ const NpcChat = ({}) => {
         className="relative flex flex-col h-full overflow-auto top-3 center mx-auto w-[96%] mb-3  border border-gold"
         style={{ scrollbarWidth: "unset" }}
       >
-        {getNumberOfStoredTownhalls(LOCAL_STORAGE_ID) === 0 ? (
+        {getNumberOfStoredDiscussions(LOCAL_STORAGE_ID) === 0 ? (
           <>
             <BlurryLoadingImage
               blurhash="LBHLO~W9x.F^Atoy%2Ri~TA0Myxt"
@@ -75,7 +82,7 @@ const NpcChat = ({}) => {
         ) : (
           <>
             <span className="" ref={topRef}></span>
-            {isTownHallLoading ? (
+            {isDiscussionLoading ? (
               <div className="absolute h-full w-[100%] overflow-hidden text-white text-center flex justify-center">
                 <div className="self-center">
                   <img src="/images/eternum-logo_animated.png" className="invert scale-50" />
@@ -85,59 +92,62 @@ const NpcChat = ({}) => {
               getDisplayableChatMessages(
                 npcs,
                 lastMessageDisplayedIndex,
-                selectedTownhall!,
+                selectedDiscussion!,
                 bottomRef,
                 LOCAL_STORAGE_ID,
+                Npc,
+                setSelectedNpc,
               )
             )}
             <span className="" ref={bottomRef}></span>;
           </>
         )}
       </div>
+      {selectedNpc && <NpcPopup selectedNpc={selectedNpc} onClose={() => setSelectedNpc(undefined)} />}
     </div>
   );
 };
 
-const getTownhallFromStorage = (index: number, localStorageId: string): StorageTownhall => {
-  const townhallsInLocalStorage: StorageTownhalls = JSON.parse(localStorage.getItem(localStorageId) ?? "{}");
-
-  return townhallsInLocalStorage[index];
+const getDiscussionFromStorage = (index: number, localStorageId: string): StorageDiscussion => {
+  const discussionsInLocalStorage: StorageDiscussions = JSON.parse(localStorage.getItem(localStorageId) ?? "{}");
+  return discussionsInLocalStorage[index];
 };
 
-const setStoredTownhallToViewedIfFullyDisplayed = (
-  townhallIndex: number,
+const setStoredDiscussionToViewedIfFullyDisplayed = (
+  discussionTs: number,
   lastMessageDisplayedIndex: number,
   localStorageId: string,
 ) => {
-  const townhall: StorageTownhall = getTownhallFromStorage(townhallIndex, localStorageId);
+  const discussion: StorageDiscussion = getDiscussionFromStorage(discussionTs, localStorageId);
 
-  if (lastMessageDisplayedIndex != townhall.dialogue.length - 1) return;
+  if (lastMessageDisplayedIndex != discussion.dialogue.length - 1) return;
 
-  if (townhall.viewed === false) {
-    const townhallsInLocalStorage: StorageTownhalls = JSON.parse(localStorage.getItem(localStorageId)!);
-    townhallsInLocalStorage[townhallIndex].viewed = true;
-    localStorage.setItem(localStorageId, JSON.stringify(townhallsInLocalStorage));
+  if (discussion.viewed === false) {
+    const discussionsInLocalStorage: StorageDiscussions = JSON.parse(localStorage.getItem(localStorageId)!);
+    discussionsInLocalStorage[discussionTs].viewed = true;
+    localStorage.setItem(localStorageId, JSON.stringify(discussionsInLocalStorage));
   }
 };
 
 const getDisplayableChatMessages = (
   npcs: Npc[],
   lastMessageDisplayedIndex: number,
-  selectedTownhall: number,
+  selectedDiscussion: number,
   bottomRef: React.RefObject<HTMLDivElement>,
   localStorageId: string,
+  NpcComponent: any,
+  setSelectedNpc: (state: Npc) => void,
 ) => {
-  console.log("fn called")
-  const storageTownhall: StorageTownhall = getTownhallFromStorage(selectedTownhall ?? 0, localStorageId);
+  const storageDiscussion: StorageDiscussion = getDiscussionFromStorage(selectedDiscussion ?? 0, localStorageId);
 
-  if (!storageTownhall) {
+  if (!storageDiscussion) {
     return;
   }
 
-  const shouldBeUsingTypingEffect = storageTownhall.viewed == false;
+  const shouldBeUsingTypingEffect = storageDiscussion.viewed == false;
 
-  return storageTownhall.dialogue.map((message: NpcTownhallMessage, index: number) => {
-    const { fullName, dialogueSegment } = message;
+  return storageDiscussion.dialogue.map((message: DiscussionSegment, index: number) => {
+    const { npcEntityId, segment } = message;
     if (shouldBeUsingTypingEffect && index > lastMessageDisplayedIndex) {
       return;
     }
@@ -146,21 +156,30 @@ const getDisplayableChatMessages = (
         key={index}
         msgIndex={index}
         bottomRef={bottomRef}
-        wasAlreadyViewed={storageTownhall.viewed}
-        dialogueSegment={dialogueSegment}
-        npc={getNpcByName(fullName, npcs)}
+        wasAlreadyViewed={storageDiscussion.viewed}
+        dialogueSegment={segment}
+        npc={getNpcFromRealmNpcsOrEntityId(NpcComponent, BigInt(npcEntityId), npcs)}
+        setSelectedNpc={setSelectedNpc}
       />
     );
   });
 };
 
-const getNumberOfStoredTownhalls = (localStorageId: string) => {
-  const storageTownhalls: StorageTownhalls = JSON.parse(localStorage.getItem(localStorageId) ?? "{}");
-  return Object.keys(storageTownhalls).length;
+const getNumberOfStoredDiscussions = (localStorageId: string) => {
+  const storageDiscussions: StorageDiscussions = JSON.parse(localStorage.getItem(localStorageId) ?? "{}");
+  return Object.keys(storageDiscussions).length;
 };
 
-const getNpcByName = (name: string, npcs: Npc[]): Npc => {
-  return npcs.find((npc: Npc) => npc.fullName === name) || defaultNpc;
+const getNpcFromRealmNpcsOrEntityId = (NpcComponent: any, npcEntityId: bigint, npcs: Npc[]): Npc => {
+  let maybeNpc = npcs.find((npc: Npc) => npc.entityId === npcEntityId);
+  if (maybeNpc !== undefined) {
+    return maybeNpc;
+  }
+  maybeNpc = getComponentValue(NpcComponent, getEntityIdFromKeys([npcEntityId])) as Npc | undefined;
+  if (maybeNpc === undefined) {
+    return defaultNpc;
+  }
+  return maybeNpc;
 };
 
 export default NpcChat;

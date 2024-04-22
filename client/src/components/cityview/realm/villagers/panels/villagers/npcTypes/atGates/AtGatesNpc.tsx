@@ -13,9 +13,10 @@ import { ReactComponent as ArrowSquare } from "../../../../../../../../assets/ic
 
 type NpcComponentProps = {
   npc: Npc;
+  setSelectedNpc: (state: Npc) => void;
 };
 
-export const AtGatesNpc = ({ npc }: NpcComponentProps) => {
+export const AtGatesNpc = ({ npc, setSelectedNpc }: NpcComponentProps) => {
   const {
     setup: {
       components: { ArrivalTime, EntityOwner, Realm },
@@ -73,5 +74,12 @@ export const AtGatesNpc = ({ npc }: NpcComponentProps) => {
       {`Welcome in`}
     </Button>,
   ];
-  return <NpcComponent npc={npc} getDisplayedInfo={getNpcGatesInfo()} extraButtons={extraButtons} />;
+  return (
+    <NpcComponent
+      npc={npc}
+      setSelectedNpc={setSelectedNpc}
+      getDisplayedInfo={getNpcGatesInfo()}
+      extraButtons={extraButtons}
+    />
+  );
 };

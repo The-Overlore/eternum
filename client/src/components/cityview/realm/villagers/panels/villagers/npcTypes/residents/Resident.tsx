@@ -14,9 +14,10 @@ import { ReactComponent as ArrowSquare } from "../../../../../../../../assets/ic
 type NpcComponentProps = {
   npc: Npc;
   native: boolean;
+  setSelectedNpc: (state: Npc) => void;
 };
 
-export const Resident = ({ npc, native }: NpcComponentProps) => {
+export const Resident = ({ npc, native, setSelectedNpc }: NpcComponentProps) => {
   const {
     setup: {
       components: { EntityOwner, Realm, ArrivalTime },
@@ -37,7 +38,9 @@ export const Resident = ({ npc, native }: NpcComponentProps) => {
     let orderName = "";
     let realmName = "";
     if (npcOriginRealm) {
-      const realmEntity = runQuery([HasValue(Realm, { entity_id: BigInt(npcOriginRealm!.entity_owner_id.toString()) })]);
+      const realmEntity = runQuery([
+        HasValue(Realm, { entity_id: BigInt(npcOriginRealm!.entity_owner_id.toString()) }),
+      ]);
       const realmId = getComponentValue(Realm, realmEntity.values().next().value);
       orderName = getRealmOrderNameById(realmId!.realm_id);
       realmName = getRealmNameById(realmId!.realm_id);
@@ -49,7 +52,9 @@ export const Resident = ({ npc, native }: NpcComponentProps) => {
       const npcArrivalTime = getComponentValue(ArrivalTime, npcArrivalTimeEntityId.values().next().value);
 
       if (npcArrivalTime) {
-        timeLeftForTravelOrSpentInRealm = formatSecondsLeftInDaysHours(nextBlockTimestamp! - npcArrivalTime!.arrives_at);
+        timeLeftForTravelOrSpentInRealm = formatSecondsLeftInDaysHours(
+          nextBlockTimestamp! - npcArrivalTime!.arrives_at,
+        );
       }
     }
     return (
@@ -105,7 +110,12 @@ export const Resident = ({ npc, native }: NpcComponentProps) => {
   return (
     <>
       {showTravel && <TravelNpcPopup npc={npc} onClose={onClose} />}
-      <NpcComponent npc={npc} getDisplayedInfo={getNpcResidencyInfo()} extraButtons={extraButtons} />
+      <NpcComponent
+        setSelectedNpc={setSelectedNpc}
+        npc={npc}
+        getDisplayedInfo={getNpcResidencyInfo()}
+        extraButtons={extraButtons}
+      />
     </>
   );
 };

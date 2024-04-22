@@ -3,7 +3,6 @@ import { useDojo } from "../../../../../../../../DojoContext";
 import { HasValue, getComponentValue, runQuery } from "@dojoengine/recs";
 import useRealmStore from "../../../../../../../../hooks/store/useRealmStore";
 import useBlockchainStore from "../../../../../../../../hooks/store/useBlockchainStore";
-import useNpcStore from "../../../../../../../../hooks/store/useNpcStore";
 import { OrderIcon } from "../../../../../../../../elements/OrderIcon";
 import Button from "../../../../../../../../elements/Button";
 import { useArrivalTimeByEntityId } from "../../../../utils";
@@ -16,9 +15,10 @@ import clsx from "clsx";
 
 type NpcComponentProps = {
   npc: Npc;
+  setSelectedNpc: (state: Npc | undefined) => void;
 };
 
-export const Traveler = ({ npc }: NpcComponentProps) => {
+export const Traveler = ({ npc, setSelectedNpc }: NpcComponentProps) => {
   const {
     setup: {
       components: { ArrivalTime, Position },
@@ -29,7 +29,6 @@ export const Traveler = ({ npc }: NpcComponentProps) => {
 
   const [loading, setLoading] = useState(false);
 
-  const { setShowNpcPopup } = useNpcStore();
   const { realmEntityId } = useRealmStore();
   const { nextBlockTimestamp } = useBlockchainStore();
 
@@ -74,10 +73,6 @@ export const Traveler = ({ npc }: NpcComponentProps) => {
     );
   };
 
-  const onClose = (): void => {
-    setShowNpcPopup(false);
-  };
-
   const bringBack = (): void => {
     if (npc.entityId) {
       setLoading(true);
@@ -87,7 +82,7 @@ export const Traveler = ({ npc }: NpcComponentProps) => {
         to_realm_entity_id: realmEntityId!,
       });
       setLoading(false);
-      onClose();
+      setSelectedNpc(undefined);
     }
   };
 
@@ -103,13 +98,18 @@ export const Traveler = ({ npc }: NpcComponentProps) => {
       variant="outline"
       withoutSound
     >
-      <ArrowSquare className={clsx("mr-1", isDisabled && "fill-gray-gold", !isDisabled && "fill-gold")}/>
+      <ArrowSquare className={clsx("mr-1", isDisabled && "fill-gray-gold", !isDisabled && "fill-gold")} />
       {`Bring back`}
     </Button>,
   ];
   return (
     <>
-      <NpcComponent npc={npc} getDisplayedInfo={getNpcTravelInfo()} extraButtons={extraButtons} />
+      <NpcComponent
+        npc={npc}
+        setSelectedNpc={setSelectedNpc}
+        getDisplayedInfo={getNpcTravelInfo()}
+        extraButtons={extraButtons}
+      />
     </>
   );
 };
