@@ -3,6 +3,7 @@ import { Npc } from "./types";
 import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
 import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg";
 import { ReactComponent as Info } from "../../../../assets/icons/npc/info.svg";
+import { getNpcImagePath } from "./utils";
 
 type NpcComponentProps = {
   npc: Npc;
@@ -12,11 +13,6 @@ type NpcComponentProps = {
 };
 
 export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo, setSelectedNpc }: NpcComponentProps) => {
-  const getProfilePic = () => {
-    // Return profile img path
-    return "";
-  };
-
   return (
     <>
       <div className="flex flex-col p-2 border rounded-md border-gray-gold text-xxs text-light-pink">
@@ -29,7 +25,7 @@ export const NpcComponent = ({ npc, extraButtons, getDisplayedInfo, setSelectedN
         </div>
 
         <div className="flex w-full mt-2">
-          <img src={getProfilePic()} className="h-12 w-10 border border-gold" />
+          <img src={getNpcImagePath(npc)} className="h-10 w-10 border border-gold" />
 
           <div className="flex flex-col mt-auto ml-2">
             <div className="flex flex-row items-center">

@@ -4,6 +4,7 @@ import { ReactComponent as Mars } from "../../../../assets/icons/npc/mars.svg";
 import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg";
 import { useEffect, useState } from "react";
 import { Npc } from "./types";
+import { getNpcImagePath } from "./utils";
 
 type NpcPopupProps = {
   selectedNpc: Npc;
@@ -36,7 +37,7 @@ export const NpcPopup = ({ selectedNpc, onClose }: NpcPopupProps) => {
 
       <SecondaryPopup.Body width={"400px"} height={"175px"}>
         <div className="flex flex-row h-full w-full p-2 text-xxs text-light-pink">
-          <img src={`/images/npc/Female_farmer_copy.png`} className="mr-2 h-full border border-gold" />
+          <img src={getNpcImagePath(selectedNpc)} className="mr-2 h-full border border-gold" />
           <div className="flex flex-col w-full">
             <div>
               <div className="flex flex-row items-center">
@@ -57,7 +58,7 @@ export const NpcPopup = ({ selectedNpc, onClose }: NpcPopupProps) => {
                 <p className="ml-1 capitalize">{selectedNpc!.characterTrait}</p>
               </div>
             </div>
-            <div className="h-full mt-2 p-2 rounded-md bg-dark overflow-y-auto text-center">{backstory}</div>
+            <div className="h-full mt-2 p-2 rounded-md bg-dark overflow-y-auto">{backstory}</div>
           </div>
         </div>
       </SecondaryPopup.Body>
