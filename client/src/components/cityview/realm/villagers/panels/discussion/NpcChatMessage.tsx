@@ -1,5 +1,4 @@
 import { useState, useEffect, RefObject } from "react";
-// import Avatar from "../../../../../../elements/Avatar";
 import { ReactComponent as Info } from "../../../../../../assets/icons/npc/info.svg";
 import { Npc } from "../../types";
 import { useDiscussion } from "./DiscussionContext";
