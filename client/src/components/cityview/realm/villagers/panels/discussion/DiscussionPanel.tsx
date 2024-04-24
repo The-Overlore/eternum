@@ -114,7 +114,6 @@ export const DiscussionPanel = ({ type = "all" }: DiscussionPanelProps) => {
         <Button
           className="mr-2"
           onClick={gatherVillagers}
-          // variant={isDiscussionLoading ? "default" : "primary"}
         >
           <Bell className="h-5 fill-gold" />
         </Button>

@@ -65,7 +65,7 @@ const NpcChat = ({}) => {
         className="relative flex flex-col h-full overflow-auto top-3 center mx-auto w-[96%] mb-3  border border-gold"
         style={{ scrollbarWidth: "unset" }}
       >
-        {getNumberOfStoredDiscussions(LOCAL_STORAGE_ID) === 0 ? (
+        {(getNumberOfStoredDiscussions(LOCAL_STORAGE_ID) === 0 && !isDiscussionLoading) ? (
           <>
             <BlurryLoadingImage
               blurhash="LBHLO~W9x.F^Atoy%2Ri~TA0Myxt"
