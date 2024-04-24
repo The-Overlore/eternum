@@ -12,25 +12,25 @@ interface TextInputProps {
   onKeyDown?: (e: any) => void;
 }
 
-const TextInput = (props: TextInputProps) => {
-  const { value, disabled, onChange, className, placeholder, maxLength, onBlur, onFocus, onKeyDown } = props;
-  return (
-    <input
-      className={clsx(
-        "w-full p-2 h-8 bg-transparent transition-all duration-300 focus:outline-none border-opacity-50 focus:border-opacity-100 text-white placeholder-white/25 flex-grow rounded-lg",
-        className,
-      )}
-      disabled={disabled || false}
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      maxLength={maxLength}
-      onBlur={onBlur}
-      onFocus={onFocus}
-      onKeyDown={onKeyDown}
-    />
-  );
-};
+  const TextInput = (props: TextInputProps) => {
+    const { value, disabled, onChange, className, placeholder, maxLength, onBlur, onFocus, onKeyDown } = props;
+    return (
+      <input
+        className={clsx(
+          "w-full p-2 h-8 bg-transparent transition-all duration-300 focus:outline-none border-opacity-50 focus:border-opacity-100 text-white placeholder-white/25 flex-grow rounded-lg",
+          className,
+        )}
+        disabled={disabled || false}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
+      />
+    );
+  };
 
-export default TextInput;
+  export default TextInput;

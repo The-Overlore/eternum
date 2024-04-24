@@ -1,27 +1,71 @@
 import { useEffect, useMemo, useState } from "react";
 import { Tabs } from "../../../elements/tab";
-import { TownhallPanel } from "./villagers/panels/townhall/TownhallPanel";
-import { ResidentsPanel } from "./villagers/panels/residents/ResidentsPanel";
+import {
+  addDiscussionToStorage,
+  getMostRecentStorageDiscussionKey,
+  DiscussionPanel,
+} from "./villagers/panels/discussion/DiscussionPanel";
+import { VillagersPanel } from "./villagers/panels/villagers/VillagersPanel";
 import useRealmStore from "../../../hooks/store/useRealmStore";
 import useUIStore from "../../../hooks/store/useUIStore";
 import { useRoute, useLocation } from "wouter";
-import { TravelersPanel } from "./villagers/panels/travelers/TravelersPanel";
-import { AtGatesPanel } from "./villagers/panels/atGates/AtGatesPanel";
+import useNpcStore from "../../../hooks/store/useNpcStore";
+import { keysSnakeToCamel } from "./villagers/utils";
+import { DiscussionProvider } from "./villagers/panels/discussion/DiscussionContext";
 
 type RealmVillagersComponentProps = {};
 
 export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
+  const [selectedDiscussion, setSelectedDiscussion] = useState<number | null>(null);
+  const [lastMessageDisplayedIndex, setLastMessageDisplayedIndex] = useState<number>(0);
+
   const [selectedTab, setSelectedTab] = useState(0);
-  const { realmEntityId } = useRealmStore();
+
+  const { loreMachineJsonRpcCall, initializedRealms, setInitialisedRealms } = useNpcStore();
+
+  const { realmEntityId, realmId } = useRealmStore();
 
   const moveCameraToLaborView = useUIStore((state) => state.moveCameraToLaborView);
   const moveCameraToFoodView = useUIStore((state) => state.moveCameraToFoodView);
   const setTooltip = useUIStore((state) => state.setTooltip);
 
+  const LOCAL_STORAGE_ID: string = `npc_chat_${realmId}`;
+
   // @ts-ignore
   const [location, setLocation] = useLocation();
   // @ts-ignore
   const [match, params]: any = useRoute("/realm/:id/:tab");
+
+  const initializeRealm = async () => {
+    const mostRecentTs: number = 1 + getMostRecentStorageDiscussionKey(LOCAL_STORAGE_ID);
+
+    const response = await loreMachineJsonRpcCall("getDiscussions", {
+      start_time: mostRecentTs,
+      realm_id: Number(realmId),
+    });
+
+    let firstTs = 0;
+    response.discussions.forEach((discussion: any) => {
+      const discussionCamel = keysSnakeToCamel(discussion);
+      const ts = addDiscussionToStorage(discussionCamel, LOCAL_STORAGE_ID);
+      if (firstTs === 0) {
+        firstTs = ts;
+      }
+    });
+
+    if (firstTs !== 0) {
+      setSelectedDiscussion(firstTs);
+    }
+
+    setInitialisedRealms([...initializedRealms, realmId!]);
+  };
+
+  useEffect(() => {
+    if (initializedRealms.includes(realmId!)) {
+      return;
+    }
+    initializeRealm();
+  }, [realmId]);
 
   useEffect(() => {
     let _tab: string = "";
@@ -54,84 +98,57 @@ export const RealmNpcComponent = ({}: RealmVillagersComponentProps) => {
           </div>
         ),
 
-        component: <TownhallPanel />,
+        component: <DiscussionPanel />,
       },
       {
-        key: "residents",
+        key: "villagers",
         label: (
           <div
             onMouseEnter={() =>
               setTooltip({
                 position: "bottom",
-                content: <p className="whitespace-nowrap">Show the resident villagers of your Realm</p>,
+                content: <p className="whitespace-nowrap">Visit your villagers</p>,
               })
             }
             onMouseLeave={() => setTooltip(null)}
             className="flex relative group flex-col items-center"
           >
-            Residents
+            <div className="flex flex-row items-baseline">
+              <p>Villagers</p>
+            </div>
           </div>
         ),
-        component: <ResidentsPanel />,
-      },
-      {
-        key: "travelers",
-        label: (
-          <div
-            onMouseEnter={() =>
-              setTooltip({
-                position: "bottom",
-                content: <p className="whitespace-nowrap">Show your traveling villagers</p>,
-              })
-            }
-            onMouseLeave={() => setTooltip(null)}
-            className="flex relative group flex-col items-center"
-          >
-            Travelers
-          </div>
-        ),
-        component: <TravelersPanel />,
-      },
-      {
-        key: "at_gates",
-        label: (
-          <div
-            onMouseEnter={() =>
-              setTooltip({
-                position: "bottom",
-                content: <p className="whitespace-nowrap">Show the villagers at your gates asking to come in</p>,
-              })
-            }
-            onMouseLeave={() => setTooltip(null)}
-            className="flex relative group flex-col items-center"
-          >
-            At your gates
-          </div>
-        ),
-        component: <AtGatesPanel />,
+        component: <VillagersPanel />,
       },
     ],
     [selectedTab],
   );
 
   return (
-    <Tabs
-      selectedIndex={selectedTab}
-      onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
-      variant="default"
-      className="h-full"
+    <DiscussionProvider
+      selectedDiscussion={selectedDiscussion}
+      setSelectedDiscussion={setSelectedDiscussion}
+      lastMessageDisplayedIndex={lastMessageDisplayedIndex}
+      setLastMessageDisplayedIndex={setLastMessageDisplayedIndex}
     >
-      <Tabs.List>
-        {tabs.map((tab, index) => (
-          <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
-        ))}
-      </Tabs.List>
-      <Tabs.Panels className="overflow-hidden">
-        {tabs.map((tab, index) => (
-          <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
-        ))}
-      </Tabs.Panels>
-    </Tabs>
+      <Tabs
+        selectedIndex={selectedTab}
+        onChange={(index: any) => setLocation(`/realm/${realmEntityId}/${tabs[index].key}`)}
+        variant="default"
+        className="h-full"
+      >
+        <Tabs.List>
+          {tabs.map((tab, index) => (
+            <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
+          ))}
+        </Tabs.List>
+        <Tabs.Panels className="overflow-hidden">
+          {tabs.map((tab, index) => (
+            <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
+          ))}
+        </Tabs.Panels>
+      </Tabs>
+    </DiscussionProvider>
   );
 };
 
