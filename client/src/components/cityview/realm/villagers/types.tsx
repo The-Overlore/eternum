@@ -14,18 +14,17 @@ export type Characteristics = {
   sex: string;
 };
 
-export type Residents = {
-  natives: Npc[];
-  foreigners: Npc[];
+export type SortVillagers = {
+  residents: Villager[];
+  travelers: Villager[];
+  atGates: Villager[];
 };
 
-export type Travelers = Npc[];
-
-export type AtGates = {
+export type Villager = {
   npc: Npc;
-  arrival_time: bigint;
+  type: string;
   native: boolean;
-}[];
+};
 
 export type DiscussionSegment = {
   npcEntityId: number;
