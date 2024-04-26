@@ -2,6 +2,8 @@ import { Headline } from "../../../../../../elements/Headline";
 import { Villager } from "../../types";
 import { SortInterface } from "../../../../../../elements/SortButton";
 
+export const READY_TO_SPAWN = -1;
+
 const HeadlineTitle: { [key: string]: string } = {
   residents: "Residents",
   travelers: "Travelers",

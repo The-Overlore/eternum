@@ -5,7 +5,7 @@ import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { BigNumberish, shortString } from "starknet";
 import { SortPanel } from "../../../../../../elements/SortPanel";
 import { SortButton, SortInterface } from "../../../../../../elements/SortButton";
-import { getNpcHeadline, sortVillagers } from "./VillagersUtils";
+import { getNpcHeadline, sortVillagers, READY_TO_SPAWN } from "./VillagersUtils";
 import {
   NPC_CONFIG_ID,
   keysSnakeToCamel,
@@ -79,9 +79,9 @@ export const VillagersPanel = () => {
   }, []);
 
   const spawnNpc = async () => {
-    const res = getLastSpawnDelay();
+    const lastSpawnTs = getLastSpawnTs();
 
-    if (!res[0]) {
+    if (lastSpawnTs !== READY_TO_SPAWN) {
       console.log("Can't spawn: spawn delay has not passed yet");
       return;
     }
@@ -112,9 +112,9 @@ export const VillagersPanel = () => {
   };
 
   const getSpawnInfo = () => {
-    const res = getLastSpawnDelay();
+    const lastSpawnTs = getLastSpawnTs();
 
-    if (res[0]) {
+    if (lastSpawnTs === READY_TO_SPAWN) {
       return (
         <>
           <p>Ready to spawn</p>
@@ -125,16 +125,13 @@ export const VillagersPanel = () => {
     return (
       <>
         <p>Spawn available in: </p>
-        <div className="ml-1 text-gold">
-          {/* Format better, mb using interface */}
-          {formatSecondsLeftInDaysHours(Number(res[1]))}
-        </div>
+        <div className="ml-1 text-gold">{formatSecondsLeftInDaysHours(Number(lastSpawnTs))}</div>
         <Plus onClick={spawnNpc} className="ml-2 rounded-sm bg-dark" />
       </>
     );
   };
 
-  const getLastSpawnDelay = () => {
+  const getLastSpawnTs = () => {
     const npcConfig = getComponentValue(
       NpcConfig,
       getEntityIdFromKeys([BigInt("0x" + NPC_CONFIG_ID.toString(16))]) as Entity,
@@ -144,10 +141,11 @@ export const VillagersPanel = () => {
     const spawnDelay: bigint = npcConfig!.spawn_delay;
     const lastSpawnedTimestamp: bigint = BigInt(last_spawned?.last_spawned_ts ?? 0);
     const nextBlockTimestampBigint: bigint = BigInt(nextBlockTimestamp!);
-    if (nextBlockTimestampBigint < spawnDelay + lastSpawnedTimestamp) {
-      return [false, Number(0)];
+
+    if (nextBlockTimestampBigint > spawnDelay + lastSpawnedTimestamp) {
+      return READY_TO_SPAWN;
     }
-    return [true, Number(spawnDelay - (nextBlockTimestampBigint - lastSpawnedTimestamp))];
+    return BigInt(spawnDelay - (nextBlockTimestampBigint - lastSpawnedTimestamp));
   };
 
   const isRealmFull = () => {
@@ -226,10 +224,7 @@ export const VillagersPanel = () => {
               {villagers &&
                 sortVillagers(villagers, activeSort)?.map((villager) => (
                   <div className="flex flex-col p-2" key={villager.npc.entityId}>
-                    <VillagerComponent
-                      villager={villager}
-                      setSelectedNpc={setSelectedNpc}
-                    />
+                    <VillagerComponent villager={villager} setSelectedNpc={setSelectedNpc} />
                   </div>
                 ))}
             </>
