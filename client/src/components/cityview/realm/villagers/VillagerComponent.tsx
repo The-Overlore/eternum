@@ -4,8 +4,8 @@ import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg"
 import { ReactComponent as Info } from "../../../../assets/icons/npc/info.svg";
 import { getNpcImagePath } from "./utils";
 import { useState } from "react";
-import { useVillagerType } from "./panels/villagers/useVillagerTypeInfo";
-import { useVillagerButtons } from "./panels/villagers/useVillagerButtons";
+import { villagerTypeInfo } from "./panels/villagers/VillagerTypeInfo";
+import { villagerButtons } from "./panels/villagers/VillagerButtons";
 import { TravelNpcPopup } from "./panels/villagers/TravelNpcPopup";
 
 type VillagerComponentProps = {
@@ -15,8 +15,8 @@ type VillagerComponentProps = {
 
 export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponentProps) => {
   const [showTravel, setShowTravel] = useState(false);
-  const { getNpcInfo } = useVillagerType();
-  const { getExtraButtons } = useVillagerButtons({ villager, setSelectedNpc, setShowTravel });
+  const { getVillagerTypeInfo } = villagerTypeInfo();
+  const { getVillagerButtons } = villagerButtons({ villager, setSelectedNpc, setShowTravel });
 
   const onClose = (): void => {
     setShowTravel(false);
@@ -32,7 +32,7 @@ export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponen
             {villager.npc.characteristics.role}
           </div>
 
-          <>{getNpcInfo(villager)}</>
+          <>{getVillagerTypeInfo(villager)}</>
         </div>
 
         <div className="flex w-full mt-2">
@@ -59,7 +59,7 @@ export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponen
             </div>
           </div>
 
-          <div className="ml-auto mt-auto p-2">{getExtraButtons().map((button: any) => button as any)}</div>
+          <div className="ml-auto mt-auto p-2">{getVillagerButtons().map((button: any) => button as any)}</div>
         </div>
       </div>
     </>

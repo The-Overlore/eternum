@@ -14,7 +14,7 @@ type VillagerButtonsProps = {
   setShowTravel: (state: boolean) => void;
 };
 
-export function useVillagerButtons({ villager, setSelectedNpc, setShowTravel }: VillagerButtonsProps) {
+export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: VillagerButtonsProps) {
   const {
     setup: {
       components: { ArrivalTime },
@@ -28,7 +28,7 @@ export function useVillagerButtons({ villager, setSelectedNpc, setShowTravel }: 
   const { realmEntityId } = useRealmStore();
   const { nextBlockTimestamp } = useBlockchainStore();
 
-  const getExtraButtons = () => {
+  const getVillagerButtons = () => {
     switch (villager.type) {
       case "traveler":
         return extraButtonsTraveler;
@@ -117,5 +117,5 @@ export function useVillagerButtons({ villager, setSelectedNpc, setShowTravel }: 
     </Button>,
   ];
 
-  return { getExtraButtons };
+  return { getVillagerButtons };
 }

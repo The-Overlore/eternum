@@ -6,7 +6,7 @@ import useBlockchainStore from "../../../../../../hooks/store/useBlockchainStore
 import { OrderIcon } from "../../../../../../elements/OrderIcon";
 import { Npc, Villager } from "../../types";
 
-export function useVillagerType() {
+export function villagerTypeInfo() {
   const {
     setup: {
       components: { ArrivalTime, EntityOwner, Realm, Position },
@@ -15,7 +15,7 @@ export function useVillagerType() {
 
   const { nextBlockTimestamp } = useBlockchainStore();
 
-  const getNpcInfo = (villager: Villager) => {
+  const getVillagerTypeInfo = (villager: Villager) => {
     switch (villager.type) {
       case "traveler":
         return getNpcTravelInfo(villager.npc);
@@ -140,5 +140,5 @@ export function useVillagerType() {
     );
   };
 
-  return { getNpcInfo };
+  return { getVillagerTypeInfo };
 }
