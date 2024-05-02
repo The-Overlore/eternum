@@ -51,11 +51,11 @@ export const VillagersPanel = () => {
     ),
   };
 
-  const [selectedNpc, setSelectedNpc] = useState<Npc | undefined>(undefined);
+  const [npcDisplayedInPopup, setNpcDisplayedInPopup] = useState<Npc | undefined>(undefined);
   const [npcIsSpawning, setNpcIsSpawning] = useState(false);
 
-  const [activeNpcGroup, setActiveNpcGroup] = useState("None");
-  const [activeSort, setActiveSort] = useState<SortInterface>({
+  const [displayedNpcGroup, setDisplayedNpcGroup] = useState("None");
+  const [sortedByParam, setSortedByParam] = useState<SortInterface>({
     sortKey: "number",
     sort: "none",
   });
@@ -125,13 +125,13 @@ export const VillagersPanel = () => {
     return (
       <>
         <p>Spawn available in: </p>
-        <div className="ml-1 text-gold">{formatSecondsLeftInDaysHours(Number(lastSpawnTs))}</div>
+        <div className="ml-1 text-gold">{formatSecondsLeftInDaysHours(lastSpawnTs)}</div>
         <Plus onClick={spawnNpc} className="ml-2 rounded-sm bg-dark" />
       </>
     );
   };
 
-  const getLastSpawnTs = () => {
+  const getLastSpawnTs = (): Number => {
     const npcConfig = getComponentValue(
       NpcConfig,
       getEntityIdFromKeys([BigInt("0x" + NPC_CONFIG_ID.toString(16))]) as Entity,
@@ -145,10 +145,10 @@ export const VillagersPanel = () => {
     if (nextBlockTimestampBigint > spawnDelay + lastSpawnedTimestamp) {
       return READY_TO_SPAWN;
     }
-    return BigInt(spawnDelay - (nextBlockTimestampBigint - lastSpawnedTimestamp));
+    return Number(spawnDelay - (nextBlockTimestampBigint - lastSpawnedTimestamp));
   };
 
-  const isRealmFull = () => {
+  const isRealmFull = (): boolean => {
     const realmRegistry = getComponentValue(RealmRegistry, getEntityIdFromKeys([BigInt(realmEntityId)]));
     if ((realmRegistry?.num_native_npcs ?? 0) >= 5 || (realmRegistry?.num_resident_npcs ?? 0) >= 5) {
       console.log("Realm is full");
@@ -158,12 +158,12 @@ export const VillagersPanel = () => {
   };
 
   const onClose = (): void => {
-    setSelectedNpc(undefined);
+    setNpcDisplayedInPopup(undefined);
   };
 
   return (
     <div className="flex flex-col">
-      {selectedNpc && <NpcPopup selectedNpc={selectedNpc} onClose={onClose} />}
+      {npcDisplayedInPopup && <NpcPopup selectedNpc={npcDisplayedInPopup} onClose={onClose} />}
 
       <SortPanel className="flex justify-between px-3 py-2">
         {sortingParams.map(({ label, sortKey, className }) => (
@@ -172,9 +172,9 @@ export const VillagersPanel = () => {
             key={sortKey}
             label={label}
             sortKey={sortKey}
-            activeSort={activeSort}
+            activeSort={sortedByParam}
             onChange={(_sortKey, _sort) => {
-              setActiveSort({
+              setSortedByParam({
                 sortKey: _sortKey,
                 sort: _sort,
               });
@@ -190,9 +190,9 @@ export const VillagersPanel = () => {
               key={label}
               className={className}
               label={label}
-              isActive={activeNpcGroup === label}
+              isActive={displayedNpcGroup === label}
               onChange={() => {
-                setActiveNpcGroup((prevState) => (prevState === label ? "None" : label));
+                setDisplayedNpcGroup((prevState) => (prevState === label ? "None" : label));
               }}
             />
           </>
@@ -201,7 +201,7 @@ export const VillagersPanel = () => {
 
       {Object.entries(villagers).map(
         ([group, villagers]) =>
-          (activeNpcGroup === group || activeNpcGroup === "None") && (
+          (displayedNpcGroup === group || displayedNpcGroup === "None") && (
             <>
               <div className="flex items-center">{getNpcHeadline(villagers ? villagers.length : 0, group)}</div>
 
@@ -222,9 +222,9 @@ export const VillagersPanel = () => {
                 ))}
 
               {villagers &&
-                sortVillagers(villagers, activeSort)?.map((villager) => (
+                sortVillagers(villagers, sortedByParam)?.map((villager) => (
                   <div className="flex flex-col p-2" key={villager.npc.entityId}>
-                    <VillagerComponent villager={villager} setSelectedNpc={setSelectedNpc} />
+                    <VillagerComponent villager={villager} setNpcDisplayedInPopup={setNpcDisplayedInPopup} />
                   </div>
                 ))}
             </>

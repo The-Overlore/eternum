@@ -10,11 +10,11 @@ import { Npc, Villager } from "../../types";
 
 type VillagerButtonsProps = {
   villager: Villager;
-  setSelectedNpc: (state: Npc | undefined) => void;
+  setNpcDisplayedInPopup: (state: Npc | undefined) => void;
   setShowTravel: (state: boolean) => void;
 };
 
-export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: VillagerButtonsProps) {
+export function villagerButtons({ villager, setNpcDisplayedInPopup, setShowTravel }: VillagerButtonsProps) {
   const {
     setup: {
       components: { ArrivalTime },
@@ -28,7 +28,7 @@ export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: Vil
   const { realmEntityId } = useRealmStore();
   const { nextBlockTimestamp } = useBlockchainStore();
 
-  const getVillagerButtons = () => {
+  const buttons = (): any[] => {
     switch (villager.type) {
       case "traveler":
         return extraButtonsTraveler;
@@ -37,7 +37,7 @@ export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: Vil
       case "atGates":
         return extraButtonsGates;
       default:
-        return <></>;
+        return [<></>];
     }
   };
 
@@ -50,7 +50,7 @@ export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: Vil
         to_realm_entity_id: realmEntityId!,
       });
       setLoading(false);
-      setSelectedNpc(undefined);
+      setNpcDisplayedInPopup(undefined);
     }
   };
 
@@ -117,5 +117,5 @@ export function villagerButtons({ villager, setSelectedNpc, setShowTravel }: Vil
     </Button>,
   ];
 
-  return { getVillagerButtons };
+  return buttons();
 }

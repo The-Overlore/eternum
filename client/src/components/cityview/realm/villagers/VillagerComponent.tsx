@@ -10,13 +10,13 @@ import { TravelNpcPopup } from "./panels/villagers/TravelNpcPopup";
 
 type VillagerComponentProps = {
   villager: Villager;
-  setSelectedNpc: (state: Npc | undefined) => void;
+  setNpcDisplayedInPopup: (state: Npc | undefined) => void;
 };
 
-export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponentProps) => {
+export const VillagerComponent = ({ villager, setNpcDisplayedInPopup }: VillagerComponentProps) => {
   const [showTravel, setShowTravel] = useState(false);
-  const { getVillagerTypeInfo } = villagerTypeInfo();
-  const { getVillagerButtons } = villagerButtons({ villager, setSelectedNpc, setShowTravel });
+  const villagerInfo = villagerTypeInfo(villager);
+  const buttons = villagerButtons({ villager, setNpcDisplayedInPopup, setShowTravel });
 
   const onClose = (): void => {
     setShowTravel(false);
@@ -32,7 +32,7 @@ export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponen
             {villager.npc.characteristics.role}
           </div>
 
-          <>{getVillagerTypeInfo(villager)}</>
+          <>{villagerInfo}</>
         </div>
 
         <div className="flex w-full mt-2">
@@ -41,7 +41,7 @@ export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponen
           <div className="flex flex-col mt-auto ml-2">
             <div className="flex flex-row items-center">
               <p className="text-gold font-semibold text-xs"> {villager.npc.fullName}</p>
-              <button className="cursor-pointer" onClick={() => setSelectedNpc(villager.npc)}>
+              <button className="cursor-pointer" onClick={() => setNpcDisplayedInPopup(villager.npc)}>
                 <Info className="ml-1.5 rounded-sm  p-0.5 bg-gold" />
               </button>
             </div>
@@ -59,7 +59,7 @@ export const VillagerComponent = ({ villager, setSelectedNpc }: VillagerComponen
             </div>
           </div>
 
-          <div className="ml-auto mt-auto p-2">{getVillagerButtons().map((button: any) => button as any)}</div>
+          <div className="ml-auto mt-auto p-2">{buttons.map((button: any) => button as any)}</div>
         </div>
       </div>
     </>
