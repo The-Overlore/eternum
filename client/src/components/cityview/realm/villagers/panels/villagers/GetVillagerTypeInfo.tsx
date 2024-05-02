@@ -15,7 +15,7 @@ export function getVillagerTypeInfo(villager: Villager) {
 
   const { nextBlockTimestamp } = useBlockchainStore();
 
-  const getInfo = () => {
+  const getInfoByType = () => {
     switch (villager.type) {
       case VillagerType.Traveler:
         return getNpcTravelInfo(villager.npc);
@@ -140,5 +140,5 @@ export function getVillagerTypeInfo(villager: Villager) {
     );
   };
 
-  return getInfo() ;
+  return getInfoByType() ;
 }
