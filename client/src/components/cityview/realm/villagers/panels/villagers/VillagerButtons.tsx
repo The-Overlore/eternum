@@ -6,7 +6,7 @@ import useBlockchainStore from "../../../../../../hooks/store/useBlockchainStore
 import useRealmStore from "../../../../../../hooks/store/useRealmStore";
 import { ReactComponent as ArrowSquare } from "../../../../../../assets/icons/npc/arrow_in.svg";
 import clsx from "clsx";
-import { Npc, Villager } from "../../types";
+import { Npc, Villager, VillagerType } from "../../types";
 
 type VillagerButtonsProps = {
   villager: Villager;
@@ -30,11 +30,11 @@ export function villagerButtons({ villager, setNpcDisplayedInPopup, setShowTrave
 
   const buttons = (): any[] => {
     switch (villager.type) {
-      case "traveler":
+      case VillagerType.Traveler:
         return extraButtonsTraveler;
-      case "resident":
+      case VillagerType.Resident:
         return extraButtonsResident;
-      case "atGates":
+      case VillagerType.AtGates:
         return extraButtonsGates;
       default:
         return [<></>];
@@ -70,7 +70,7 @@ export function villagerButtons({ villager, setNpcDisplayedInPopup, setShowTrave
     }
   };
 
-  const isDisabled = (villager.type === 'traveler') ? (useArrivalTimeByEntityId(villager.npc.entityId, ArrivalTime) > nextBlockTimestamp!) : true;
+  const isDisabled = (villager.type === VillagerType.Traveler) ? (useArrivalTimeByEntityId(villager.npc.entityId, ArrivalTime) > nextBlockTimestamp!) : true;
   const extraButtonsTraveler: any = [
     <Button
       key="bringBackButton"

@@ -131,7 +131,7 @@ export const VillagersPanel = () => {
     );
   };
 
-  const getLastSpawnTs = (): Number => {
+  const getLastSpawnTs = (): number => {
     const npcConfig = getComponentValue(
       NpcConfig,
       getEntityIdFromKeys([BigInt("0x" + NPC_CONFIG_ID.toString(16))]) as Entity,

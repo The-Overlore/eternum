@@ -20,9 +20,15 @@ export type SortVillagers = {
   atGates: Villager[];
 };
 
+export enum VillagerType {
+  Resident,
+  Traveler,
+  AtGates
+}
+
 export type Villager = {
   npc: Npc;
-  type: string;
+  type: VillagerType;
   native: boolean;
 };
 

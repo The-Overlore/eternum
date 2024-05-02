@@ -4,7 +4,7 @@ import { getRealmIdByPosition, getRealmNameById, getRealmOrderNameById } from ".
 import { formatSecondsLeftInDaysHours } from "../../../labor/laborUtils";
 import useBlockchainStore from "../../../../../../hooks/store/useBlockchainStore";
 import { OrderIcon } from "../../../../../../elements/OrderIcon";
-import { Npc, Villager } from "../../types";
+import { Npc, Villager, VillagerType } from "../../types";
 
 export function villagerTypeInfo(villager: Villager) {
   const {
@@ -17,11 +17,11 @@ export function villagerTypeInfo(villager: Villager) {
 
   const getVillagerTypeInfo = () => {
     switch (villager.type) {
-      case "traveler":
+      case VillagerType.Traveler:
         return getNpcTravelInfo(villager.npc);
-      case "resident":
+      case VillagerType.Resident:
         return getNpcResidencyInfo(villager.npc, villager.native);
-      case "atGates":
+      case VillagerType.AtGates:
         return getNpcGatesInfo(villager.npc);
       default:
         return <></>;

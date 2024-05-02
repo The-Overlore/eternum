@@ -1,5 +1,5 @@
 import { BigNumberish, shortString } from "starknet";
-import { Characteristics, Npc, Villager } from "./types";
+import { Characteristics, Npc, Villager, VillagerType } from "./types";
 import { SEX, ROLES } from "./constants";
 import { Entity, Has, HasValue, NotValue, QueryFragment, getComponentValue, runQuery } from "@dojoengine/recs";
 import { useEntityQuery } from "@dojoengine/react";
@@ -32,7 +32,7 @@ export const getTravelersNpcs = (
   );
   const villagers: Villager[] = travelers.map(npc => ({
     npc: npc,
-    type: 'traveler',
+    type: VillagerType.Traveler,
     native: true,
   }))
 
@@ -97,7 +97,7 @@ const getNpcsOnlyIfArrivedAtGates = (
   const npcs: Villager[] = tempNpcs.reduce((acc: Villager[], npc: Npc) => {
     const npcWithArrivalTimeAlreadyAtGate = alreadyArrivedAtGates(npc, nextBlockTimestamp, ArrivalTime);
     if (npcWithArrivalTimeAlreadyAtGate !== undefined) {
-      acc.push({ npc:npcWithArrivalTimeAlreadyAtGate, type:"atGates", native });
+      acc.push({ npc:npcWithArrivalTimeAlreadyAtGate, type:VillagerType.AtGates, native });
     }
     return acc;
   }, []);
@@ -117,7 +117,7 @@ export const useResidentsNpcs = (realmEntityId: bigint, NpcComponent: any, Entit
 
   const natives_as_villager = natives.map(npc => ({
     npc: npc,
-    type: 'resident',
+    type: VillagerType.Resident,
     native: true
   }))
 
@@ -131,7 +131,7 @@ export const useResidentsNpcs = (realmEntityId: bigint, NpcComponent: any, Entit
 
   const foreigners_as_villager = foreigners.map(npc => ({
     npc: npc,
-    type: 'resident',
+    type: VillagerType.Resident,
     native: false
   }))
 
