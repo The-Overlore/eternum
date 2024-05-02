@@ -4,8 +4,8 @@ import { ReactComponent as Venus } from "../../../../assets/icons/npc/venus.svg"
 import { ReactComponent as Info } from "../../../../assets/icons/npc/info.svg";
 import { getNpcImagePath } from "./utils";
 import { useState } from "react";
-import { villagerTypeInfo } from "./panels/villagers/VillagerTypeInfo";
-import { villagerButtons } from "./panels/villagers/VillagerButtons";
+import { getVillagerTypeInfo } from "./panels/villagers/GetVillagerTypeInfo";
+import { getVillagerButtons } from "./panels/villagers/GetVillagerButtons";
 import { TravelNpcPopup } from "./panels/villagers/TravelNpcPopup";
 
 type VillagerComponentProps = {
@@ -15,8 +15,8 @@ type VillagerComponentProps = {
 
 export const VillagerComponent = ({ villager, setNpcDisplayedInPopup }: VillagerComponentProps) => {
   const [showTravel, setShowTravel] = useState(false);
-  const villagerInfo = villagerTypeInfo(villager);
-  const buttons = villagerButtons({ villager, setNpcDisplayedInPopup, setShowTravel });
+  const villagerInfo = getVillagerTypeInfo(villager);
+  const buttons = getVillagerButtons({ villager, setNpcDisplayedInPopup, setShowTravel });
 
   const onClose = (): void => {
     setShowTravel(false);
