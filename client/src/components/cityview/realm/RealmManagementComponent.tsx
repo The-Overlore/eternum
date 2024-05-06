@@ -87,6 +87,30 @@ const RealmManagementComponent = () => {
         ),
         component: <RealmTradeComponent />,
       },
+	  {
+        key: "villagers",
+        label: (
+          <div
+            onMouseEnter={() =>
+              setTooltip({
+                position: "bottom",
+                content: (
+                  <>
+                    <p className="whitespace-nowrap">A realm only thrives with villagers.</p>
+                    <p className="whitespace-nowrap">Treat them well or you</p>
+                    <p className="whitespace-nowrap">might get some bad surprises.</p>
+                  </>
+                ),
+              })
+            }
+            onMouseLeave={() => setTooltip(null)}
+            className="flex relative group flex-col items-center"
+          >
+            <Village className="mb-2 fill-gold" /> <div>Villagers</div>
+          </div>
+        ),
+        component: <RealmNpcComponent />,
+      },
       {
         key: "villagers",
         label: (

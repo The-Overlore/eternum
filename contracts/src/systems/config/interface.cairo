@@ -84,7 +84,6 @@ trait INpcConfig<TContractState> {
     );
 }
 
-
 #[starknet::interface]
 trait ILaborConfig<TContractState> {
     fn set_labor_cost_resources(
