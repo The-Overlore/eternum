@@ -1,12 +1,12 @@
 import { getOrderName, orders } from "@bibliothecadao/eternum";
 import { create } from "zustand";
-import { getEntityIdFromKeys } from "../../utils/utils";
+import { getEntityIdFromKeys } from "../../ui/utils/utils";
 import { getComponentValue } from "@dojoengine/recs";
-import { useDojo } from "../../DojoContext";
+import { useDojo } from "../context/DojoContext";
 import { useGetRealms, useRealm } from "../helpers/useRealm";
 import { useEffect } from "react";
 import useRealmStore from "./useRealmStore";
-import { getRealmOrderNameById } from "../../utils/realms";
+import { getRealmOrderNameById } from "../../ui/utils/realms";
 
 export interface RealmLordsLeaderboardInterface {
   address: string;
@@ -34,7 +34,7 @@ interface LeaderboardStore {
   ) => void;
 }
 
-const useLeaderBoardStore = create<LeaderboardStore>((set, get) => {
+const useLeaderBoardStore = create<LeaderboardStore>((set) => {
   return {
     loading: false,
     realmLordsLeaderboard: [],

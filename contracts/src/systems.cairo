@@ -1,15 +1,74 @@
-mod config;
-mod realm;
-mod labor;
-mod trade;
-mod resources;
-mod transport;
-mod combat;
-mod leveling;
-mod name;
-mod bank;
-mod npc;
-mod hyperstructure;
-mod buildings;
+mod config {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod realm {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod trade {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod resources {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod transport {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
 
-mod test;
+mod leveling {
+    mod contracts;
+    mod interface;
+    #[cfg(test)]
+    mod tests;
+}
+mod name {
+    mod contracts;
+}
+mod hyperstructure {
+    mod contracts;
+    mod interface;
+    #[cfg(test)]
+    mod tests;
+}
+mod buildings {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod map {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+mod dev {
+    mod contracts;
+}
+mod combat {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+
+mod bank {
+    mod contracts;
+    #[cfg(test)]
+    mod tests;
+}
+
+mod npc {
+    mod contracts;
+    mod interface;
+    #[cfg(test)]
+    mod tests;
+    mod utils;
+}
+

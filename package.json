@@ -2,11 +2,14 @@
   "name": "eternum",
   "version": "0.1.0",
   "scripts": {
-    "build-packages": "bun run --cwd sdk/packages/eternum build",
-    "build-client": "bun run --cwd ./client build"
+    "dev": "pnpm --dir ./client dev",
+    "build-packages": "pnpm --dir sdk/packages/eternum build",
+    "build-client": "pnpm --dir ./client build",
+    "prettier-check": "npx prettier --check .",
+    "prettier": "npx prettier --write .",
+    "dev:docs": "pnpm --dir ./eternum-docs dev"
   },
-  "workspaces": [
-    "sdk/packages/eternum",
-    "client"
-  ]
+  "dependencies": {
+    "tsup": "^8.0.2"
+  }
 }

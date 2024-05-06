@@ -23,14 +23,20 @@ type getEventsQuery = {
   };
 };
 
-export async function createEventSubscription(keys: string[]): Promise<Observable<Event | null>> {
+export async function createEventSubscription(
+  keys: string[],
+  addPast: boolean = true,
+  maxEvents: number = MAX_EVENTS,
+  filterTimestamp: boolean = true,
+): Promise<Observable<Event | null>> {
   const lastUpdate$ = new ReplaySubject<Event | null>();
 
   const formattedKeys = keys.map((key) => `"${key}"`).join(",");
 
-  const queryBuilder = `
+  if (addPast) {
+    const queryBuilder = `
     query {
-      events(keys: [${formattedKeys}] last: ${MAX_EVENTS}) {
+      events(keys: [${formattedKeys}] last: ${maxEvents}) {
         edges {
           node {
             id
@@ -43,35 +49,40 @@ export async function createEventSubscription(keys: string[]): Promise<Observabl
     }
   `;
 
-  const { events }: getEventsQuery = await client.request(queryBuilder);
+    const { events }: getEventsQuery = await client.request(queryBuilder);
 
-  const timestamps = getLastLoginTimestamp();
+    const timestamps = getLastLoginTimestamp();
 
-  events.edges
-    .filter((event) => {
-      return dateToTimestamp(event.node.createdAt) > timestamps.lastLoginTimestamp;
-    })
-    .forEach((event) => {
+    let edges = events.edges;
+    if (filterTimestamp) {
+      edges.filter((event) => {
+        return dateToTimestamp(event.node.createdAt) > timestamps.lastLoginTimestamp;
+      });
+    }
+    edges.forEach((event) => {
       if (event.node) {
         lastUpdate$.next(event.node);
       }
     });
+  }
+
+  let subscriptionQuery = gql`
+    subscription {
+      eventEmitted(keys: [${formattedKeys}]) {
+        id
+        keys
+        data
+        createdAt
+      }
+    }
+      `;
 
   wsClient.subscribe(
     {
-      query: gql`
-        subscription {
-          eventEmitted(keys: [${formattedKeys}]) {
-            id
-            keys
-            data
-            createdAt
-          }
-        }
-      `,
+      query: subscriptionQuery,
     },
     {
-      next: ({ data }) => {
+      next: ({ data }: any) => {
         try {
           const event = data?.eventEmitted as Event;
           if (event) {
@@ -81,7 +92,7 @@ export async function createEventSubscription(keys: string[]): Promise<Observabl
           console.log({ error });
         }
       },
-      error: (error) => console.log({ error }),
+      error: () => console.log("ws error"),
       complete: () => console.log("complete"),
     },
   );

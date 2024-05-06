@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { Has, HasValue, getComponentValue, runQuery } from "@dojoengine/recs";
-import { useDojo } from "../../DojoContext";
-import { getEntityIdFromKeys, hexToAscii, numberToHex } from "../../utils/utils";
+import { useDojo } from "../context/DojoContext";
+import { getEntityIdFromKeys, hexToAscii, numberToHex } from "../../ui/utils/utils";
 import { getOrderName } from "@bibliothecadao/eternum";
 import realmIdsByOrder from "../../data/realmids_by_order.json";
-import { unpackResources } from "../../utils/packedData";
+import { unpackResources } from "../../ui/utils/packedData";
 import { useEntityQuery } from "@dojoengine/react";
 import { RealmInterface } from "@bibliothecadao/eternum";
-import { getRealm, getRealmNameById } from "../../utils/realms";
+import { getRealm, getRealmNameById } from "../../ui/utils/realms";
 
 export type RealmExtended = RealmInterface & {
   entity_id: bigint;
@@ -17,9 +17,14 @@ export type RealmExtended = RealmInterface & {
 export function useRealm() {
   const {
     setup: {
-      components: { Realm, AddressName, Owner },
+      components: { Realm, AddressName, Owner, Position },
     },
   } = useDojo();
+
+  const isRealmIdSettled = (realmId: bigint) => {
+    const entityIds = runQuery([HasValue(Realm, { realm_id: realmId })]);
+    return entityIds.size > 0;
+  };
 
   const getNextRealmIdForOrder = (order: number) => {
     const orderName = getOrderName(order);
@@ -47,6 +52,19 @@ export function useRealm() {
     } else {
       return orderRealmIds[latestIndex + 1];
     }
+  };
+
+  const getRealmEntityIdFromRealmId = (realmId: bigint): bigint | undefined => {
+    const realmEntityIds = runQuery([HasValue(Realm, { realm_id: realmId })]);
+    if (realmEntityIds.size > 0) {
+      const realm = getComponentValue(Realm, realmEntityIds.values().next().value);
+      return realm!.entity_id;
+    }
+  };
+
+  const getRealmIdFromRealmEntityId = (realmEntityId: bigint) => {
+    const realm = getComponentValue(Realm, getEntityIdFromKeys([realmEntityId]));
+    return realm?.realm_id;
   };
 
   const getRealmIdForOrderAfter = (order: number, realmId: bigint) => {
@@ -80,11 +98,29 @@ export function useRealm() {
     }
   };
 
+  const getRealmEntityIdsOnPosition = (x: number, y: number) => {
+    const entityIds = runQuery([Has(Realm), HasValue(Position, { x, y })]);
+    const realmEntityIds = Array.from(entityIds).map((entityId) => {
+      return getComponentValue(Realm, entityId)!.entity_id;
+    });
+    return realmEntityIds.length === 1 ? realmEntityIds[0] : undefined;
+  };
+
+  const isEntityIdRealm = (entityId: bigint) => {
+    const realm = getComponentValue(Realm, getEntityIdFromKeys([entityId]));
+    return realm ? true : false;
+  };
+
   return {
+    isRealmIdSettled,
     getNextRealmIdForOrder,
     getAddressName,
     getRealmAddressName,
     getRealmIdForOrderAfter,
+    getRealmIdFromRealmEntityId,
+    getRealmEntityIdFromRealmId,
+    isEntityIdRealm,
+    getRealmEntityIdsOnPosition,
   };
 }
 
@@ -98,7 +134,7 @@ export function useGetRealm(realmEntityId: bigint | undefined) {
   const [realm, setRealm] = useState<RealmInterface | undefined>(undefined);
 
   useMemo((): any => {
-    if (realmEntityId) {
+    if (realmEntityId !== undefined) {
       let entityId = getEntityIdFromKeys([realmEntityId]);
       const realm = getComponentValue(Realm, entityId);
       const owner = getComponentValue(Owner, entityId);
