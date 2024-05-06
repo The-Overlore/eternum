@@ -1,28 +1,28 @@
 [package]
-cairo-version = "2.4.0"
+cairo-version = "2.5.0"
 name = "eternum"
-version = "0.3.0"
+version = "0.5.0"
 
 [cairo]
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.4.1" }
-alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "98aadc7e3f12dbb026e853604fe2cc061451cc8a" }
-cubit = { git = "https://github.com/akhercha/cubit", rev = "d3869a3f0c47e5ed229bbbfe2fce3fc0510cbc8a" }
-# TODO: use dojo_defi when works with latest nightly
-#dojo_defi = { git = "https://github.com/dojoengine/dojo" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v0.6.1-alpha.4" }
+alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "cairo-v2.5.4" }
+cubit = { git = "https://github.com/ponderingdemocritus/cubit" }
 
 [tool.dojo.env]
-world_address = "0x5cb4ce060de62a7b6bfd4cb70fd4ae3196bfe399c372cb0863e632ba8cc73ef"
-
 ## dev
-account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
-private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+world_address = "0x177a3f3d912cf4b55f0f74eccf3b7def7c6144efeba033e9f21d9cdb0230c64"
+account_address = "0xb3ff441a68610b30fd5e2abbf3a1548eb6ba6f3559f2862bf2dc757e5828ca"
+private_key = "0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a"
 
-## prod
-#account_address = "0x178af2a04c0c16ad688ebac1c826b4be27b440979296b50947400691dcc4e7a"
-#private_key = "0x22b6155e4cf0748ac40306efa1a42520705c956d0ce6331d72bc1579f7f9918"
+## realms.world
+[profile.prod.tool.dojo.env]
+rpc_url = "https://api.cartridge.gg/x/realms/katana/"
+account_address = "0x7d549f53e4c914608e8a3537eccc5e540c6c6c21547b49a28d3ae9b708db0bc"
+private_key = "0x4a3b4a925e3d264affeb8d05c56dbeb0c7ec431d062ce69c2f1ffb83a3c5013"
+world_address = "0x33de265e91c5e9222ec308743843d41d20acba98f81d791cd545b7158d88422"
 
 [[target.dojo]]
 
@@ -30,6 +30,9 @@ private_key = "0x1800000000300000180000000000030000000000003006001800006600"
 
 [tool.dojo.world]
 name = "Realms: Eternum"
-description = "Rule the Realms"
+description = "Rule the Hex"
 cover_uri = "file://assets/bg.webp"
 website = "https://alpha-eternum.realms.world/"
+
+[tool.fmt]
+sort-module-level-items = true

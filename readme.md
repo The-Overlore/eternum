@@ -5,82 +5,56 @@
 <img src="https://img.shields.io/twitter/follow/BibliothecaDAO?style=social"/>
 </a>
 
-
 [![discord](https://img.shields.io/badge/join-bibliothecadao-black?logo=discord&logoColor=white)](https://discord.gg/realmsworld)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-![background](./bg.webp)
-
 # Realms: Eternum
 
-## Table of Contents
-1. [Introduction to Eternum](#introduction-to-eternum)
-2. [Open World Philosophy](#open-world-philosophy)
-3. [Eternum's Client Approach](#eternums-client-approach)
-4. [Eternum Roadmap](#eternum-roadmap)
-5. [Prerequisites for Getting Started](#prerequisites-for-getting-started)
-6. [Vision for Development](#vision-for-development)
-7. [Project Structure](#project-structure)
-8. [Local Client Building Instructions](#local-client-building-instructions)
-9. [Local Contracts Building Instructions](#local-contracts-building-instructions)
+Eternum is built on Cairo smart contracts and runs on the [Dojo game engine](https://dojoengine.org). It's open-source,
+licensed under both MIT for software freedom and CC0 for public domain use, ensuring wide accessibility and
+community-driven development.
 
-## Introduction to Eternum
-Eternum serves as one of the pioneering nodes in the Realms Autonomous World, constructed atop the [dojo](https://github.com/dojoengine/dojo) platform. Its primary objective is to establish the foundational economic layer of the Realms Autonomous World, with its structure built around the original Realm NFTs.
+Eternum represents the culmination of two years of dedicated effort, aimed at crafting a world that transcends the
+bounds of its creators. It's not just a game; it's a sophisticated fusion of economic and social frameworks, forming the
+backbone of a burgeoning digital society. Eternum is designed to evolve and grow, offering a dynamic experience far
+removed from the conventional notion of a 'finished game' like Civilization 6. Think of it as a living, breathing
+digital ecosystem, constantly evolving and inviting endless exploration.
 
-Eternum represents an ambitious endeavor to forge an open and composable world, one that is collectively owned and governed by its user community. More than just a collection, Eternum encompasses a suite of smart contracts, crafted to be both composable and extensible. These contracts are not only designed to be utilized by various other contracts and applications but also to encourage a versatile and innovative ecosystem.
+<details>
+<summary> Click to expand</summary>
 
-As a developer you could deploy a set of systems in this world and ecourage players to use these systems, and in the process earn a small fee in resources or the native token lords.
+### L3 Network
 
-## Open World Philosophy
-The term 'open' in this context means anyone can deploy a dojo system in Eternum, expanding its functionality or even adjusting its governing rules. For an in-depth understanding of its mechanics and ideology, consider delving into the dojo book.
+Eternum will exist on the Realms World L3 network. Read the documentation here: [dev](https://dev.realms.world/)
 
-## Eternum's Client Approach
-Eternum operates in a headless manner. The provided client in this repository is just a reference. There's no obligation to use it. Instead, we champion the development of various clients, promoting diverse interactions with the contracts. You can choose your preferred client or even interact directly with the contracts.
+### Open World Philosophy
 
-## Eternum Roadmap
-Below are the key goals for Eternum, but they're adaptable:
-1. [x] Trading and Hyperstructures
-2. [ ] Banking
-3. [ ] Combat
-4. [ ] World Governance
+Emphasizing the concept of a truly Autonomous World is pivotal. In our vision, it must embody two key characteristics:
+radical openness and persistence. But what exactly does this entail? Let's delve into both theoretical and mechanical
+perspectives.
 
-## Prerequisites for Getting Started
-To begin, familiarize yourself with the [dojo](https://book.dojoengine.org) and react.
+From a theoretical standpoint, radical openness signifies an inclusive world accessible to everyone. This openness
+transcends traditional barriers - there are no gatekeepers, no singular entities exerting control. Instead, it's a space
+where anyone can contribute, build, and actively participate without restrictions.
 
-## Vision for Development
-From a high-level perspective, we envision:
-- Guilds
-- Player opt-in communism
-- Player-operated casinos
-- Balancing chaos and order
-- Introducing resources external to Eternums
+Mechanically, radical openness is reflected in the flexibility and adaptability of the world's underlying structures.
+The contracts that define this world are not rigid; they are designed to be extended, forked, and maintained by anyone
+with the willingness and capability to do so.
+
+Envision Eternum as akin to the original cellular structure in a primordial soup. Over time, this basic form dissolves,
+giving rise to a more complex organism. Eternum is the genesis, the starting point from which an intricate and expansive
+world emerges, constantly evolving and reshaping itself in response to the contributions and interactions of its
+inhabitants.
+
+</details>
 
 ## Project Structure
-- [Client](./client/)
-- [Contracts](./contracts/)
 
-## Local Client Building Instructions
-To build the client locally:
-
-1. Clone the repo.
-2. Install dependencies with `bun`.
-3. Use bun workspaces. Install bun using `curl -fsSL https://bun.sh/install | bash`.
-4. From the main directory:
-   - Install dependencies: `bun install`
-   - Build the packages: `bun run build-packages`
-   - Run the client: `cd client && bun run dev`
-
-## Local Contracts Building Instructions
-To build contracts locally:
-
-1. **Terminal 1 - Katana**:
-```console
-cd dojo-starter && katana --disable-fee
-```
-2. **Terminal 2 - Contracts**:
-```console
-cd clients && sozo build && sozo migrate
-```
+- [Client](./client) Vite App with threejs interface
+- [Contracts](./contracts) Cairo Based
+- [Eternum Docs](./eternum-docs) Documentation around playing and building on Eternum
+- [Scripts](./scripts) Development
+- [SDK](./sdk) Npm packages
 
 ## Docker Building Instructions
 
@@ -99,5 +73,98 @@ Clean the cache for the client (this is done automatically when running `build_c
 
 ---
 
+## Development of Eternum
+
+Development of Eternum is open-source. All efforts are funded via OnlyDust. If you would like to contribute comment on
+an open issue.
+
+## Prerequisites
+
+- [Dojo onchain game engine](https://book.dojoengine.org)
+- React
+
+# Setup
+
+Install dojo via
+
+`curl -L https://install.dojoengine.org | bash`
+
+Make sure install the same version within the `Scarb.toml` file. Currently this is `0.6.1-alpha.4`
+
+Eternum uses a pnpm workspace to allow easy npm packages to be created. So you will need pnpm installed also.
+
+`npm install -g pnpm`
+
+## Easy Method (3 commands)
+
+We have bundled up three scripts to run in three different CLI terminals. Run the scripts in order and leave the window
+open.
+
+### Terminal 1 - Client setup
+
+This will set the client up, however you **must** run the other scripts otherwise it will not work
+
+```
+sh scripts/client.sh
+```
+
+### Terminal 2 - Build the contracts and run the sequencer
+
+```
+sh scripts/contracts.sh
+```
+
+### Terminal 3 - Migrate the contracts and start the indexer
+
+```
+sh scripts/indexer.sh
+```
+
+## Manual Method
+
+### Terminal 1 - Client Setup
+
+- **Dependencies:** Install deps
+  ```bash
+  # @dev: Client will not work until the next step is also complete
+  pnpm i && pnpm build-packages && pnpm dev
+  ```
+
+### Contracts, Katana and Indexing
+
+For local setup and execution on Katana, follow these steps:
+
+1. **Navigate to Contracts Directory:**
+   ```bash
+   cd contracts
+   ```
+2. **Build Contracts:**
+   ```bash
+   sozo build
+   ```
+3. **Run Katana:**
+   ```bash
+   katana --disable-fee
+   ```
+4. **Apply Migrations:**
+   ```bash
+   sozo migrate
+   ```
+5. **Run Indexer (in another cli window):**
+   ```bash
+   torii --world <WORLD ADDRESS>
+   ```
+6. **Set Environment Variables:**
+   ```bash
+   source scripts/env_variables.sh
+   ```
+7. **Configure Settings:**
+
+   ```bash
+   # Make sure to set a delay in seconds of at least 0.1 seconds between each transaction
+   ./scripts/set_config.sh
+   ```
+
 ## License
+
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.

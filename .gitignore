@@ -1,3 +1,12 @@
 node_modules
 volume/
-contracts/config/litefs.static-lease.yml
+contracts/target/*
+!contracts/target/dev/manifest.json
+!contracts/target/release/manifest.json
+contracts/torii.db
+contracts/KATANA.toml
+contracts/manifests/*
+!contracts/manifests/dev/manifest.json
+!contracts/manifests/dev/manifest.toml
+!contracts/manifests/prod/manifest.json
+!contracts/manifests/prod/manifest.toml

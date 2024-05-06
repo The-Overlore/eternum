@@ -1,6 +1,8 @@
-mod unpack;
+mod map;
 mod math;
+mod number;
 mod random;
-mod vrgda;
 #[cfg(test)]
 mod testing;
+mod unpack;
+mod vrgda;

@@ -1,417 +1,184 @@
 import { DojoProvider } from "@dojoengine/core";
-import {
-  AcceptOrderProps,
-  AttachCaravanProps,
-  BuildLaborProps,
-  CancelFungibleOrderProps,
-  CreateCaravanProps,
-  CreateFreeTransportUnitProps,
-  CreateOrderProps,
-  CreateRealmProps,
-  CreateMultipleRealmsProps,
-  CreateRoadProps,
-  FeedHyperstructureAndTravelBackPropos,
-  HarvestLaborProps,
-  PurchaseLaborProps,
-  SendResourcesToLocationProps,
-  TransferResourcesProps,
-  TravelProps,
-  TransferItemsProps,
-  TransferItemsFromMultipleProps,
-  CreateSoldiersProps,
-  DetachSoldiersProps,
-  AttackProps,
-  StealProps,
-  LevelUpRealmProps,
-  ControlHyperstructureProps,
-  CompleteHyperstructureProps,
-  SetAddressNameProps,
-  MergeSoldiersProps,
-  CreateAndMergeSoldiersProps,
-  HealSoldiersProps,
-  HarvestAllLaborProps,
-  SwapBankAndTravelBackProps,
-  SpawnNpcProps,
-  NpcTravelProps,
-  WelcomeNpcProps,
-  KickOutNpcProps,
-  MintResourcesProps,
-  DisassembleCaravanAndReturnFreeUnitsProps,
-  CreateLaborBuildingProps,
-  DestroyLaborBuildingProps,
-} from "../types/provider";
-
-import { Call } from "starknet";
-
-const UUID_OFFSET_CREATE_CARAVAN = 2;
+import * as SystemProps from "../types/provider";
+import { Account, AccountInterface, AllowArray, Call, CallData } from "starknet";
+import EventEmitter from "eventemitter3";
 
 export const getContractByName = (manifest: any, name: string) => {
-  return (
-    manifest.contracts.find((contract: any) => {
-      const nameParts = contract.name.split("::");
-      return nameParts[nameParts.length - 1] === name;
-    })?.address || ""
-  );
+  const contract = manifest.contracts.find((contract: any) => contract.name.includes("::" + name));
+  if (contract) {
+    return contract.address;
+  } else {
+    return "";
+  }
 };
 
-export class EternumProvider extends DojoProvider {
-  constructor(world_address: string, url?: string, manifest: any = undefined) {
-    super(world_address, manifest, url);
+function ApplyEventEmitter<T extends new (...args: any[]) => {}>(Base: T) {
+  return class extends Base {
+    eventEmitter = new EventEmitter();
+
+    emit(event: string, ...args: any[]) {
+      this.eventEmitter.emit(event, ...args);
+    }
+
+    on(event: string, listener: (...args: any[]) => void) {
+      this.eventEmitter.on(event, listener);
+    }
+
+    off(event: string, listener: (...args: any[]) => void) {
+      this.eventEmitter.off(event, listener);
+    }
+  };
+}
+const EnhancedDojoProvider = ApplyEventEmitter(DojoProvider);
+
+export class EternumProvider extends EnhancedDojoProvider {
+  constructor(katana: any, url?: string) {
+    super(katana, url);
+    this.manifest = katana;
+
+    this.getWorldAddress = function () {
+      const worldAddress = this.manifest.world.address;
+      return worldAddress;
+    };
   }
 
-  public async purchase_labor(props: PurchaseLaborProps): Promise<any> {
-    const { signer, entity_id, resource_type, labor_units, multiplier } = props;
+  private async executeAndCheckTransaction(
+    signer: Account | AccountInterface,
+    transactionDetails: AllowArray<Call>,
+  ): Promise<any> {
+    const tx = await this.executeMulti(signer, transactionDetails);
+    const transactionResult = await this.waitForTransactionWithCheck(tx.transaction_hash);
+    this.emit("transactionComplete", transactionResult);
+    return transactionResult;
+  }
 
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "labor_systems"),
-      calldata: {
-        world: this.getWorldAddress(),
-        entity_id,
-        resource_type,
-        labor_units: (labor_units as number) * (multiplier as number),
+  // Wrapper function to check for transaction errors
+  async waitForTransactionWithCheck(transactionHash: string) {
+    const receipt = await this.provider.waitForTransaction(transactionHash, {
+      retryInterval: 500,
+    });
+
+    // Check if the transaction was reverted and throw an error if it was
+    if (receipt.isReverted()) {
+      this.emit("transactionFailed", `Transaction failed with reason: ${receipt.revert_reason}`);
+      throw new Error(`Transaction failed with reason: ${receipt.revert_reason}`);
+    }
+
+    return receipt;
+  }
+
+  public async create_order(props: SystemProps.CreateOrderProps) {
+    const { maker_id, maker_gives_resources, taker_id, taker_gives_resources, signer, expires_at } = props;
+
+    // implement that in ui instead
+    // let maker_gives_resource = maker_gives_resource_amounts.flatMap((amount, i) => {
+    //   return [maker_gives_resource_types[i], amount];
+    // });
+
+    // let taker_gives_resource = taker_gives_resource_amounts.flatMap((amount, i) => {
+    //   return [taker_gives_resource_types[i], amount];
+    // });
+
+    const tx = await this.executeMulti(signer, [
+      {
+        contractAddress: getContractByName(this.manifest, "trade_systems"),
+        entrypoint: "create_order",
+        calldata: [
+          maker_id,
+          maker_gives_resources.length / 2,
+          ...maker_gives_resources,
+          taker_id,
+          taker_gives_resources.length / 2,
+          ...taker_gives_resources,
+          expires_at,
+        ],
       },
-      entrypoint: "purchase",
-    });
-
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    ]);
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  // Refactor the functions using the interfaces
-  public async build_labor(props: BuildLaborProps) {
-    const { entity_id, resource_type, labor_units, multiplier, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "labor_systems"),
-      entrypoint: "build",
-      calldata: [this.getWorldAddress(), entity_id, resource_type, labor_units, multiplier],
-    });
+  public async accept_order(props: SystemProps.AcceptOrderProps) {
+    const { taker_id, trade_id, maker_gives_resources, taker_gives_resources, signer } = props;
 
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async spawn_npc(props: SpawnNpcProps) {
-    const { realm_entity_id, characteristics, character_trait, full_name, signature, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "npc_systems"),
-      entrypoint: "spawn_npc",
-      calldata: [this.getWorldAddress(), realm_entity_id, characteristics, character_trait, full_name, signature],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async npc_travel(props: NpcTravelProps) {
-    const { npc_entity_id, to_realm_entity_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "npc_systems"),
-      entrypoint: "npc_travel",
-      calldata: [this.getWorldAddress(), npc_entity_id, to_realm_entity_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async welcome_npc(props: WelcomeNpcProps) {
-    const { npc_entity_id, into_realm_entity_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "npc_systems"),
-      entrypoint: "welcome_npc",
-      calldata: [this.getWorldAddress(), npc_entity_id, into_realm_entity_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async kick_out_npc(props: KickOutNpcProps) {
-    const { npc_entity_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "npc_systems"),
-      entrypoint: "kick_out_npc",
-      calldata: [this.getWorldAddress(), npc_entity_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async harvest_labor(props: HarvestLaborProps) {
-    const { realm_id, resource_type, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "labor_systems"),
-      entrypoint: "harvest",
-      calldata: [this.getWorldAddress(), realm_id, resource_type],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async harvest_all_labor(props: HarvestAllLaborProps) {
-    const { entity_ids, signer } = props;
-
-    const calldata = entity_ids.map((entity_id) => {
-      return {
-        contractAddress: getContractByName(this.manifest, "labor_systems"),
-        entrypoint: "harvest",
-        calldata: [this.getWorldAddress(), ...entity_id],
-      };
-    });
-
-    const tx = await this.executeMulti(signer, calldata);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async create_order(props: CreateOrderProps) {
-    const uuid = await this.uuid();
-    const {
-      maker_id,
-      maker_gives_resource_types,
-      maker_gives_resource_amounts,
-      taker_id,
-      taker_gives_resource_types,
-      taker_gives_resource_amounts,
-      signer,
-      maker_transport_id,
-      donkeys_quantity,
-      expires_at,
-    } = props;
-
-    let maker_gives_resource = maker_gives_resource_amounts.flatMap((amount, i) => {
-      return [maker_gives_resource_types[i], amount];
-    });
-
-    let taker_gives_resource = taker_gives_resource_amounts.flatMap((amount, i) => {
-      return [taker_gives_resource_types[i], amount];
-    });
-
-    let transactions: Call[] = [];
-
-    // If no caravan_id is provided, create a new caravan
-    let final_caravan_id = maker_transport_id || 0;
-    if (!maker_transport_id && donkeys_quantity) {
-      final_caravan_id = uuid + UUID_OFFSET_CREATE_CARAVAN;
-
-      transactions.push(
-        {
-          contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
-          entrypoint: "create_free_unit",
-          calldata: [this.getWorldAddress(), maker_id, donkeys_quantity],
-        },
-        {
-          contractAddress: getContractByName(this.manifest, "caravan_systems"),
-          entrypoint: "create",
-          calldata: [this.getWorldAddress(), [uuid].length, ...[uuid]],
-        },
-      );
-    }
-
-    // // Common transaction for creating an order
-    transactions.push({
-      contractAddress: getContractByName(this.manifest, "trade_systems"),
-      entrypoint: "create_order",
-      calldata: [
-        this.getWorldAddress(),
-        maker_id,
-        maker_gives_resource_types.length,
-        ...maker_gives_resource,
-        final_caravan_id,
-        taker_id,
-        taker_gives_resource_types.length,
-        ...taker_gives_resource,
-        expires_at,
-      ],
-    });
-
-    const tx = await this.executeMulti(signer, transactions);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async mint_resources(props: MintResourcesProps) {
-    const { receiver_id, resources } = props;
-
-    const tx = await this.executeMulti(props.signer, {
-      contractAddress: getContractByName(this.manifest, "test_resource_systems"),
-      entrypoint: "mint",
-      calldata: [this.getWorldAddress(), receiver_id, resources.length / 2, ...resources],
-    });
-
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async accept_order(props: AcceptOrderProps) {
-    const { taker_id, trade_id, donkeys_quantity, caravan_id, signer } = props;
-
-    let transactions: Call[] = [];
-    let final_caravan_id = caravan_id;
-
-    // If no caravan_id, create a new caravan
-    if (!caravan_id && donkeys_quantity) {
-      const transport_unit_ids = await this.uuid();
-      final_caravan_id = transport_unit_ids + UUID_OFFSET_CREATE_CARAVAN;
-
-      transactions.push(
-        {
-          contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
-          entrypoint: "create_free_unit",
-          calldata: [this.getWorldAddress(), taker_id, donkeys_quantity],
-        },
-        {
-          contractAddress: getContractByName(this.manifest, "caravan_systems"),
-          entrypoint: "create",
-          calldata: [this.getWorldAddress(), [transport_unit_ids].length, ...[transport_unit_ids]],
-        },
-      );
-    }
-
-    if (final_caravan_id) {
-      // Common transactions
-      transactions.push({
+    const tx = await this.executeMulti(signer, [
+      {
         contractAddress: getContractByName(this.manifest, "trade_systems"),
         entrypoint: "accept_order",
-        calldata: [this.getWorldAddress(), taker_id, final_caravan_id, trade_id],
-      });
-    }
-
-    const tx = await this.executeMulti(signer, transactions);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+        calldata: [
+          taker_id,
+          trade_id,
+          maker_gives_resources.length / 2,
+          ...maker_gives_resources,
+          taker_gives_resources.length / 2,
+          ...taker_gives_resources,
+        ],
+      },
+    ]);
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async cancel_fungible_order(props: CancelFungibleOrderProps) {
-    const { trade_id, signer } = props;
+  public async cancel_order(props: SystemProps.CancelOrderProps) {
+    const { trade_id, return_resources, signer } = props;
     const tx = await this.executeMulti(signer, {
       contractAddress: getContractByName(this.manifest, "trade_systems"),
       entrypoint: "cancel_order",
-      calldata: [this.getWorldAddress(), trade_id],
+      calldata: [trade_id, return_resources.length / 2, ...return_resources],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async transfer_items_from_multiple(props: TransferItemsFromMultipleProps) {
-    const { senders, signer } = props;
+  public async mint_resources(props: SystemProps.MintResourcesProps) {
+    const { receiver_id, resources } = props;
 
-    let calldata = senders.flatMap((sender) => {
-      return sender.indices.map((index) => {
-        return {
-          contractAddress: getContractByName(this.manifest, "resource_systems"),
-          entrypoint: "transfer_item",
-          calldata: [this.getWorldAddress(), sender.sender_id, index, sender.receiver_id],
-        };
-      });
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "dev_resource_systems"),
+      entrypoint: "mint",
+      calldata: [receiver_id, resources.length / 2, ...resources],
     });
 
-    const tx = await this.executeMulti(signer, calldata);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
+  }
+  public async spawn_npc(props: SystemProps.SpawnNpcProps) {
+    const { realm_entity_id, characteristics, character_trait, full_name, signature } = props;
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "spawn_npc",
+      calldata: [realm_entity_id, characteristics, character_trait, full_name, signature],
     });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async transfer_items(props: TransferItemsProps) {
-    const { sender_id, indices, receiver_id, signer } = props;
-
-    let calldata = indices.map((index) => {
-      return {
-        contractAddress: getContractByName(this.manifest, "resource_systems"),
-        entrypoint: "transfer_item",
-        calldata: [this.getWorldAddress(), sender_id, index, receiver_id],
-      };
+  public async npc_travel(props: SystemProps.NpcTravelProps) {
+    const { npc_entity_id, to_realm_entity_id } = props;
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "npc_travel",
+      calldata: [npc_entity_id, to_realm_entity_id],
     });
-    const tx = await this.executeMulti(signer, calldata);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async create_free_transport_unit(props: CreateFreeTransportUnitProps) {
-    const { realm_id, quantity, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
-      entrypoint: "create_free_unit",
-      calldata: [this.getWorldAddress(), realm_id, quantity],
+  public async welcome_npc(props: SystemProps.WelcomeNpcProps) {
+    const { npc_entity_id, into_realm_entity_id } = props;
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "welcome_npc",
+      calldata: [npc_entity_id, into_realm_entity_id],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async create_caravan(props: CreateCaravanProps) {
-    const { entity_ids, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "caravan_systems"),
-      entrypoint: "create",
-      calldata: [this.getWorldAddress(), entity_ids.length, ...entity_ids],
+  public async kick_out_npc(props: SystemProps.KickOutNpcProps) {
+    const { npc_entity_id } = props;
+    const tx = await this.executeMulti(props.signer, {
+      contractAddress: getContractByName(this.manifest, "npc_systems"),
+      entrypoint: "kick_out_npc",
+      calldata: [npc_entity_id],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async disassemble_caravan_and_return_free_units(props: DisassembleCaravanAndReturnFreeUnitsProps) {
-    const { caravan_id, unit_ids, signer } = props;
-    const tx = await this.executeMulti(signer, [
-      {
-        contractAddress: getContractByName(this.manifest, "caravan_systems"),
-        entrypoint: "disassemble",
-        calldata: [this.getWorldAddress(), caravan_id],
-      },
-      {
-        contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
-        entrypoint: "return_free_units",
-        calldata: [this.getWorldAddress(), unit_ids.length, ...unit_ids],
-      },
-    ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async attach_caravan(props: AttachCaravanProps) {
-    const { realm_id, trade_id, caravan_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "trade_systems"),
-      entrypoint: "attach_caravan",
-      calldata: [this.getWorldAddress(), realm_id, trade_id, caravan_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async purchase_and_build_labor(props: PurchaseLaborProps & BuildLaborProps) {
-    const { entity_id, resource_type, labor_units, multiplier, signer } = props;
-    const tx = await this.executeMulti(signer, [
-      {
-        contractAddress: getContractByName(this.manifest, "labor_systems"),
-        entrypoint: "purchase",
-        calldata: [this.getWorldAddress(), entity_id, resource_type, (labor_units as number) * (multiplier as number)],
-      },
-      {
-        contractAddress: getContractByName(this.manifest, "labor_systems"),
-        entrypoint: "build",
-        calldata: [this.getWorldAddress(), entity_id, resource_type, labor_units, multiplier],
-      },
-    ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async create_realm(props: CreateRealmProps) {
+  public async create_realm(props: SystemProps.CreateRealmProps) {
     const {
       realm_id,
       resource_types_packed,
@@ -431,7 +198,6 @@ export class EternumProvider extends DojoProvider {
         contractAddress: getContractByName(this.manifest, "realm_systems"),
         entrypoint: "create",
         calldata: [
-          this.getWorldAddress(),
           realm_id,
           resource_types_packed,
           resource_types_count,
@@ -447,12 +213,10 @@ export class EternumProvider extends DojoProvider {
         ],
       },
     ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  create_multiple_realms = async (props: CreateMultipleRealmsProps) => {
+  create_multiple_realms = async (props: SystemProps.CreateMultipleRealmsProps) => {
     let { realms, signer } = props;
 
     let calldata = realms.flatMap((realm) => {
@@ -474,7 +238,6 @@ export class EternumProvider extends DojoProvider {
           contractAddress: getContractByName(this.manifest, "realm_systems"),
           entrypoint: "create",
           calldata: [
-            this.getWorldAddress(),
             realm_id,
             resource_types_packed,
             resource_types_count,
@@ -495,12 +258,10 @@ export class EternumProvider extends DojoProvider {
     });
 
     const tx = await this.executeMulti(signer, calldata);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   };
 
-  public async create_road(props: CreateRoadProps) {
+  public async create_road(props: SystemProps.CreateRoadProps) {
     const { creator_id, start_coord, end_coord, usage_count, signer } = props;
     const tx = await this.executeMulti(signer, {
       contractAddress: getContractByName(this.manifest, "road_systems"),
@@ -515,312 +276,221 @@ export class EternumProvider extends DojoProvider {
         usage_count,
       ],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async transfer_resources(props: TransferResourcesProps) {
+  public async transfer_resources(props: SystemProps.TransferResourcesProps) {
     const { sending_entity_id, receiving_entity_id, resources, signer } = props;
     const tx = await this.executeMulti(signer, {
       contractAddress: getContractByName(this.manifest, "resource_systems"),
       entrypoint: "transfer",
-      calldata: [this.getWorldAddress(), sending_entity_id, receiving_entity_id, resources.length / 2, ...resources],
+      calldata: [sending_entity_id, receiving_entity_id, resources.length / 2, ...resources],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async send_resources_to_location(props: SendResourcesToLocationProps) {
-    const {
-      sending_entity_id,
-      resources,
-      donkeys_quantity,
-      destination_coord_x,
-      destination_coord_y,
-      caravan_id,
-      signer,
-    } = props;
+  public async send_resources(props: SystemProps.SendResourcesProps) {
+    const { sender_entity_id, recipient_entity_id, resources, signer } = props;
 
-    let transactions: Call[] = [];
-    let final_caravan_id = caravan_id;
-
-    // If no caravan_id, create a new caravan
-    if (!caravan_id && donkeys_quantity) {
-      const transport_unit_ids = await this.uuid();
-      final_caravan_id = transport_unit_ids + UUID_OFFSET_CREATE_CARAVAN;
-
-      transactions.push(
-        {
-          contractAddress: getContractByName(this.manifest, "transport_unit_systems"),
-          entrypoint: "create_free_unit",
-          calldata: [this.getWorldAddress(), sending_entity_id, donkeys_quantity],
-        },
-        {
-          contractAddress: getContractByName(this.manifest, "caravan_systems"),
-          entrypoint: "create",
-          calldata: [this.getWorldAddress(), [transport_unit_ids].length, ...[transport_unit_ids]],
-        },
-      );
-    }
-
-    if (final_caravan_id) {
-      // Common transactions
-      transactions.push(
-        {
-          contractAddress: getContractByName(this.manifest, "resource_systems"),
-          entrypoint: "transfer",
-          calldata: [this.getWorldAddress(), sending_entity_id, final_caravan_id, resources.length / 2, ...resources],
-        },
-        {
-          contractAddress: getContractByName(this.manifest, "travel_systems"),
-          entrypoint: "travel",
-          calldata: [this.getWorldAddress(), final_caravan_id, destination_coord_x, destination_coord_y],
-        },
-      );
-    }
-
-    const tx = await this.executeMulti(signer, transactions);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+    const tx = await this.executeMulti(signer, {
+      contractAddress: getContractByName(this.manifest, "resource_systems"),
+      entrypoint: "send",
+      calldata: [sender_entity_id, recipient_entity_id, resources.length / 2, ...resources],
     });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public swap_bank_and_travel_back = async (props: SwapBankAndTravelBackProps) => {
-    const {
-      sender_id,
-      inventoryIndex,
-      bank_id,
-      resource_types,
-      resource_amounts,
-      indices,
-      destination_coord_x,
-      destination_coord_y,
-      signer,
-    } = props;
+  public async pickup_resources(props: SystemProps.PickupResourcesProps) {
+    const { recipient_entity_id, owner_entity_id, resources, signer } = props;
 
     const tx = await this.executeMulti(signer, [
       {
         contractAddress: getContractByName(this.manifest, "resource_systems"),
-        entrypoint: "transfer_item",
-        calldata: [this.getWorldAddress(), sender_id, inventoryIndex, sender_id],
+        entrypoint: "approve",
+        calldata: [owner_entity_id, recipient_entity_id, resources.length / 2, ...resources],
       },
-      ...indices.map((index, i) => ({
-        contractAddress: getContractByName(this.manifest, "bank_systems"),
-        entrypoint: "swap",
-        calldata: [this.getWorldAddress(), bank_id, index, sender_id, resource_types[i], resource_amounts[i]],
-      })),
-      {
-        contractAddress: getContractByName(this.manifest, "travel_systems"),
-        entrypoint: "travel",
-        calldata: [this.getWorldAddress(), sender_id, destination_coord_x, destination_coord_y],
-      },
-    ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  };
-
-  public feed_hyperstructure_and_travel_back = async (props: FeedHyperstructureAndTravelBackPropos) => {
-    const { entity_id, inventoryIndex, hyperstructure_id, destination_coord_x, destination_coord_y, signer } = props;
-
-    const tx = await this.executeMulti(signer, [
       {
         contractAddress: getContractByName(this.manifest, "resource_systems"),
-        entrypoint: "transfer_item",
-        calldata: [this.getWorldAddress(), entity_id, inventoryIndex, hyperstructure_id],
-      },
-      {
-        contractAddress: getContractByName(this.manifest, "travel_systems"),
-        entrypoint: "travel",
-        calldata: [this.getWorldAddress(), entity_id, destination_coord_x, destination_coord_y],
+        entrypoint: "pickup",
+        calldata: [recipient_entity_id, owner_entity_id, resources.length / 2, ...resources],
       },
     ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  };
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
+  }
 
-  public async travel(props: TravelProps) {
+  public async travel(props: SystemProps.TravelProps) {
     const { travelling_entity_id, destination_coord_x, destination_coord_y, signer } = props;
     const tx = await this.executeMulti(signer, {
       contractAddress: getContractByName(this.manifest, "travel_systems"),
       entrypoint: "travel",
-      calldata: [this.getWorldAddress(), travelling_entity_id, destination_coord_x, destination_coord_y],
+      calldata: [travelling_entity_id, destination_coord_x, destination_coord_y],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async create_soldiers(props: CreateSoldiersProps) {
-    const { realm_entity_id, quantity, signer } = props;
+  public async travel_hex(props: SystemProps.TravelHexProps) {
+    const { travelling_entity_id, directions, signer } = props;
     const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "create_soldiers",
-      calldata: [this.getWorldAddress(), realm_entity_id, quantity],
+      contractAddress: getContractByName(this.manifest, "travel_systems"),
+      entrypoint: "travel_hex",
+      calldata: [travelling_entity_id, directions],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
+    return await this.waitForTransactionWithCheck(tx.transaction_hash);
   }
 
-  public async detach_soldiers(props: DetachSoldiersProps) {
-    const { unit_id, detached_quantity, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "detach_soldiers",
-      calldata: [this.getWorldAddress(), unit_id, detached_quantity],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async attack(props: AttackProps) {
-    const { attacker_ids, target_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "attack",
-      calldata: [this.getWorldAddress(), attacker_ids.length, ...attacker_ids, target_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async steal(props: StealProps) {
-    const { attacker_id, target_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "steal",
-      calldata: [this.getWorldAddress(), attacker_id, target_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async control_hyperstructure(props: ControlHyperstructureProps) {
-    const { hyperstructure_id, order_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "hyperstructure_systems"),
-      entrypoint: "control",
-      calldata: [this.getWorldAddress(), hyperstructure_id, order_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async complete_hyperstructure(props: CompleteHyperstructureProps) {
-    const { hyperstructure_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "hyperstructure_systems"),
-      entrypoint: "complete",
-      calldata: [this.getWorldAddress(), hyperstructure_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async level_up_realm(props: LevelUpRealmProps) {
+  public async level_up_realm(props: SystemProps.LevelUpRealmProps) {
     const { realm_entity_id, signer } = props;
-    const tx = await this.executeMulti(signer, {
+
+    return await this.executeAndCheckTransaction(signer, {
       contractAddress: getContractByName(this.manifest, "leveling_systems"),
       entrypoint: "level_up_realm",
-      calldata: [this.getWorldAddress(), realm_entity_id],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+      calldata: [realm_entity_id],
     });
   }
 
-  public async merge_soldiers(props: MergeSoldiersProps) {
-    const { merge_into_unit_id, units, signer } = props;
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "merge_soldiers",
-      calldata: [this.getWorldAddress(), merge_into_unit_id, units.length / 2, ...units],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async create_and_merge_soldiers(props: CreateAndMergeSoldiersProps) {
-    const { realm_entity_id, quantity, merge_into_unit_id, signer } = props;
-    const uuid = await this.uuid();
-
-    const units = [uuid, quantity];
-    const tx = await this.executeMulti(signer, [
-      {
-        contractAddress: getContractByName(this.manifest, "combat_systems"),
-        entrypoint: "create_soldiers",
-        calldata: [this.getWorldAddress(), realm_entity_id, quantity],
-      },
-      {
-        contractAddress: getContractByName(this.manifest, "combat_systems"),
-        entrypoint: "merge_soldiers",
-        calldata: [this.getWorldAddress(), merge_into_unit_id, units.length / 2, ...units],
-      },
-    ]);
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async heal_soldiers(props: HealSoldiersProps) {
-    const { unit_id, health_amount, signer } = props;
-
-    const tx = await this.executeMulti(signer, {
-      contractAddress: getContractByName(this.manifest, "combat_systems"),
-      entrypoint: "heal_soldiers",
-      calldata: [this.getWorldAddress(), unit_id, health_amount],
-    });
-
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
-    });
-  }
-
-  public async set_address_name(props: SetAddressNameProps) {
+  public async set_address_name(props: SystemProps.SetAddressNameProps) {
     const { name, signer } = props;
-    const tx = await this.executeMulti(signer, {
+
+    return await this.executeAndCheckTransaction(signer, {
       contractAddress: getContractByName(this.manifest, "name_systems"),
       entrypoint: "set_address_name",
-      calldata: [this.getWorldAddress(), name],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+      calldata: [name],
     });
   }
 
-  public async create_labor_building(props: CreateLaborBuildingProps) {
-    const { realm_entity_id, building_type } = props;
+  public async set_entity_name(props: SystemProps.SetEntityNameProps) {
+    const { entity_id, name, signer } = props;
 
-    const tx = await this.executeMulti(props.signer, {
-      contractAddress: getContractByName(this.manifest, "buildings_systems"),
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "name_systems"),
+      entrypoint: "set_entity_name",
+      calldata: [entity_id, name],
+    });
+  }
+
+  public async explore(props: SystemProps.ExploreProps) {
+    const { unit_id, direction, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "map_systems"),
+      entrypoint: "explore",
+      calldata: [unit_id, direction],
+    });
+  }
+
+  public async create_building(props: SystemProps.CreateBuildingProps) {
+    const { entity_id, building_coord, building_category, produce_resource_type, signer } = props;
+
+    return this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "building_systems"),
       entrypoint: "create",
-      calldata: [this.getWorldAddress(), realm_entity_id, building_type],
-    });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+      calldata: CallData.compile([
+        entity_id,
+        building_coord.x,
+        building_coord.y,
+        building_category,
+        produce_resource_type,
+      ]),
     });
   }
 
-  public async destroy_labor_building(props: DestroyLaborBuildingProps) {
-    const { realm_entity_id } = props;
+  public async destroy_building(props: SystemProps.DestroyBuildingProps) {
+    const { entity_id, building_coord, signer } = props;
 
-    const tx = await this.executeMulti(props.signer, {
-      contractAddress: getContractByName(this.manifest, "buildings_systems"),
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "building_systems"),
       entrypoint: "destroy",
-      calldata: [this.getWorldAddress(), realm_entity_id],
+      calldata: [entity_id, building_coord.x, building_coord.y],
     });
-    return await this.provider.waitForTransaction(tx.transaction_hash, {
-      retryInterval: 500,
+  }
+
+  public async create_bank(props: SystemProps.CreateBankProps) {
+    const { realm_entity_id, coord, owner_fee_scaled, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "bank_systems"),
+      entrypoint: "create_bank",
+      calldata: [realm_entity_id, coord, owner_fee_scaled],
+    });
+  }
+
+  public async open_account(props: SystemProps.OpenAccountProps) {
+    const { realm_entity_id, bank_entity_id, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "bank_systems"),
+      entrypoint: "open_account",
+      calldata: [realm_entity_id, bank_entity_id],
+    });
+  }
+
+  public async change_bank_owner_fee(props: SystemProps.ChangeBankOwnerFeeProps) {
+    const { bank_entity_id, new_swap_fee_unscaled, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "bank_systems"),
+      entrypoint: "change_owner_fee",
+      calldata: [bank_entity_id, new_swap_fee_unscaled],
+    });
+  }
+
+  public async buy_resources(props: SystemProps.BuyResourcesProps) {
+    const { bank_entity_id, resource_type, amount, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "swap_systems"),
+      entrypoint: "buy",
+      calldata: [bank_entity_id, resource_type, amount],
+    });
+  }
+
+  public async sell_resources(props: SystemProps.SellResourcesProps) {
+    const { bank_entity_id, resource_type, amount, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "swap_systems"),
+      entrypoint: "sell",
+      calldata: [bank_entity_id, resource_type, amount],
+    });
+  }
+
+  public async add_liquidity(props: SystemProps.AddLiquidityProps) {
+    const { bank_entity_id, resource_type, resource_amount, lords_amount, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "liquidity_systems"),
+      entrypoint: "add",
+      calldata: [bank_entity_id, resource_type, resource_amount, lords_amount],
+    });
+  }
+
+  public async remove_liquidity(props: SystemProps.RemoveLiquidityProps) {
+    const { bank_entity_id, resource_type, shares, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "liquidity_systems"),
+      entrypoint: "remove",
+      calldata: [bank_entity_id, resource_type, shares, false],
+    });
+  }
+
+  public async create_army(props: SystemProps.CreateArmyProps) {
+    const { owner_id, troops, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "combat_systems"),
+      entrypoint: "create_army",
+      calldata: [owner_id, troops.knight_count, troops.paladin_count, troops.crossbowman_count],
+    });
+  }
+
+  public async mint_starting_resources(props: SystemProps.CreateStartingResources) {
+    const { realm_entity_id, config_id, signer } = props;
+
+    return await this.executeAndCheckTransaction(signer, {
+      contractAddress: getContractByName(this.manifest, "realm_systems"),
+      entrypoint: "mint_starting_resources",
+      calldata: [config_id, realm_entity_id],
     });
   }
 }

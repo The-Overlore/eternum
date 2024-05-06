@@ -1,3 +1,5 @@
+const plugin = require("tailwindcss/plugin");
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -10,12 +12,14 @@ export default {
         fancy: "url(/cursor.png), pointer",
         pointer: "url(/cursor.png), pointer",
         grab: "url(/grab.png), grab",
+        crosshair: "url(/cursor-cross.png), crosshair",
+        wait: "url(/images/eternum-logo_animated.png), wait",
       },
       strokeWidth: {
         8: "8px",
       },
       colors: {
-        gold: "#E0AF65",
+        gold: "#F3C99F",
         crimson: "#89192D",
         brilliance: "#7DFFBA",
         orange: "#FE993C",
@@ -52,6 +56,24 @@ export default {
           rage: "#C74800",
           anger: "#89192D",
           gods: "#94a3b8",
+        },
+        biome: {
+          deep_ocean: "#3a5f65",
+          ocean: "#62a68f",
+          beach: "#ffe079",
+          scorched: "#8B4513",
+          bare: "#A8A8A8",
+          tundra: "#B4C7D9",
+          snow: "#FFFFFF",
+          temperate_desert: "#f3c959",
+          shrubland: "#b3ab3e",
+          taiga: "#615b27",
+          grassland: "#6b8228",
+          temperate_deciduous_forest: "#57641f",
+          temperate_rain_forest: "#5a6322",
+          subtropical_desert: "#b2ac3a",
+          tropical_seasonal_forest: "#596823",
+          tropical_rain_forest: "#4f6123",
         },
       },
     },
@@ -125,6 +147,34 @@ export default {
     "text-order-rage",
     "text-order-anger",
     "text-order-gods",
+    "text-biome-deep_ocean",
+    "text-biome-ocean",
+    "text-biome-beach",
+    "text-biome-scorched",
+    "text-biome-bare",
+    "text-biome-tundra",
+    "text-biome-snow",
+    "text-biome-temperate_desert",
+    "text-biome-shrubland",
+    "text-biome-taiga",
+    "text-biome-grassland",
+    "text-biome-temperate_deciduous_forest",
+    "text-biome-temperate_rain_forest",
+    "text-biome-subtropical_desert",
+    "text-biome-tropical_seasonal_forest",
+    "text-biome-tropical_rain_forest",
   ],
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      const newUtilities = {
+        ".border-gradient": {
+          borderImage: "linear-gradient(to right, transparent, #F3C99F, transparent) 1",
+        },
+        ".clip-squared": {
+          clipPath: "polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%)",
+        },
+      };
+      addUtilities(newUtilities, ["responsive", "hover"]);
+    }),
+  ],
 };
