@@ -1,3 +1,4 @@
+use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use eternum::{
     models::{
         owner::{Owner, EntityOwner}, config::NpcConfig,
@@ -6,16 +7,12 @@ use eternum::{
     constants::NPC_CONFIG_ID
 };
 
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-
 #[dojo::contract]
 mod npc_systems {
-    use core::{Into, ecdsa::check_ecdsa_signature};
     use box::BoxTrait;
+    use core::{Into, ecdsa::check_ecdsa_signature};
 
-    use starknet::{get_caller_address, info::{BlockInfo, v2::ExecutionInfo, get_execution_info}};
-
-    use super::{assert_is_allowed_to_spawn};
+    use debug::PrintTrait;
 
     use eternum::{
         models::{
@@ -37,7 +34,9 @@ mod npc_systems {
         }
     };
 
-    use debug::PrintTrait;
+    use starknet::{get_caller_address, info::{BlockInfo, v2::ExecutionInfo, get_execution_info}};
+
+    use super::{assert_is_allowed_to_spawn};
 
     #[derive(Drop, starknet::Event)]
     struct NpcSpawned {

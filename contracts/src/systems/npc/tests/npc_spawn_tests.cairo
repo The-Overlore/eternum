@@ -1,5 +1,5 @@
-use core::traits::Into;
 use core::option::OptionTrait;
+use core::traits::Into;
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
