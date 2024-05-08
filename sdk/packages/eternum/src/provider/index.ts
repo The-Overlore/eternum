@@ -1,8 +1,10 @@
 import { DojoProvider } from "@dojoengine/core";
 import * as SystemProps from "../types/provider";
-import { Account, AccountInterface, AllowArray, Call, CallData, RpcProvider } from "starknet";
+import { Account, AccountInterface, AllowArray, Call, CallData } from "starknet";
 import EventEmitter from "eventemitter3";
 import extensionsProviderFunctions from "./extensions/providerFunctions";
+
+export * from "./extensions";
 
 export const getContractByName = (manifest: any, name: string) => {
   const contract = manifest.contracts.find((contract: any) => contract.name.includes("::" + name));
@@ -33,6 +35,8 @@ function ApplyEventEmitter<T extends new (...args: any[]) => {}>(Base: T) {
 const EnhancedDojoProvider = ApplyEventEmitter(DojoProvider);
 
 export class EternumProvider extends EnhancedDojoProvider {
+  [key: string]: any;
+
   constructor(katana: any, url?: string) {
     super(katana, url);
     this.manifest = katana;
@@ -41,6 +45,10 @@ export class EternumProvider extends EnhancedDojoProvider {
       const worldAddress = this.manifest.world.address;
       return worldAddress;
     };
+
+    Object.entries(extensionsProviderFunctions).map(([key, value]) => {
+      this[key] = value;
+    });
   }
 
   private async executeAndCheckTransaction(
@@ -519,12 +527,3 @@ export class EternumProvider extends EnhancedDojoProvider {
     });
   }
 }
-
-extensionsProviderFunctions.forEach((func) => {
-  Object.defineProperty(EternumProvider.prototype, func.name, {
-    value: func,
-    writable: true,
-    configurable: true,
-    enumerable: false
-  })
-})

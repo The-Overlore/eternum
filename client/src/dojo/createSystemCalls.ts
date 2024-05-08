@@ -1,7 +1,7 @@
 import { SetupNetworkResult } from "./setupNetwork";
 import { toast } from "react-toastify";
 import * as SystemProps from "@bibliothecadao/eternum";
-import { createExtensionsSystemCalls } from "./extensions/createExtensionsSystemCalls"
+import { createExtensionsSystemCalls } from "./extensions/createExtensionsSystemCalls";
 
 export type SystemCallFunctions = ReturnType<typeof createSystemCalls>;
 type SystemCallFunction = (...args: any[]) => any;
@@ -145,6 +145,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
   };
 
   const extensionSystemCalls = createExtensionsSystemCalls(provider);
+
   const systemCalls = {
     ...extensionSystemCalls,
     send_resources,

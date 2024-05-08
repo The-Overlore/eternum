@@ -1,4 +1,4 @@
-import npcProviderFunctions from "./npc/providerFunctions";
+import { npcProviderFunctions } from "./npc";
 
-  const extensionsProviderFunctions = [...npcProviderFunctions,];
-  export default extensionsProviderFunctions;
+const extensionsProviderFunctions = { ...npcProviderFunctions };
+export default extensionsProviderFunctions;

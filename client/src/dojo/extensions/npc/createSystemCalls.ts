@@ -1,5 +1,10 @@
-import { SpawnNpcProps, NpcTravelProps, WelcomeNpcProps, KickOutNpcProps } from "@bibliothecadao/eternum";
-import { EternumProvider } from "@bibliothecadao/eternum";
+import {
+  EternumProvider,
+  SpawnNpcProps,
+  NpcTravelProps,
+  WelcomeNpcProps,
+  KickOutNpcProps,
+} from "@bibliothecadao/eternum";
 
 export type SystemCallFunctions = ReturnType<typeof createNpcSystemCalls>;
 
@@ -20,12 +25,12 @@ export function createNpcSystemCalls(provider: EternumProvider) {
     await provider.kick_out_npc(props);
   };
 
-  const systemCalls = [
+  const systemCalls = {
     spawn_npc,
     npc_travel,
     welcome_npc,
     kick_out_npc,
-  ];
+  };
 
   return systemCalls;
 }
