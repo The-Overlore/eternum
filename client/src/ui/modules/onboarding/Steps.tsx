@@ -80,10 +80,11 @@ export const Naming = ({ onNext }: { onNext: () => void }) => {
   useEffect(() => {
     setAddressName(name);
   }, [name]);
-  console.log(masterAccount);
+
   const onSetName = async () => {
     setLoading(true);
     if (inputName) {
+      console.log(masterAccount);
       await set_address_name({ name: inputName, signer: account as any });
       setAddressName(inputName);
       setLoading(false);
