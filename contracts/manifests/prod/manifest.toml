@@ -165,10 +165,10 @@ name = "eternum::systems::name::contracts::name_systems"
 
 [[contracts]]
 kind = "DojoContract"
-address = "0x5454422eebb2106d479dab4c1bfae9d6e85280b35172c5eaa5ee337695e3e84"
+address = "0x3f05e2e7647482bf49e3bc0b9429571605e686be1376aef7892e5abf9f9dcf6"
 class_hash = "0x55adafc152449e3bb412c7a77f9b5928e2791919d610e42cdec3393ae9ea4e7"
 original_class_hash = "0x55adafc152449e3bb412c7a77f9b5928e2791919d610e42cdec3393ae9ea4e7"
-base_class_hash = "0x0"
+base_class_hash = "0x679177a2cb757694ac4f326d01052ff0963eac0bc2a17116a2b87badcdf6f76"
 abi = "abis/deployments/contracts/eternum_systems_npc_contracts_npc_systems.json"
 reads = []
 writes = []

@@ -56,6 +56,7 @@ export const StepOne = ({ onNext }: { onNext: () => void }) => {
 
 export const Naming = ({ onNext }: { onNext: () => void }) => {
   const {
+    masterAccount,
     account: { create, isDeploying, list, account, select, clear },
     setup: {
       systemCalls: { set_address_name },
@@ -79,7 +80,7 @@ export const Naming = ({ onNext }: { onNext: () => void }) => {
   useEffect(() => {
     setAddressName(name);
   }, [name]);
-
+  console.log(masterAccount);
   const onSetName = async () => {
     setLoading(true);
     if (inputName) {
