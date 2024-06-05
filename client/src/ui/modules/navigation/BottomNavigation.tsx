@@ -167,6 +167,20 @@ export const BottomNavigation = () => {
           ></CircleButton>
         ),
       },
+      {
+        name: MenuEnum.villagers,
+        button: (
+          <CircleButton
+            className="banking-selector"
+            image={BuildingThumbs.villagers}
+            tooltipLocation="top"
+            label={villagers}
+            active={isPopupOpen(villagers)}
+            size="xl"
+            onClick={() => togglePopup(villagers)}
+          ></CircleButton>
+        ),
+      },
     ];
 
     return location === "/map"
